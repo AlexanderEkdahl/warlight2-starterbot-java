@@ -1,7 +1,29 @@
-<project default="compile">
+<project name="Warlight" default="compile" basedir=".">
+  <property name="src.dir" value="src"/>
+  <property name="build.dir" value="bin"/>
+  <property name="main-class" value="bot.BotStarter"/>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
   <target name="compile">
-    <mkdir dir="bin"/>
-    <javac includeantruntime="false" srcdir="src" destdir="bin"/>
+    <mkdir dir="${build.dir}"/>
+    <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}"/>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${build.dir}"/>
+    <delete file="${build.dir}/${ant.project.name}.jar"/>
+    <jar destfile="${build.dir}/${ant.project.name}.jar" basedir="${build.dir}">
+      <manifest>
+        <attribute name="Main-Class" value="${main-class}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="jar">
+    <java jar="${build.dir}/${ant.project.name}.jar" fork="true"/>
   </target>
 
   <target name="zip">
