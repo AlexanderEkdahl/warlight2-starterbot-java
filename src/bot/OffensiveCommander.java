@@ -6,81 +6,78 @@ import java.util.LinkedList;
 import map.Map;
 import map.Region;
 import map.SuperRegion;
+import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class OffensiveCommander {
-	
+
 	private LinkedList<SuperRegion> ranking;
 	private Region baseOfAttack;
-	private SuperRegion targetSuperRegion;
 	private Region targetRegion;
 	private String myName;
-	
-	
-	
-	public OffensiveCommander(BotState currentState){
+
+	public OffensiveCommander(BotState currentState) {
 		this.myName = currentState.getMyPlayerName();
-		
+
 		// totalt slumpad rank atm
 		ranking = currentState.getFullMap().getSuperRegions();
 	}
-	
-	
+
 	// placera trupper för anfall
-	public ArrayList<PlaceArmiesMove> Placement(int forces, Map currentMap){
+	public ArrayList<PlaceArmiesMove> Placement(int forces, Map currentMap) {
 		EvaluatePriorities();
-		
+
 		LinkedList<Region> tempNeighbors;
 		LinkedList<Region> owned = currentMap.getOwned();
-		
-		//hitta region som tillhör superregion med högst prioritet som vi har tillgång till
-		
-		for (int i = 0; i<ranking.size(); i++){
-			for (Region r : owned){
-				tempNeighbors = r.getNeighbors();
-				for (Region n: tempNeighbors){
-					if (n.getSuperRegion() == ranking.get(i) && !n.ownedByPlayer(myName)){
-						baseOfAttack = r;
-						targetRegion = n;
-					};
+
+		// hitta region som tillhör superregion med högst prioritet som vi har
+		// tillgång till
+		int currentBest = Integer.MAX_VALUE;
+
+		outer: for (Region r : owned) {
+			tempNeighbors = r.getNeighbors();
+			for (Region n : tempNeighbors) {
+				if (ranking.indexOf(n.getSuperRegion()) < currentBest
+						&& !n.ownedByPlayer(myName)) {
+					currentBest = ranking.indexOf(n.getSuperRegion());
+					baseOfAttack = r;
+					targetRegion = n;
 				}
+
 			}
-			
-			
+
 		}
-		
-		
-		// alla ska med
+
+		// alla på samma tile
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-		
-			placeArmiesMoves
-			.add(new PlaceArmiesMove(myName, baseOfAttack, forces));
-			
+		placeArmiesMoves.add(new PlaceArmiesMove(myName, baseOfAttack, forces));
 		return placeArmiesMoves;
-		
-		
-		
-	}
-	
-	
-	public void Attack(){
-		if (targetRegion != null){
-			
-		}
-		EvaluatePriorities();
-		
-		
-		
-		
-		
-	}
-	
-	
-	private void EvaluatePriorities() {
-		// lol im just a dumb computer pls help me think
-		
+
 	}
 
-	
+	public ArrayList<AttackTransferMove> Attack() {
+		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
+
+		// full fart
+		if (targetRegion != null && baseOfAttack != null) {
+			attackTransferMoves.add(new AttackTransferMove(myName,
+					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
+
+		} else {
+			// finns ingen attack planerad
+
+		}
+		EvaluatePriorities();
+
+		baseOfAttack = null;
+		targetRegion = null;
+		return attackTransferMoves;
+
+	}
+
+	private void EvaluatePriorities() {
+		// lol im just a dumb computer pls help me think
+
+	}
 
 }
