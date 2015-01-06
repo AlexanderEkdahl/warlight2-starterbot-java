@@ -29,7 +29,6 @@ public class BotState {
 	private Map visibleMap; //This map represents everything the player can see, updated at the end of each round.
 
 	private ArrayList<Region> pickableStartingRegions; //2 randomly chosen regions from each superregion are given, which the bot can chose to start with
-	private ArrayList<Region> wastelands; //wastelands, i.e. neutral regions with a larger amount of armies on them. Given before the picking of starting regions
 
 	private ArrayList<Move> opponentMoves; //list of all the opponent's moves, reset at the end of each round
 
@@ -125,14 +124,12 @@ public class BotState {
 		}
 		else if(mapInput[1].equals("wastelands"))
 		{
-			wastelands = new ArrayList<Region>();
-			for(i=2; i<mapInput.length; i++)
+			for(i=2; i < mapInput.length; i++)
 			{
 				try {
-					wastelandId = Integer.parseInt(mapInput[i]);
-					wastelands.add(fullMap.getRegion(wastelandId));
-				}
-				catch(Exception e) {
+					Region region = fullMap.getRegion(Integer.parseInt(mapInput[i]));
+					region.setWasteland(true);
+				} catch(Exception e) {
 					System.err.println("Unable to parse wastelands " + e.getMessage());
 				}
 			}

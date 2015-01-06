@@ -36,21 +36,20 @@ public class BotStarter implements Bot {
 	 * This method returns the smallest super region
 	 */
 	public Region getStartingRegion(BotState state, Long timeOut) {
-		ArrayList<Region> availableRegions = state.getPickableStartingRegions();
-		Region minRegion = availableRegions.get(0);
-		int minSuperRegionSize = minRegion.getSuperRegion().getSubRegions().size();
+		Region maxRegion = null;
+		float maxValue = 0;
 
-		for (int i = 1; i < availableRegions.size(); i++) {
-			Region region = availableRegions.get(i);
-			int size = region.getSuperRegion().getSubRegions().size();
+		for (Region currentRegion : state.getPickableStartingRegions()) {
+			SuperRegion superRegion = currentRegion.getSuperRegion();
 
-			if (size < minSuperRegionSize) {
-				minSuperRegionSize = size;
-				minRegion = region;
+			float value = Values.startingRegion(superRegion.getNeutralsCount(), superRegion.getArmiesReward());
+			if (value > maxValue) {
+				maxValue = value;
+				maxRegion = currentRegion;
 			}
 		}
 
-		return minRegion;
+		return maxRegion;
 	}
 
 	@Override
