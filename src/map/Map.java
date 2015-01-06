@@ -16,6 +16,7 @@ public class Map {
 
 	public LinkedList<Region> regions;
 	public LinkedList<SuperRegion> superRegions;
+	private String myName;
 
 	public Map()
 	{
@@ -123,6 +124,22 @@ public class Map {
 			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
 		}
 		return mapString;
+	}
+	
+	public LinkedList<Region> getOwned(){
+		LinkedList<Region> owned = new LinkedList<Region>();
+		for (Region r : regions){
+			if (r.ownedByPlayer(myName)){
+				owned.add(r);
+			}
+			
+		}
+		return owned;
+		
+	}
+
+	public void addName(String value) {
+		myName = value;
 	}
 
 }

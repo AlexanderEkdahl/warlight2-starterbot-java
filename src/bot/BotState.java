@@ -47,8 +47,10 @@ public class BotState {
 
 	public void updateSettings(String key, String value)
 	{
-		if(key.equals("your_bot")) //bot's own name
+		if(key.equals("your_bot")){ //bot's own name
 			myName = value;
+			fullMap.addName(value);
+		}
 		else if(key.equals("opponent_bot")) //opponent's name
 			opponentName = value;
 		else if(key.equals("max_rounds"))
