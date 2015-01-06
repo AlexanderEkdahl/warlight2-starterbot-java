@@ -12,10 +12,12 @@ package bot;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.io.InputStream;
 
 import map.Region;
 import move.PlaceArmiesMove;
 import move.AttackTransferMove;
+
 
 public class BotParser {
 
@@ -25,9 +27,9 @@ public class BotParser {
 
 	BotState currentState;
 
-	public BotParser(Bot bot)
+	public BotParser(Bot bot, InputStream in)
 	{
-		this.scan = new Scanner(System.in);
+		this.scan = new Scanner(in);
 		this.bot = bot;
 		this.currentState = new BotState();
 	}
