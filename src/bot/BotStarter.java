@@ -40,10 +40,41 @@ public class BotStarter implements Bot
 	{
 		double rand = Math.random();
 		int r = (int) (rand*state.getPickableStartingRegions().size());
+		
+		
+		
 		int regionId = state.getPickableStartingRegions().get(r).getId();
 		Region startingRegion = state.getFullMap().getRegion(regionId);
 		
 		return startingRegion;
+	}
+	
+	
+	// get smallest possible starting region
+	
+	public Region calculateStartingRegion(BotState state){
+		LinkedList<SuperRegion> AvailableSuperRegions = state.getFullMap().getSuperRegions();
+		LinkedList<Region> regions;
+		int smallestForce = Integer.MAX_VALUE;
+		int currentForce;
+		Region chosenRegion = null;
+		for (SuperRegion s : AvailableSuperRegions){
+			regions = s.getSubRegions();
+			currentForce = 0;
+			for (Region r : regions){
+				currentForce += r.getArmies();
+			}
+			if (currentForce < smallestForce){
+				smallestForce = currentForce;
+				chosenRegion = s.getSubRegions().getFirst();
+			}
+			
+			
+			
+		}
+		return chosenRegion;		
+		
+		
 	}
 
 	@Override
