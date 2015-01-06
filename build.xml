@@ -4,11 +4,9 @@
     <javac includeantruntime="false" srcdir="src" destdir="bin"/>
   </target>
 
-  <target name="tar">
-    <tar destfile="${basedir}/output.tar.gz">
-      <tarfileset dir="src">
-        <include name="**/*"/>
-      </tarfileset>
-    </tar>
+  <target name="zip">
+    <zip destfile="${basedir}/output.zip">
+      <zipfileset dir="src"/>
+    </zip>
   </target>
 </project>

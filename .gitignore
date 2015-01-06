@@ -1,6 +1,25 @@
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
 .project
 .classpath
 
 bin/
 
-output.tar.gz
+output.zip
+
+### Eclipse ###
+*.pydevproject
+.metadata
+.gradle
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
