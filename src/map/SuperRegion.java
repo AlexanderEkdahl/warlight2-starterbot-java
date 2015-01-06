@@ -66,7 +66,10 @@ public class SuperRegion {
 		return subRegions;
 	}
 
-	public int getNeutralsCount() {
+	/**
+	* @return The number of neutrals in this superregion at the start of the game
+	*/
+	public int getInitialNeutralCount() {
 		int neutrals = 0;
 
 		for (Region region : this.getSubRegions()) {

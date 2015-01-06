@@ -42,7 +42,7 @@ public class BotStarter implements Bot {
 		for (Region currentRegion : state.getPickableStartingRegions()) {
 			SuperRegion superRegion = currentRegion.getSuperRegion();
 
-			float value = Values.startingRegion(superRegion.getNeutralsCount(), superRegion.getArmiesReward());
+			float value = Values.startingRegion(superRegion.getInitialNeutralCount(), superRegion.getArmiesReward());
 			if (value > maxValue) {
 				maxValue = value;
 				maxRegion = currentRegion;

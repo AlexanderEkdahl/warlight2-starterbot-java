@@ -13,20 +13,14 @@ package map;
 import java.util.LinkedList;
 
 public class Map {
-	
+
 	public LinkedList<Region> regions;
 	public LinkedList<SuperRegion> superRegions;
-	
+
 	public Map()
 	{
 		this.regions = new LinkedList<Region>();
 		this.superRegions = new LinkedList<SuperRegion>();
-	}
-	
-	public Map(LinkedList<Region> regions, LinkedList<SuperRegion> superRegions)
-	{
-		this.regions = regions;
-		this.superRegions = superRegions;
 	}
 
 	/**
@@ -43,7 +37,7 @@ public class Map {
 			}
 		regions.add(region);
 	}
-	
+
 	/**
 	 * add a SuperRegion to the map
 	 * @param superRegion : SuperRegion to be added
@@ -58,7 +52,7 @@ public class Map {
 			}
 		superRegions.add(superRegion);
 	}
-	
+
 	/**
 	 * @return : a new Map object exactly the same as this one
 	 */
@@ -82,21 +76,21 @@ public class Map {
 		}
 		return newMap;
 	}
-	
+
 	/**
 	 * @return : the list of all Regions in this map
 	 */
 	public LinkedList<Region> getRegions() {
 		return regions;
 	}
-	
+
 	/**
 	 * @return : the list of all SuperRegions in this map
 	 */
 	public LinkedList<SuperRegion> getSuperRegions() {
 		return superRegions;
 	}
-	
+
 	/**
 	 * @param id : a Region id number
 	 * @return : the matching Region object
@@ -108,7 +102,7 @@ public class Map {
 				return region;
 		return null;
 	}
-	
+
 	/**
 	 * @param id : a SuperRegion id number
 	 * @return : the matching SuperRegion object
@@ -120,7 +114,7 @@ public class Map {
 				return superRegion;
 		return null;
 	}
-	
+
 	public String getMapString()
 	{
 		String mapString = "";
@@ -129,6 +123,6 @@ public class Map {
 			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
 		}
 		return mapString;
-	}	
-	
+	}
+
 }
