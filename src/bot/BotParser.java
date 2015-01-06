@@ -18,20 +18,20 @@ import move.PlaceArmiesMove;
 import move.AttackTransferMove;
 
 public class BotParser {
-	
+
 	final Scanner scan;
-	
+
 	final Bot bot;
-	
+
 	BotState currentState;
-	
+
 	public BotParser(Bot bot)
 	{
 		this.scan = new Scanner(System.in);
 		this.bot = bot;
 		this.currentState = new BotState();
 	}
-	
+
 	public void run()
 	{
 		while(scan.hasNextLine())
@@ -39,26 +39,26 @@ public class BotParser {
 			String line = scan.nextLine().trim();
 			if(line.length() == 0) { continue; }
 			String[] parts = line.split(" ");
-			if(parts[0].equals("pick_starting_region")) 
+			if(parts[0].equals("pick_starting_region"))
 			{
 				//pick which regions you want to start with
 				currentState.setPickableStartingRegions(parts);
 				Region startingRegion = bot.getStartingRegion(currentState, Long.valueOf(parts[1]));
-				
+
 				System.out.println(startingRegion.getId());
 			}
-			else if(parts.length == 3 && parts[0].equals("go")) 
+			else if(parts.length == 3 && parts[0].equals("go"))
 			{
 				//we need to do a move
 				String output = "";
-				if(parts[1].equals("place_armies")) 
+				if(parts[1].equals("place_armies"))
 				{
 					//place armies
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot.getPlaceArmiesMoves(currentState, Long.valueOf(parts[2]));
 					for(PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
-				} 
-				else if(parts[1].equals("attack/transfer")) 
+				}
+				else if(parts[1].equals("attack/transfer"))
 				{
 					//attack/transfer
 					ArrayList<AttackTransferMove> attackTransferMoves = bot.getAttackTransferMoves(currentState, Long.valueOf(parts[2]));
@@ -69,7 +69,7 @@ public class BotParser {
 					System.out.println(output);
 				else
 					System.out.println("No moves");
-			} else if(parts.length == 3 && parts[0].equals("settings")) {
+			} else if(parts[0].equals("settings")) {
 				//update settings
 				currentState.updateSettings(parts[1], parts[2]);
 			} else if(parts[0].equals("setup_map")) {

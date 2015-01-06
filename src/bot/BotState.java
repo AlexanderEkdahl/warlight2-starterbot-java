@@ -21,16 +21,16 @@ import move.PlaceArmiesMove;
 import move.Move;
 
 public class BotState {
-	
+
 	private String myName = "";
 	private String opponentName = "";
-	
+
 	private final Map fullMap = new Map(); //This map is known from the start, contains all the regions and how they are connected, doesn't change after initialization
 	private Map visibleMap; //This map represents everything the player can see, updated at the end of each round.
-	
+
 	private ArrayList<Region> pickableStartingRegions; //2 randomly chosen regions from each superregion are given, which the bot can chose to start with
 	private ArrayList<Region> wastelands; //wastelands, i.e. neutral regions with a larger amount of armies on them. Given before the picking of starting regions
-	
+
 	private ArrayList<Move> opponentMoves; //list of all the opponent's moves, reset at the end of each round
 
 	private int startingArmies; //number of armies the player can place on map
@@ -39,13 +39,13 @@ public class BotState {
 
 	private long totalTimebank; //total time that can be in the timebank
 	private long timePerMove; //the amount of time that is added to the timebank per requested move
-	
+
 	public BotState()
 	{
 		opponentMoves = new ArrayList<Move>();
 		roundNumber = 0;
 	}
-	
+
 	public void updateSettings(String key, String value)
 	{
 		if(key.equals("your_bot")) //bot's own name
@@ -58,18 +58,21 @@ public class BotState {
 			totalTimebank = Long.parseLong(value);
 		else if(key.equals("time_per_move"))
 			timePerMove = Long.parseLong(value);
-		else if(key.equals("starting_armies")) 
+		else if(key.equals("starting_armies"))
 		{
 			startingArmies = Integer.parseInt(value);
 			roundNumber++; //next round
 		}
+		else if(key.equals("starting_regions")) {
+			// Do nothing
+		}
 	}
-	
+
 	//initial map is given to the bot with all the information except for player and armies info
 	public void setupMap(String[] mapInput)
 	{
 		int i, regionId, superRegionId, wastelandId, reward;
-		
+
 		if(mapInput[1].equals("super_regions"))
 		{
 			for(i=2; i<mapInput.length; i++)
@@ -135,7 +138,7 @@ public class BotState {
 			}
 		}
 	}
-	
+
 	//regions from wich a player is able to pick his preferred starting region
 	public void setPickableStartingRegions(String[] mapInput)
 	{
@@ -153,7 +156,7 @@ public class BotState {
 			}
 		}
 	}
-	
+
 	//visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput)
 	{
@@ -164,7 +167,7 @@ public class BotState {
 				Region region = visibleMap.getRegion(Integer.parseInt(mapInput[i]));
 				String playerName = mapInput[i+1];
 				int armies = Integer.parseInt(mapInput[i+2]);
-				
+
 				region.setPlayerName(playerName);
 				region.setArmies(armies);
 				i += 2;
@@ -174,16 +177,16 @@ public class BotState {
 			}
 		}
 		ArrayList<Region> unknownRegions = new ArrayList<Region>();
-		
+
 		//remove regions which are unknown.
 		for(Region region : visibleMap.regions)
 			if(region.getPlayerName().equals("unknown"))
 				unknownRegions.add(region);
 		for(Region unknownRegion : unknownRegions)
-			visibleMap.getRegions().remove(unknownRegion);				
+			visibleMap.getRegions().remove(unknownRegion);
 	}
 
-	//Parses a list of the opponent's moves every round. 
+	//Parses a list of the opponent's moves every round.
 	//Clears it at the start, so only the moves of this round are stored.
 	public void readOpponentMoves(String[] moveInput)
 	{
@@ -223,27 +226,27 @@ public class BotState {
 			}
 		}
 	}
-	
+
 	public String getMyPlayerName(){
 		return myName;
 	}
-	
+
 	public String getOpponentPlayerName(){
 		return opponentName;
 	}
-	
+
 	public int getStartingArmies(){
 		return startingArmies;
 	}
-	
+
 	public int getRoundNumber(){
 		return roundNumber;
 	}
-	
+
 	public Map getVisibleMap(){
 		return visibleMap;
 	}
-	
+
 	public Map getFullMap(){
 		return fullMap;
 	}
@@ -251,7 +254,7 @@ public class BotState {
 	public ArrayList<Move> getOpponentMoves(){
 		return opponentMoves;
 	}
-	
+
 	public ArrayList<Region> getPickableStartingRegions(){
 		return pickableStartingRegions;
 	}
