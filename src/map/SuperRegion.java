@@ -9,19 +9,19 @@
  */
 
 package map;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class SuperRegion {
 
 	private int id;
 	private int armiesReward;
-	private LinkedList<Region> subRegions;
+	private ArrayList<Region> subRegions;
 
 	public SuperRegion(int id, int armiesReward)
 	{
 		this.id = id;
 		this.armiesReward = armiesReward;
-		subRegions = new LinkedList<Region>();
+		subRegions = new ArrayList<Region>();
 	}
 
 	public void addSubRegion(Region subRegion)
@@ -33,16 +33,13 @@ public class SuperRegion {
 	/**
 	 * @return A string with the name of the player that fully owns this SuperRegion
 	 */
-	public String ownedByPlayer()
+	public boolean ownedByPlayer(String name)
 	{
-		// TODO: Cache - return value does not change if round is the same
-		String playerName = subRegions.getFirst().getPlayerName();
-		for(Region region : subRegions)
-		{
-			if (!playerName.equals(region.getPlayerName()))
-				return null;
+		for(Region region : subRegions) {
+			if (!name.equals(region.getPlayerName()))
+				return false;
 		}
-		return playerName;
+		return true;
 	}
 
 	/**
@@ -62,7 +59,7 @@ public class SuperRegion {
 	/**
 	 * @return A list with the Regions that are part of this SuperRegion
 	 */
-	public LinkedList<Region> getSubRegions() {
+	public ArrayList<Region> getSubRegions() {
 		return subRegions;
 	}
 

@@ -10,7 +10,7 @@ import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class OffensiveCommander {
-	private LinkedList<SuperRegion> ranking;
+	private ArrayList<SuperRegion> ranking;
 	private Region baseOfAttack;
 	private Region targetRegion;
 
@@ -18,8 +18,8 @@ public class OffensiveCommander {
 
 		// totalt slumpad rank atm
 	}
-	
-	public void setSuperRegions(LinkedList<SuperRegion> sr){
+
+	public void setSuperRegions(ArrayList<SuperRegion> sr){
 		this.ranking = sr;
 	}
 
@@ -29,8 +29,7 @@ public class OffensiveCommander {
 		EvaluatePriorities();
 
 		LinkedList<Region> tempNeighbors;
-		LinkedList<Region> owned = currentState.getVisibleMap().getOwned(
-				currentState);
+		ArrayList<Region> owned = currentState.getVisibleMap().getOwned(currentState.getMyPlayerName());
 
 		// hitta region som tillh-r superregion med h-gst prioritet som vi har
 		// tillg-ng till
@@ -40,7 +39,7 @@ public class OffensiveCommander {
 			tempNeighbors = r.getNeighbors();
 			for (Region n : tempNeighbors) {
 				if (ranking.indexOf(n.getSuperRegion()) < currentBest
-						&& !n.ownedByPlayer(currentState.getMyPlayerName())) {
+						&& !n.getPlayerName().equals(currentState.getMyPlayerName())) {
 					currentBest = ranking.indexOf(n.getSuperRegion());
 					baseOfAttack = r;
 					targetRegion = n;
@@ -60,8 +59,8 @@ public class OffensiveCommander {
 	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 
-		LinkedList<Region> available = currentState.getVisibleMap().getOwned(
-				currentState);
+		ArrayList<Region> available = currentState.getVisibleMap().getOwned(
+				currentState.getMyPlayerName());
 		// planned main attack
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(currentState
@@ -90,7 +89,7 @@ public class OffensiveCommander {
 	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
 		LinkedList<Region> tempNeighbors = r.getNeighbors();
 		for (Region n : tempNeighbors) {
-			if (!n.ownedByPlayer(currentState.getMyPlayerName())) {
+			if (!n.getPlayerName().equals(currentState.getMyPlayerName())) {
 				return (new AttackTransferMove(currentState.getMyPlayerName(),
 						r, n, r.getArmies() - 1));
 
@@ -106,7 +105,7 @@ public class OffensiveCommander {
 
 	public void setPrioritySuperRegion(SuperRegion sr) {
 		ranking.remove(sr);
-		ranking.addFirst(sr);
+		ranking.add(0, sr);
 	}
 
 	private void EvaluatePriorities() {

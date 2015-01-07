@@ -1,6 +1,7 @@
 package bot;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import map.Region;
 import map.SuperRegion;
@@ -31,29 +32,39 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 	
 }
 
-public static int calculateRequiredForcesAttack(int armySize){
-	int forces = 0;
+public static int calculateRequiredForcesAttack(Region r){
 	
+	// these numbers will be prone to change
+	int armySize = r.getArmies();
+	if (armySize <= 2){
+		return armySize +1;
+	}
 	if (armySize <= 3){
 		return armySize + 2;
 	}
 	else if (armySize <= 5){
-		return armySize + 4;
+		return armySize + 3;
 	}
-	
-	// small chance of success
-	forces[0] = r.getArmies() + 1;
-	// good chance of success
-	forces[1] = (int) (r.getArmies() * 1.5 + 2);
-	// certain success
-	forces[2] = r.getArmies() * 2 + 2;
-	return forces;
+	else{
+		return (int) (armySize * 1.5);
+	}
+
 	
 }
 
-public static int[] calculateRequiredForces(SuperRegion s){
-	int[] 
-	return null;
+public static int calculateRequiredForcesAttack(SuperRegion s){
+	int totalRequired = 0;
+	LinkedList<Region> regions = s.getSubRegions();
+	
+	// must leave one dude on each tile
+	totalRequired += regions.size();
+	
+	for (Region r : regions){
+		totalRequired += calculateRequiredForcesAttack(r);
+	}
+	
+	
+	return totalRequired;
 	
 }
 }
