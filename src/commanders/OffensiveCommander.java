@@ -99,8 +99,8 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 		}
 		// exclude owned superregions
-		hasPresence.remove(state.getVisibleMap().getOwnedSuperRegions(
-				state.getMyPlayerName()));
+		hasPresence.removeAll((state.getVisibleMap().getOwnedSuperRegions(
+				state.getMyPlayerName())));
 
 		for (SuperRegion s : hasPresence) {
 			if (Values
