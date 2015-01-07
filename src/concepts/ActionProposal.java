@@ -10,6 +10,7 @@ public class ActionProposal implements Comparable<ActionProposal> {
 
 	public ActionProposal(float weight, Region origin, Region target, int requiredForces) {
 		this.origin = origin;
+		this.target = target;
 		this.weight = weight;
 		this.requiredForces = requiredForces;
 	}

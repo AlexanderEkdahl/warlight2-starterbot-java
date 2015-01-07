@@ -110,9 +110,11 @@ public class OffensiveCommander extends TemplateCommander {
 
 		SuperRegion target = calculateWantedSuperRegion(state);
 		ArrayList<Region> neighbors;
+		
+		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
+				state.getMyPlayerName());
 
-		for (Region r : state.getVisibleMap().getOwnedRegions(
-				state.getMyPlayerName())) {
+		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
 				if (n.getSuperRegion().equals(target)
@@ -124,6 +126,9 @@ public class OffensiveCommander extends TemplateCommander {
 				}
 			}
 		}
+		System.out.println("i have 2 proposals " + proposals.size());
+		System.out.println("one is to attack " + proposals.get(0).getTarget()
+				+ " from " + proposals.get(0).getOrigin() + " with " + proposals.get(0).getRequiredForces());
 		return proposals;
 	}
 }
