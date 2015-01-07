@@ -10,17 +10,17 @@ import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class OffensiveCommander {
-
 	private LinkedList<SuperRegion> ranking;
 	private Region baseOfAttack;
 	private Region targetRegion;
-	private String myName;
 
-	public OffensiveCommander(BotState currentState) {
-		this.myName = currentState.getMyPlayerName();
+	public OffensiveCommander() {
 
 		// totalt slumpad rank atm
-		ranking = currentState.getFullMap().getSuperRegions();
+	}
+	
+	public void setSuperRegions(LinkedList<SuperRegion> sr){
+		this.ranking = sr;
 	}
 
 	// placera trupper f-r anfall
@@ -40,7 +40,7 @@ public class OffensiveCommander {
 			tempNeighbors = r.getNeighbors();
 			for (Region n : tempNeighbors) {
 				if (ranking.indexOf(n.getSuperRegion()) < currentBest
-						&& !n.ownedByPlayer(myName)) {
+						&& !n.ownedByPlayer(currentState.getMyPlayerName())) {
 					currentBest = ranking.indexOf(n.getSuperRegion());
 					baseOfAttack = r;
 					targetRegion = n;
@@ -51,7 +51,8 @@ public class OffensiveCommander {
 		}
 		// alla p- samma tile
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-		placeArmiesMoves.add(new PlaceArmiesMove(myName, baseOfAttack, forces));
+		placeArmiesMoves.add(new PlaceArmiesMove(
+				currentState.getMyPlayerName(), baseOfAttack, forces));
 		return placeArmiesMoves;
 
 	}
@@ -63,8 +64,9 @@ public class OffensiveCommander {
 				currentState);
 		// planned main attack
 		if (targetRegion != null && baseOfAttack != null) {
-			attackTransferMoves.add(new AttackTransferMove(myName,
-					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
+			attackTransferMoves.add(new AttackTransferMove(currentState
+					.getMyPlayerName(), baseOfAttack, targetRegion,
+					baseOfAttack.getArmies() - 1));
 
 			available.remove(baseOfAttack);
 		}
@@ -73,7 +75,7 @@ public class OffensiveCommander {
 
 		for (Region r : available) {
 			if (r.getArmies() > 1) {
-				attackTransferMoves.add(improvisedAction(r));
+				attackTransferMoves.add(improvisedAction(r, currentState));
 
 			}
 		}
@@ -86,20 +88,26 @@ public class OffensiveCommander {
 
 	}
 
-	private AttackTransferMove improvisedAction(Region r) {
+	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
 		LinkedList<Region> tempNeighbors = r.getNeighbors();
 		for (Region n : tempNeighbors) {
-			if (!n.ownedByPlayer(myName)) {
-				return (new AttackTransferMove(myName, r, n, r.getArmies() - 1));
+			if (!n.ownedByPlayer(currentState.getMyPlayerName())) {
+				return (new AttackTransferMove(currentState.getMyPlayerName(),
+						r, n, r.getArmies() - 1));
 
 			}
 		}
 
 		// nobody to attack
 
-		return (new AttackTransferMove(myName, r, r.getNeighbors().get(0),
-				r.getArmies() - 1));
+		return (new AttackTransferMove(currentState.getMyPlayerName(), r, r
+				.getNeighbors().get(0), r.getArmies() - 1));
 
+	}
+
+	public void setPrioritySuperRegion(SuperRegion sr) {
+		ranking.remove(sr);
+		ranking.addFirst(sr);
 	}
 
 	private void EvaluatePriorities() {
