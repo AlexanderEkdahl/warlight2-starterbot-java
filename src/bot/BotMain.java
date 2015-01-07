@@ -31,6 +31,12 @@ import move.PlaceArmiesMove;
 public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	
+	
+	public static void main(String[] args) {
+		BotParser parser = new BotParser(new BotMain(), System.in);
+		parser.run();
+	}
+	
 	public BotMain(){
 		oc = new OffensiveCommander();
 		
@@ -129,9 +135,6 @@ public class BotMain implements Bot {
 		return oc.Attack(state);
 	}
 
-	public static void main(String[] args) {
-		BotParser parser = new BotParser(new BotMain(), System.in);
-		parser.run();
-	}
+	
 
 }

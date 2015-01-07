@@ -16,7 +16,7 @@ public class Values {
 
 public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions) {
 	Region maxRegion = null;
-	float maxValue = 0;
+	float maxValue = Integer.MIN_VALUE;
 	for (Region currentRegion : pickableStartingRegions) {
 		SuperRegion superRegion = currentRegion.getSuperRegion();
 
