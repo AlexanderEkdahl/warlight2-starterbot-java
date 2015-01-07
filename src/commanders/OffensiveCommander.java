@@ -7,9 +7,7 @@ import concepts.ActionProposal;
 import concepts.PlacementProposal;
 import bot.BotState;
 import bot.Values;
-import map.Map;
-import map.Region;
-import map.SuperRegion;
+import map.*;
 import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
@@ -34,6 +32,13 @@ public class OffensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 		Map currentMap = state.getVisibleMap();
+
+		Pathfinder pathfinder = new Pathfinder(currentMap, new PathfinderWeighter() {
+			public int weight(Region nodeA, Region nodeB) {
+				return 1;
+			}
+		});
+		// pathfinder.execute(a);
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
