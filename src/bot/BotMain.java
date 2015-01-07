@@ -133,7 +133,6 @@ public class BotMain implements Bot {
 
 			currentProposalnr++;
 		}
-		System.out.println("i have " + orders.size() + " orders");
 
 		return orders;
 	}
