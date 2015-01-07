@@ -126,7 +126,7 @@ public class Map {
 		ArrayList<Region> owned = new ArrayList<Region>();
 
 		for (Region r : regions.values()) {
-			if (name.equals(name)) {
+			if (r.getPlayerName().equals(name)) {
 				owned.add(r);
 			}
 		}
