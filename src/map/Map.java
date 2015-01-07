@@ -27,7 +27,7 @@ public class Map {
 
 	/**
 	 * add a Region to the map
-	 * 
+	 *
 	 * @param region
 	 *            : Region to be added
 	 */
@@ -37,7 +37,7 @@ public class Map {
 
 	/**
 	 * add a SuperRegion to the map
-	 * 
+	 *
 	 * @param superRegion
 	 *            : SuperRegion to be added
 	 */
@@ -126,7 +126,7 @@ public class Map {
 		ArrayList<Region> owned = new ArrayList<Region>();
 
 		for (Region r : regions.values()) {
-			if (name.equals(name)) {
+			if (r.getPlayerName().equals(name)) {
 				owned.add(r);
 			}
 		}
