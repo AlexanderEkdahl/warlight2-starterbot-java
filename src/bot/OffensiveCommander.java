@@ -28,7 +28,8 @@ public class OffensiveCommander {
 		EvaluatePriorities();
 
 		LinkedList<Region> tempNeighbors;
-		LinkedList<Region> owned = currentState.getFullMap().getOwned();
+		LinkedList<Region> owned = currentState.getVisibleMap().getOwned(currentState);
+	
 
 		// hitta region som tillhör superregion med högst prioritet som vi har
 		// tillgång till
@@ -57,7 +58,8 @@ public class OffensiveCommander {
 	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 
-		LinkedList<Region> available = currentState.getFullMap().getOwned();
+		LinkedList<Region> available = currentState.getVisibleMap().getOwned(currentState);
+//		System.out.println("THERES NO ONE HERE IS THERE? " + currentState.getVisibleMap().getOwned(currentState).size());
 		// huvudattack
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(myName,
@@ -68,6 +70,7 @@ public class OffensiveCommander {
 		
 
 		// resten anfaller eller förflyttas
+		
 		for (Region r : available) {
 			if (r.getArmies() > 1) {
 				improvisedAction(r);
@@ -92,7 +95,7 @@ public class OffensiveCommander {
 			}
 		}
 
-		// fanns ingen att anfalla, förflytta ist till nån position
+		// nobody to attack
 
 		return (new AttackTransferMove(myName, r, r.getNeighbors().get(0),
 				r.getArmies() - 1));

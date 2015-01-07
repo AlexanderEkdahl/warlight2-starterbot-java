@@ -12,6 +12,8 @@ package map;
 
 import java.util.LinkedList;
 
+import bot.BotState;
+
 public class Map {
 
 	public LinkedList<Region> regions;
@@ -126,19 +128,24 @@ public class Map {
 		return mapString;
 	}
 	
-	public LinkedList<Region> getOwned(){
+	public LinkedList<Region> getOwned(BotState state){
 		LinkedList<Region> owned = new LinkedList<Region>();
 		for (Region r : regions){
-			if (r.ownedByPlayer(myName)){
+//			System.out.println("THIS BELONGS TO:" + r.getPlayerName());
+			if (r.ownedByPlayer(state.getMyPlayerName())){
+				
 				owned.add(r);
 			}
 			
 		}
+//		System.out.println("WE OWN " + owned.size() + " SECTORS");
+//		System.out.println("OUT OF THE EXISTING " + regions.size());
 		return owned;
 		
 	}
 
 	public void addName(String value) {
+//		System.out.println("AND MY NAME IS NOW " + value);
 		myName = value;
 	}
 
