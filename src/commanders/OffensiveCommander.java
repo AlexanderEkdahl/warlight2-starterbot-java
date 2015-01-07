@@ -33,11 +33,6 @@ public class OffensiveCommander extends TemplateCommander {
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 		Map currentMap = state.getVisibleMap();
 
-		Pathfinder pathfinder = new Pathfinder(currentMap, new PathfinderWeighter() {
-			public int weight(Region nodeA, Region nodeB) {
-				return 1;
-			}
-		});
 		// pathfinder.execute(a);
 
 		// if we don't have any super regions, prioritize expansion greatly
@@ -99,8 +94,8 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 		}
 		// exclude owned superregions
-		hasPresence.removeAll((state.getVisibleMap().getOwnedSuperRegions(
-				state.getMyPlayerName())));
+		hasPresence.removeAll((state.getVisibleMap().getOwnedSuperRegions(state
+				.getMyPlayerName())));
 
 		for (SuperRegion s : hasPresence) {
 			if (Values
@@ -133,10 +128,29 @@ public class OffensiveCommander extends TemplateCommander {
 						&& r.getArmies() > 1) {
 					proposals.add(new ActionProposal(selfImportance, r, n, r
 							.getArmies() - 1));
+					available.remove(r);
 
 				}
 			}
 		}
+
+		// move idle units up to the front
+
+		for (Region r : available) {
+			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+					new PathfinderWeighter() {
+						public int weight(Region nodeA, Region nodeB) {
+							return 1;
+						}
+					});
+
+			pathfinder.execute(r);
+
+			proposals.add(new ActionProposal(selfImportance - 10, r, pathfinder
+					.getPath(target.getSubRegions().get(0)).get(1), r
+					.getArmies() - 1));
+		}
+
 		return proposals;
 	}
 }
