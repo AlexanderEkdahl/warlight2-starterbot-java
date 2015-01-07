@@ -97,6 +97,10 @@ public class BotMain implements Bot {
 			}
 
 			currentProposalnr++;
+			if (currentProposalnr >= proposals.size()) {
+				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
+						currentProposal.getRegion(), armiesLeft));
+			}
 
 		}
 		return orders;
