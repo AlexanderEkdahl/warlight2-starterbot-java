@@ -119,6 +119,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
+		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
