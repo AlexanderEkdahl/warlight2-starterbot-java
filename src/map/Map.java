@@ -11,13 +11,14 @@
 package map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import bot.BotState;
 
 public class Map {
 	private HashMap<Integer, Region> regions;
-	ArrayList<SuperRegion> superRegions;
+	private ArrayList<SuperRegion> superRegions;
 
 	public Map() {
 		this.regions = new HashMap<Integer, Region>();
@@ -80,10 +81,17 @@ public class Map {
 	}
 
 	/**
-	 * @return : the list of all Regions in this map
-	 */
+	* @return : the list of all Regions in this map
+	*/
 	public HashMap<Integer, Region> getRegions() {
 		return regions;
+	}
+
+	/**
+	* @return : the list of all Regions in this map
+	*/
+	public Collection<Region> getRegionList() {
+		return regions.values();
 	}
 
 	/**

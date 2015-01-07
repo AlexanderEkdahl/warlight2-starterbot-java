@@ -10,11 +10,10 @@
 
 package map;
 
+import java.util.List;
 import java.util.ArrayList;
 
-
 public class Region {
-
 	private int id;
 	private ArrayList<Region> neighbors;
 	private SuperRegion superRegion;
@@ -24,13 +23,7 @@ public class Region {
 
 	public Region(int id, SuperRegion superRegion)
 	{
-		this.id = id;
-		this.superRegion = superRegion;
-		this.neighbors = new ArrayList<Region>();
-		this.playerName = "unknown";
-		this.armies = 0;
-
-		superRegion.addSubRegion(this);
+		this(id, superRegion, "unkown", 0);
 	}
 
 	public Region(int id, SuperRegion superRegion, String playerName, int armies)

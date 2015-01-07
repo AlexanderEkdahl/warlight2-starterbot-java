@@ -12,20 +12,17 @@ package map;
 import java.util.ArrayList;
 
 public class SuperRegion {
-
 	private int id;
 	private int armiesReward;
 	private ArrayList<Region> subRegions;
 
-	public SuperRegion(int id, int armiesReward)
-	{
+	public SuperRegion(int id, int armiesReward) {
 		this.id = id;
 		this.armiesReward = armiesReward;
 		subRegions = new ArrayList<Region>();
 	}
 
-	public void addSubRegion(Region subRegion)
-	{
+	public void addSubRegion(Region subRegion) {
 		if(!subRegions.contains(subRegion))
 			subRegions.add(subRegion);
 	}
@@ -33,8 +30,7 @@ public class SuperRegion {
 	/**
 	 * @return A string with the name of the player that fully owns this SuperRegion
 	 */
-	public boolean ownedByPlayer(String name)
-	{
+	public boolean ownedByPlayer(String name)	{
 		for(Region region : subRegions) {
 			if (!name.equals(region.getPlayerName()))
 				return false;
