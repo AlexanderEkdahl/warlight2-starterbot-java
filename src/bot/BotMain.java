@@ -84,7 +84,6 @@ public class BotMain implements Bot {
 		while (armiesLeft > 0) {
 			currentProposal = proposals.get(currentProposalnr);
 			if (currentProposal.getRequiredForces() > armiesLeft) {
-
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
 						currentProposal.getRegion(), armiesLeft));
 				armiesLeft = 0;

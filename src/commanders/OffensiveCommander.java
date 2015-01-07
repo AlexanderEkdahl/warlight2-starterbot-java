@@ -41,6 +41,7 @@ public class OffensiveCommander extends TemplateCommander {
 		} else {
 			selfImportance = 1;
 		}
+
 		SuperRegion wantedSuperRegion = calculateWantedSuperRegion(state);
 		ArrayList<PlacementProposal> attackPlans = prepareAttack(
 				wantedSuperRegion, state);
@@ -92,6 +93,10 @@ public class OffensiveCommander extends TemplateCommander {
 				hasPresence.add(n.getSuperRegion());
 			}
 		}
+		// exclude owned superregions
+		hasPresence.remove(state.getVisibleMap().getOwnedSuperRegions(
+				state.getMyPlayerName()));
+
 		for (SuperRegion s : hasPresence) {
 			if (s.getArmiesReward() > 1) {
 				if (Values.calculateRequiredForcesAttack(
@@ -113,7 +118,6 @@ public class OffensiveCommander extends TemplateCommander {
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
-
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
