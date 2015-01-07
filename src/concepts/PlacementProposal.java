@@ -1,13 +1,15 @@
 package concepts;
 
+import bot.BotState;
 import map.Region;
+import move.PlaceArmiesMove;
 
-public class PlacementProposal {
+public class PlacementProposal implements Comparable<PlacementProposal> {
 	private float weight;
 	private Region region;
 	private int requiredForces;
-	
-	public PlacementProposal(float weight, Region region,int requiredForces) {
+
+	public PlacementProposal(float weight, Region region, int requiredForces) {
 		this.weight = weight;
 		this.region = region;
 		this.requiredForces = requiredForces;
@@ -35,6 +37,15 @@ public class PlacementProposal {
 
 	public void setRequiredForces(int requiredForces) {
 		this.requiredForces = requiredForces;
+	}
+
+	@Override
+	public int compareTo(PlacementProposal otherProposal) {
+		if ((otherProposal).getWeight() > weight) {
+			return -1;
+		} else {
+			return 1;
+		}
 	}
 
 }

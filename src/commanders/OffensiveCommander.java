@@ -1,86 +1,50 @@
 package commanders;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
 import bot.BotState;
+import bot.Values;
 import map.Map;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
-public class OffensiveCommander extends TemplateCommander{
+public class OffensiveCommander extends TemplateCommander {
 	private ArrayList<SuperRegion> ranking;
-	private Region baseOfAttack;
-	private Region targetRegion;
+	private int selfImportance;
 
 
-	// placera trupper f-r anfall
-	public ArrayList<PlaceArmiesMove> Placement(int forces,
-			BotState currentState) {
-		EvaluatePriorities(currentState);
-
-		ArrayList<Region> tempNeighbors;
-		ArrayList<Region> owned = currentState.getVisibleMap().getOwned(currentState.getMyPlayerName());
-
-		// hitta region som tillh-r superregion med h-gst prioritet som vi har
-		// tillg-ng till
-		int currentBest = Integer.MAX_VALUE;
-
-		for (Region r : owned) {
-			tempNeighbors = r.getNeighbors();
-			for (Region n : tempNeighbors) {
-				if (ranking.indexOf(n.getSuperRegion()) < currentBest
-						&& !n.getPlayerName().equals(currentState.getMyPlayerName())) {
-					currentBest = ranking.indexOf(n.getSuperRegion());
-					baseOfAttack = r;
-					targetRegion = n;
-				}
-
-			}
-
-		}
-		// alla p- samma tile
-		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-		placeArmiesMoves.add(new PlaceArmiesMove(
-				currentState.getMyPlayerName(), baseOfAttack, forces));
-		return placeArmiesMoves;
-
-	}
-
-	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
-		EvaluatePriorities(currentState);
-		
-		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-		ArrayList<Region> available = currentState.getVisibleMap().getOwned(
-				currentState.getMyPlayerName());
-		// planned main attack
-		if (targetRegion != null && baseOfAttack != null) {
-			attackTransferMoves.add(new AttackTransferMove(currentState
-					.getMyPlayerName(), baseOfAttack, targetRegion,
-					baseOfAttack.getArmies() - 1));
-
-			available.remove(baseOfAttack);
-		}
-
-		// resten anfaller eller f-rflyttas randomly
-
-		for (Region r : available) {
-			if (r.getArmies() > 1) {
-				attackTransferMoves.add(improvisedAction(r, currentState));
-			}
-		}
-
-		
-
-		baseOfAttack = null;
-		targetRegion = null;
-		return attackTransferMoves;
-
-	}
+//	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
+//		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
+//		ArrayList<Region> available = currentState.getVisibleMap()
+//				.getOwnedRegions(currentState.getMyPlayerName());
+//		// planned main attack
+//		if (targetRegion != null && baseOfAttack != null) {
+//			attackTransferMoves.add(new AttackTransferMove(currentState
+//					.getMyPlayerName(), baseOfAttack, targetRegion,
+//					baseOfAttack.getArmies() - 1));
+//
+//			available.remove(baseOfAttack);
+//		}
+//
+//		// resten anfaller eller f-rflyttas randomly
+//
+//		for (Region r : available) {
+//			if (r.getArmies() > 1) {
+//				attackTransferMoves.add(improvisedAction(r, currentState));
+//			}
+//		}
+//		baseOfAttack = null;
+//		targetRegion = null;
+//		return attackTransferMoves;
+//
+//	}
 
 	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
 		ArrayList<Region> tempNeighbors = r.getNeighbors();
@@ -99,22 +63,78 @@ public class OffensiveCommander extends TemplateCommander{
 
 	}
 
-	public void setPrioritySuperRegion(SuperRegion sr) {
-		ranking.remove(sr);
-		ranking.add(0, sr);
-	}
-
-	private void EvaluatePriorities(BotState CurrentState) {
-		// lol im just a dumb computer pls help me think
-		
-		
-
-	}
-
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-		// TODO Auto-generated method stub
-		return null;
+		Map currentMap = state.getVisibleMap();
+
+		// if we don't have any super regions, prioritize expansion greatly
+		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
+			selfImportance = 10;
+		} else {
+			selfImportance = 1;
+		}
+		SuperRegion wantedSuperRegion = calculateWantedSuperRegion(state);
+		ArrayList<PlacementProposal> attackPlans = prepareAttack(
+				wantedSuperRegion, state);
+
+		return attackPlans;
+	}
+
+	private ArrayList<PlacementProposal> prepareAttack(
+			SuperRegion wantedSuperRegion, BotState state) {
+		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
+
+		HashSet<Region> possibleBases = new HashSet<Region>();
+		ArrayList<Region> neighbors;
+		for (Region r : state.getVisibleMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			neighbors = r.getNeighbors();
+			for (Region n : neighbors) {
+				if (r.getSuperRegion().equals(wantedSuperRegion)
+						&& r.getPlayerName() != state.getMyPlayerName()) {
+					possibleBases.add(r);
+				}
+			}
+
+		}
+
+		// create proposals that are based on the appreciated cost of attacking
+		// and the forces available
+		for (Region r : possibleBases) {
+			proposals.add(new PlacementProposal(selfImportance, r, Values
+					.calculateRequiredForcesAttack(state.getMyPlayerName(),
+							wantedSuperRegion)
+					- r.getArmies()));
+		}
+		return proposals;
+	}
+
+	private SuperRegion calculateWantedSuperRegion(BotState state) {
+		SuperRegion cheapest = null;
+		int cheapestCost = Integer.MAX_VALUE;
+		// find the cheapest where we have presence or neighbors that still
+		// gives a reward
+		HashSet<SuperRegion> hasPresence = new HashSet<SuperRegion>();
+		ArrayList<Region> neighbors;
+
+		for (Region r : state.getVisibleMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			neighbors = r.getNeighbors();
+			for (Region n : neighbors) {
+				hasPresence.add(n.getSuperRegion());
+			}
+		}
+		for (SuperRegion s : hasPresence) {
+			if (s.getArmiesReward() > 1) {
+				if (Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), s) < cheapestCost) {
+					cheapest = s;
+				}
+			}
+
+		}
+		return cheapest;
+
 	}
 
 	@Override

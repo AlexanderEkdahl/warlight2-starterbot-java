@@ -19,31 +19,32 @@ public class Map {
 	private HashMap<Integer, Region> regions;
 	ArrayList<SuperRegion> superRegions;
 
-	public Map()
-	{
+	public Map() {
 		this.regions = new HashMap<Integer, Region>();
 		this.superRegions = new ArrayList<SuperRegion>();
 	}
 
 	/**
 	 * add a Region to the map
-	 * @param region : Region to be added
+	 * 
+	 * @param region
+	 *            : Region to be added
 	 */
-	public void add(Region region)
-	{
+	public void add(Region region) {
 		regions.put(region.getId(), region);
 	}
 
 	/**
 	 * add a SuperRegion to the map
-	 * @param superRegion : SuperRegion to be added
+	 * 
+	 * @param superRegion
+	 *            : SuperRegion to be added
 	 */
-	public void add(SuperRegion superRegion)
-	{
-		for(SuperRegion s : superRegions)
-			if(s.getId() == superRegion.getId())
-			{
-				System.err.println("SuperRegion cannot be added: id already exists.");
+	public void add(SuperRegion superRegion) {
+		for (SuperRegion s : superRegions)
+			if (s.getId() == superRegion.getId()) {
+				System.err
+						.println("SuperRegion cannot be added: id already exists.");
 				return;
 			}
 		superRegions.add(superRegion);
@@ -55,20 +56,23 @@ public class Map {
 	public Map getMapCopy() {
 		Map newMap = new Map();
 
-		for(SuperRegion sr : superRegions) //copy superRegions
+		for (SuperRegion sr : superRegions) // copy superRegions
 		{
-			SuperRegion newSuperRegion = new SuperRegion(sr.getId(), sr.getArmiesReward());
+			SuperRegion newSuperRegion = new SuperRegion(sr.getId(),
+					sr.getArmiesReward());
 			newMap.add(newSuperRegion);
 		}
-		for(Region r : regions.values()) //copy regions
+		for (Region r : regions.values()) // copy regions
 		{
-			Region newRegion = new Region(r.getId(), newMap.getSuperRegion(r.getSuperRegion().getId()), r.getPlayerName(), r.getArmies());
+			Region newRegion = new Region(r.getId(), newMap.getSuperRegion(r
+					.getSuperRegion().getId()), r.getPlayerName(),
+					r.getArmies());
 			newMap.add(newRegion);
 		}
-		for(Region r : regions.values()) //add neighbors to copied regions
+		for (Region r : regions.values()) // add neighbors to copied regions
 		{
 			Region newRegion = newMap.getRegion(r.getId());
-			for(Region neighbor : r.getNeighbors())
+			for (Region neighbor : r.getNeighbors())
 				newRegion.addNeighbor(newMap.getRegion(neighbor.getId()));
 		}
 
@@ -90,35 +94,48 @@ public class Map {
 	}
 
 	/**
-	 * @param id : a Region id number
+	 * @param id
+	 *            : a Region id number
 	 * @return : the matching Region object
 	 */
-	public Region getRegion(int id)
-	{
+	public Region getRegion(int id) {
 		return regions.get(id);
 	}
 
 	/**
-	 * @param id : a SuperRegion id number
+	 * @param id
+	 *            : a SuperRegion id number
 	 * @return : the matching SuperRegion object
 	 */
-	public SuperRegion getSuperRegion(int id)
-	{
-		for(SuperRegion superRegion : superRegions)
-			if(superRegion.getId() == id)
+	public SuperRegion getSuperRegion(int id) {
+		for (SuperRegion superRegion : superRegions)
+			if (superRegion.getId() == id)
 				return superRegion;
 		return null;
 	}
 
-	public ArrayList<Region> getOwned(String name){
+	public ArrayList<Region> getOwnedRegions(String name) {
 		ArrayList<Region> owned = new ArrayList<Region>();
 
-		for (Region r : regions.values()){
-			if (name.equals(r.getPlayerName())) {
+		for (Region r : regions.values()) {
+			if (name.equals(name)) {
 				owned.add(r);
 			}
 		}
 
 		return owned;
 	}
+
+	public ArrayList<SuperRegion> getOwnedSuperRegions(String name) {
+		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
+		for (SuperRegion r : getSuperRegions()) {
+			if (r.ownedByPlayer(name)) {
+				owned.add(r);
+			}
+		}
+
+		return owned;
+
+	}
+
 }

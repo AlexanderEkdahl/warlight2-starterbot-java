@@ -32,9 +32,13 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 	
 }
 
-public static int calculateRequiredForcesAttack(Region r){
+public static int calculateRequiredForcesAttack(String myName, Region r){
 	
 	// these numbers will be prone to change
+	if (r.getPlayerName().equals(myName)){
+		return 0;
+	}
+	
 	int armySize = r.getArmies();
 	if (armySize <= 2){
 		return armySize +1;
@@ -52,7 +56,7 @@ public static int calculateRequiredForcesAttack(Region r){
 	
 }
 
-public static int calculateRequiredForcesAttack(SuperRegion s){
+public static int calculateRequiredForcesAttack(String myName, SuperRegion s){
 	int totalRequired = 0;
 	ArrayList<Region> regions = s.getSubRegions();
 	
@@ -60,7 +64,7 @@ public static int calculateRequiredForcesAttack(SuperRegion s){
 	totalRequired += regions.size();
 	
 	for (Region r : regions){
-		totalRequired += calculateRequiredForcesAttack(r);
+		totalRequired += calculateRequiredForcesAttack(myName,r);
 	}
 	
 	

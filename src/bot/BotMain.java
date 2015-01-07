@@ -21,11 +21,14 @@ package bot;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Queue;
 
 import commanders.DefensiveCommander;
 import commanders.GriefCommander;
 import commanders.OffensiveCommander;
+import concepts.PlacementProposal;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
@@ -35,20 +38,19 @@ public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
-	
-	
 
 	public static void main(String[] args) {
 		BotParser parser = new BotParser(new BotMain(), System.in);
 		parser.run();
 	}
 
-	public BotMain(){
+	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
 		gc = new GriefCommander();
 
 	}
+
 	@Override
 	/**
 	 * A method that returns which region the bot would like to start on, the pickable regions are stored in the BotState.
@@ -57,21 +59,42 @@ public class BotMain implements Bot {
 	 */
 	public Region getStartingRegion(BotState state, Long timeOut) {
 		Region startPosition;
-		startPosition = Values.getBestStartRegion(state.getPickableStartingRegions());
+		startPosition = Values.getBestStartRegion(state
+				.getPickableStartingRegions());
 		return startPosition;
 	}
 
 	@Override
 	/**
-	 * This method is called for at first part of each round. This example puts two armies on random regions
-	 * until he has no more armies left to place.
+	 * This method is called for at first part of each round.
 	 * @return The list of PlaceArmiesMoves for one round
 	 */
+	// right now it just takes the highest priority tasks and executes them
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state,
 			Long timeOut) {
 
+		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
+
 		int armiesLeft = state.getStartingArmies();
-		return oc.Placement(armiesLeft, state);
+		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
+		proposals.addAll(oc.getPlacementProposals(state));
+
+		Collections.sort(proposals);
+		int currentProposalnr = 0;
+		PlacementProposal currentProposal;
+		while (armiesLeft > 0) {
+			currentProposal = proposals.get(currentProposalnr);
+			if (currentProposal.getRequiredForces() > armiesLeft) {
+				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
+						currentProposal.getRegion(), armiesLeft));
+			} else {
+				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
+						currentProposal.getRegion(), currentProposal
+								.getRequiredForces()));
+			}
+
+		}
+		return orders;
 	}
 
 	@Override
@@ -85,7 +108,5 @@ public class BotMain implements Bot {
 
 		return oc.Attack(state);
 	}
-
-
 
 }
