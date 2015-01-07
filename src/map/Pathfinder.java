@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
 
-interface PathfinderWeighter {
-  int weight(Region a, Region b);
-}
-
 public class Pathfinder {
   private final Collection<Region> nodes;
   private HashSet<Region> settledNodes;
