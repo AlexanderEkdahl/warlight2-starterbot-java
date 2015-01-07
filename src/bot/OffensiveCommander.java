@@ -76,7 +76,6 @@ public class OffensiveCommander {
 		for (Region r : available) {
 			if (r.getArmies() > 1) {
 				attackTransferMoves.add(improvisedAction(r, currentState));
-
 			}
 		}
 

@@ -30,4 +30,30 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 	return maxRegion;
 	
 }
+
+public static int calculateRequiredForcesAttack(int armySize){
+	int forces = 0;
+	
+	if (armySize <= 3){
+		return armySize + 2;
+	}
+	else if (armySize <= 5){
+		return armySize + 4;
+	}
+	
+	// small chance of success
+	forces[0] = r.getArmies() + 1;
+	// good chance of success
+	forces[1] = (int) (r.getArmies() * 1.5 + 2);
+	// certain success
+	forces[2] = r.getArmies() * 2 + 2;
+	return forces;
+	
+}
+
+public static int[] calculateRequiredForces(SuperRegion s){
+	int[] 
+	return null;
+	
+}
 }

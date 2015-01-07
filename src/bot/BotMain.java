@@ -30,6 +30,7 @@ import move.PlaceArmiesMove;
 
 public class BotMain implements Bot {
 	private OffensiveCommander oc;
+	private DefensiveCommander dc;
 	
 	
 	public static void main(String[] args) {
@@ -64,25 +65,7 @@ public class BotMain implements Bot {
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state,
 			Long timeOut) {
 
-//		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-//		String myName = state.getMyPlayerName();
-//		int armies = 2;
 		int armiesLeft = state.getStartingArmies();
-//		LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
-//
-//		while (armiesLeft > 0) {
-//			double rand = Math.random();
-//			int r = (int) (rand * visibleRegions.size());
-//			Region region = visibleRegions.get(r);
-//
-//			if (region.ownedByPlayer(myName)) {
-//				placeArmiesMoves
-//						.add(new PlaceArmiesMove(myName, region, armies));
-//				armiesLeft -= armies;
-//			}
-//		}
-//
-//		return placeArmiesMoves;
 		return oc.Placement(armiesLeft, state);
 	}
 
@@ -94,44 +77,7 @@ public class BotMain implements Bot {
 	 */
 	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state,
 			Long timeOut) {
-//		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-//		String myName = state.getMyPlayerName();
-//		int armies = 5;
-//		int maxTransfers = 10;
-//		int transfers = 0;
-//
-//		for (Region fromRegion : state.getVisibleMap().getRegions()) {
-//			if (fromRegion.ownedByPlayer(myName)) // do an attack
-//			{
-//				ArrayList<Region> possibleToRegions = new ArrayList<Region>();
-//				possibleToRegions.addAll(fromRegion.getNeighbors());
-//
-//				while (!possibleToRegions.isEmpty()) {
-//					double rand = Math.random();
-//					int r = (int) (rand * possibleToRegions.size());
-//					Region toRegion = possibleToRegions.get(r);
-//
-//					if (!toRegion.getPlayerName().equals(myName)
-//							&& fromRegion.getArmies() > 6) // do an attack
-//					{
-//						attackTransferMoves.add(new AttackTransferMove(myName,
-//								fromRegion, toRegion, armies));
-//						break;
-//					} else if (toRegion.getPlayerName().equals(myName)
-//							&& fromRegion.getArmies() > 1
-//							&& transfers < maxTransfers) // do a transfer
-//					{
-//						attackTransferMoves.add(new AttackTransferMove(myName,
-//								fromRegion, toRegion, armies));
-//						transfers++;
-//						break;
-//					} else
-//						possibleToRegions.remove(toRegion);
-//				}
-//			}
-//		}
-//
-//		return attackTransferMoves;
+
 		return oc.Attack(state);
 	}
 
