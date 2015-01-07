@@ -10,13 +10,12 @@
 
 package map;
 
-import java.util.ArrayList;
-
+import java.util.List;
+import java.util.LinkedList;
 
 public class Region {
-
 	private int id;
-	private ArrayList<Region> neighbors;
+	private LinkedList<Region> neighbors;
 	private SuperRegion superRegion;
 	private int armies;
 	private String playerName;
@@ -24,20 +23,14 @@ public class Region {
 
 	public Region(int id, SuperRegion superRegion)
 	{
-		this.id = id;
-		this.superRegion = superRegion;
-		this.neighbors = new ArrayList<Region>();
-		this.playerName = "unknown";
-		this.armies = 0;
-
-		superRegion.addSubRegion(this);
+		this(id, superRegion, "unkown", 0);
 	}
 
 	public Region(int id, SuperRegion superRegion, String playerName, int armies)
 	{
 		this.id = id;
 		this.superRegion = superRegion;
-		this.neighbors = new ArrayList<Region>();
+		this.neighbors = new LinkedList<Region>();
 		this.playerName = playerName;
 		this.armies = armies;
 
@@ -88,7 +81,7 @@ public class Region {
 	/**
 	 * @return A list of this Region's neighboring Regions
 	 */
-	public ArrayList<Region> getNeighbors() {
+	public LinkedList<Region> getNeighbors() {
 		return neighbors;
 	}
 
