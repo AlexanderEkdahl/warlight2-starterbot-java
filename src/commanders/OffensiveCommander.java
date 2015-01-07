@@ -1,34 +1,29 @@
-package bot;
+package commanders;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import concepts.ActionProposal;
+import concepts.PlacementProposal;
+import bot.BotState;
 import map.Map;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
-public class OffensiveCommander {
+public class OffensiveCommander extends TemplateCommander{
 	private ArrayList<SuperRegion> ranking;
 	private Region baseOfAttack;
 	private Region targetRegion;
 
-	public OffensiveCommander() {
-
-		// totalt slumpad rank atm
-	}
-
-	public void setSuperRegions(ArrayList<SuperRegion> sr){
-		this.ranking = sr;
-	}
 
 	// placera trupper f-r anfall
 	public ArrayList<PlaceArmiesMove> Placement(int forces,
 			BotState currentState) {
-		EvaluatePriorities();
+		EvaluatePriorities(currentState);
 
-		LinkedList<Region> tempNeighbors;
+		ArrayList<Region> tempNeighbors;
 		ArrayList<Region> owned = currentState.getVisibleMap().getOwned(currentState.getMyPlayerName());
 
 		// hitta region som tillh-r superregion med h-gst prioritet som vi har
@@ -57,8 +52,9 @@ public class OffensiveCommander {
 	}
 
 	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
+		EvaluatePriorities(currentState);
+		
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-
 		ArrayList<Region> available = currentState.getVisibleMap().getOwned(
 				currentState.getMyPlayerName());
 		// planned main attack
@@ -78,7 +74,7 @@ public class OffensiveCommander {
 			}
 		}
 
-		EvaluatePriorities();
+		
 
 		baseOfAttack = null;
 		targetRegion = null;
@@ -87,7 +83,7 @@ public class OffensiveCommander {
 	}
 
 	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
-		LinkedList<Region> tempNeighbors = r.getNeighbors();
+		ArrayList<Region> tempNeighbors = r.getNeighbors();
 		for (Region n : tempNeighbors) {
 			if (!n.getPlayerName().equals(currentState.getMyPlayerName())) {
 				return (new AttackTransferMove(currentState.getMyPlayerName(),
@@ -108,9 +104,23 @@ public class OffensiveCommander {
 		ranking.add(0, sr);
 	}
 
-	private void EvaluatePriorities() {
+	private void EvaluatePriorities(BotState CurrentState) {
 		// lol im just a dumb computer pls help me think
+		
+		
 
+	}
+
+	@Override
+	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<ActionProposal> getActionProposals(BotState state) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

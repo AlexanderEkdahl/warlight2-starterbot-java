@@ -54,7 +54,7 @@ public static int calculateRequiredForcesAttack(Region r){
 
 public static int calculateRequiredForcesAttack(SuperRegion s){
 	int totalRequired = 0;
-	LinkedList<Region> regions = s.getSubRegions();
+	ArrayList<Region> regions = s.getSubRegions();
 	
 	// must leave one dude on each tile
 	totalRequired += regions.size();

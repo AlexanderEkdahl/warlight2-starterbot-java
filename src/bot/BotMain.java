@@ -23,6 +23,9 @@ package bot;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import commanders.DefensiveCommander;
+import commanders.GriefCommander;
+import commanders.OffensiveCommander;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
@@ -31,6 +34,7 @@ import move.PlaceArmiesMove;
 public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
+	private GriefCommander gc;
 	
 	
 
@@ -41,6 +45,8 @@ public class BotMain implements Bot {
 
 	public BotMain(){
 		oc = new OffensiveCommander();
+		dc = new DefensiveCommander();
+		gc = new GriefCommander();
 
 	}
 	@Override
@@ -52,8 +58,6 @@ public class BotMain implements Bot {
 	public Region getStartingRegion(BotState state, Long timeOut) {
 		Region startPosition;
 		startPosition = Values.getBestStartRegion(state.getPickableStartingRegions());
-		oc.setSuperRegions(state.getFullMap().getSuperRegions());
-		oc.setPrioritySuperRegion(startPosition.getSuperRegion());
 		return startPosition;
 	}
 
