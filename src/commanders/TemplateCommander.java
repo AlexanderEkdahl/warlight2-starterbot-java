@@ -7,10 +7,10 @@ import concepts.PlacementProposal;
 import bot.BotState;
 
 public abstract class TemplateCommander {
-	protected int personalImportance;
+	protected int selfImportance;
 	
 	public TemplateCommander(){
-		personalImportance = 0;
+		selfImportance = 0;
 	}
 
 	

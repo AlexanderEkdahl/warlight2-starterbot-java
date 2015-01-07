@@ -2,8 +2,6 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
@@ -13,38 +11,8 @@ import map.Map;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
-import move.PlaceArmiesMove;
 
 public class OffensiveCommander extends TemplateCommander {
-	private ArrayList<SuperRegion> ranking;
-	private int selfImportance;
-
-
-//	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
-//		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
-//		ArrayList<Region> available = currentState.getVisibleMap()
-//				.getOwnedRegions(currentState.getMyPlayerName());
-//		// planned main attack
-//		if (targetRegion != null && baseOfAttack != null) {
-//			attackTransferMoves.add(new AttackTransferMove(currentState
-//					.getMyPlayerName(), baseOfAttack, targetRegion,
-//					baseOfAttack.getArmies() - 1));
-//
-//			available.remove(baseOfAttack);
-//		}
-//
-//		// resten anfaller eller f-rflyttas randomly
-//
-//		for (Region r : available) {
-//			if (r.getArmies() > 1) {
-//				attackTransferMoves.add(improvisedAction(r, currentState));
-//			}
-//		}
-//		baseOfAttack = null;
-//		targetRegion = null;
-//		return attackTransferMoves;
-//
-//	}
 
 	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
 		ArrayList<Region> tempNeighbors = r.getNeighbors();
@@ -90,8 +58,8 @@ public class OffensiveCommander extends TemplateCommander {
 				state.getMyPlayerName())) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
-				if (r.getSuperRegion().equals(wantedSuperRegion)
-						&& r.getPlayerName() != state.getMyPlayerName()) {
+				if (n.getSuperRegion().equals(wantedSuperRegion)
+						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
 					possibleBases.add(r);
 				}
 			}
@@ -134,13 +102,28 @@ public class OffensiveCommander extends TemplateCommander {
 
 		}
 		return cheapest;
-
 	}
 
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
+		SuperRegion target = calculateWantedSuperRegion(state);
+		ArrayList<Region> neighbors;
+
+		for (Region r : state.getVisibleMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			neighbors = r.getNeighbors();
+			for (Region n : neighbors) {
+				if (n.getSuperRegion().equals(target)
+						&& !(n.getPlayerName().equals(state.getMyPlayerName()))
+						&& r.getArmies() > 1) {
+					proposals.add(new ActionProposal(selfImportance, r, n, r
+							.getArmies() - 1));
+
+				}
+			}
+		}
+		return proposals;
+	}
 }

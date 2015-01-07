@@ -22,15 +22,13 @@ package bot;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import commanders.DefensiveCommander;
 import commanders.GriefCommander;
 import commanders.OffensiveCommander;
+import concepts.ActionProposal;
 import concepts.PlacementProposal;
 import map.Region;
-import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
@@ -76,9 +74,10 @@ public class BotMain implements Bot {
 		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 
 		int armiesLeft = state.getStartingArmies();
+
+		// TODO decide how to merge proposals
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
-
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
@@ -93,6 +92,8 @@ public class BotMain implements Bot {
 								.getRequiredForces()));
 			}
 
+			currentProposalnr++;
+
 		}
 		return orders;
 	}
@@ -105,8 +106,30 @@ public class BotMain implements Bot {
 	 */
 	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state,
 			Long timeOut) {
+		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
+		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		return oc.Attack(state);
+		ArrayList<Region> availableRegions = state.getVisibleMap()
+				.getOwnedRegions(state.getMyPlayerName());
+
+		proposals.addAll(oc.getActionProposals(state));
+
+		Collections.sort(proposals);
+
+		int currentProposalnr = 0;
+		ActionProposal currentProposal;
+
+		while (availableRegions.size() > 0
+				&& currentProposalnr < proposals.size()) {
+			currentProposal = proposals.get(currentProposalnr);
+			orders.add(new AttackTransferMove(state.getMyPlayerName(),
+					currentProposal.getOrigin(), currentProposal.getTarget(),
+					currentProposal.getRequiredForces()));
+
+			currentProposalnr++;
+		}
+		
+		return orders;
 	}
 
 }
