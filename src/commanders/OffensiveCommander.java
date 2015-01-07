@@ -146,9 +146,12 @@ public class OffensiveCommander extends TemplateCommander {
 
 			pathfinder.execute(r);
 
-			proposals.add(new ActionProposal(selfImportance - 10, r, pathfinder
-					.getPath(target.getSubRegions().get(0)).get(1), r
-					.getArmies() - 1));
+			if (!r.equals(target.getSubRegions().get(0))) {
+				proposals.add(new ActionProposal(selfImportance - 10, r,
+						pathfinder.getPath(target.getSubRegions().get(0))
+								.get(1), r.getArmies() - 1));
+			}
+
 		}
 
 		return proposals;
