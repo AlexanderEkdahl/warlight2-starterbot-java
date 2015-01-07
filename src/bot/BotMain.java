@@ -30,16 +30,16 @@ import move.PlaceArmiesMove;
 
 public class BotMain implements Bot {
 	private OffensiveCommander oc;
-	
-	
+
+
 	public static void main(String[] args) {
 		BotParser parser = new BotParser(new BotMain(), System.in);
 		parser.run();
 	}
-	
+
 	public BotMain(){
 		oc = new OffensiveCommander();
-		
+
 	}
 	@Override
 	/**
@@ -50,7 +50,7 @@ public class BotMain implements Bot {
 	public Region getStartingRegion(BotState state, Long timeOut) {
 		Region startPosition;
 		startPosition = Values.getBestStartRegion(state.getPickableStartingRegions());
-		oc.setSuperRegions(state.getFullMap().superRegions);
+		oc.setSuperRegions(state.getFullMap().getSuperRegions());
 		oc.setPrioritySuperRegion(startPosition.getSuperRegion());
 		return startPosition;
 	}
@@ -135,6 +135,6 @@ public class BotMain implements Bot {
 		return oc.Attack(state);
 	}
 
-	
+
 
 }

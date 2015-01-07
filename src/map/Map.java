@@ -10,20 +10,19 @@
 
 package map;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import bot.BotState;
 
 public class Map {
-
-	public LinkedList<Region> regions;
-	public LinkedList<SuperRegion> superRegions;
-	private String myName;
+	private HashMap<Integer, Region> regions;
+	ArrayList<SuperRegion> superRegions;
 
 	public Map()
 	{
-		this.regions = new LinkedList<Region>();
-		this.superRegions = new LinkedList<SuperRegion>();
+		this.regions = new HashMap<Integer, Region>();
+		this.superRegions = new ArrayList<SuperRegion>();
 	}
 
 	/**
@@ -32,13 +31,7 @@ public class Map {
 	 */
 	public void add(Region region)
 	{
-		for(Region r : regions)
-			if(r.getId() == region.getId())
-			{
-				System.err.println("Region cannot be added: id already exists.");
-				return;
-			}
-		regions.add(region);
+		regions.put(region.getId(), region);
 	}
 
 	/**
@@ -61,36 +54,38 @@ public class Map {
 	 */
 	public Map getMapCopy() {
 		Map newMap = new Map();
+
 		for(SuperRegion sr : superRegions) //copy superRegions
 		{
 			SuperRegion newSuperRegion = new SuperRegion(sr.getId(), sr.getArmiesReward());
 			newMap.add(newSuperRegion);
 		}
-		for(Region r : regions) //copy regions
+		for(Region r : regions.values()) //copy regions
 		{
 			Region newRegion = new Region(r.getId(), newMap.getSuperRegion(r.getSuperRegion().getId()), r.getPlayerName(), r.getArmies());
 			newMap.add(newRegion);
 		}
-		for(Region r : regions) //add neighbors to copied regions
+		for(Region r : regions.values()) //add neighbors to copied regions
 		{
 			Region newRegion = newMap.getRegion(r.getId());
 			for(Region neighbor : r.getNeighbors())
 				newRegion.addNeighbor(newMap.getRegion(neighbor.getId()));
 		}
+
 		return newMap;
 	}
 
 	/**
 	 * @return : the list of all Regions in this map
 	 */
-	public LinkedList<Region> getRegions() {
+	public HashMap<Integer, Region> getRegions() {
 		return regions;
 	}
 
 	/**
 	 * @return : the list of all SuperRegions in this map
 	 */
-	public LinkedList<SuperRegion> getSuperRegions() {
+	public ArrayList<SuperRegion> getSuperRegions() {
 		return superRegions;
 	}
 
@@ -100,10 +95,7 @@ public class Map {
 	 */
 	public Region getRegion(int id)
 	{
-		for(Region region : regions)
-			if(region.getId() == id)
-				return region;
-		return null;
+		return regions.get(id);
 	}
 
 	/**
@@ -118,35 +110,15 @@ public class Map {
 		return null;
 	}
 
-	public String getMapString()
-	{
-		String mapString = "";
-		for(Region region : regions)
-		{
-			mapString = mapString.concat(region.getId() + ";" + region.getPlayerName() + ";" + region.getArmies() + " ");
-		}
-		return mapString;
-	}
-	
-	public LinkedList<Region> getOwned(BotState state){
-		LinkedList<Region> owned = new LinkedList<Region>();
-		for (Region r : regions){
-//			System.out.println("THIS BELONGS TO:" + r.getPlayerName());
-			if (r.ownedByPlayer(state.getMyPlayerName())){
-				
+	public ArrayList<Region> getOwned(String name){
+		ArrayList<Region> owned = new ArrayList<Region>();
+
+		for (Region r : regions.values()){
+			if (name.equals(r.getPlayerName())) {
 				owned.add(r);
 			}
-			
 		}
-//		System.out.println("WE OWN " + owned.size() + " SECTORS");
-//		System.out.println("OUT OF THE EXISTING " + regions.size());
+
 		return owned;
-		
 	}
-
-	public void addName(String value) {
-//		System.out.println("AND MY NAME IS NOW " + value);
-		myName = value;
-	}
-
 }

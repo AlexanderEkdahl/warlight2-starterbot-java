@@ -10,13 +10,13 @@
 
 package map;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 
 public class Region {
 
 	private int id;
-	private LinkedList<Region> neighbors;
+	private ArrayList<Region> neighbors;
 	private SuperRegion superRegion;
 	private int armies;
 	private String playerName;
@@ -26,7 +26,7 @@ public class Region {
 	{
 		this.id = id;
 		this.superRegion = superRegion;
-		this.neighbors = new LinkedList<Region>();
+		this.neighbors = new ArrayList<Region>();
 		this.playerName = "unknown";
 		this.armies = 0;
 
@@ -37,7 +37,7 @@ public class Region {
 	{
 		this.id = id;
 		this.superRegion = superRegion;
-		this.neighbors = new LinkedList<Region>();
+		this.neighbors = new ArrayList<Region>();
 		this.playerName = playerName;
 		this.armies = armies;
 
@@ -65,17 +65,6 @@ public class Region {
 	}
 
 	/**
-	 * @param playerName A string with a player's name
-	 * @return True if this region is owned by given playerName, false otherwise
-	 */
-	public boolean ownedByPlayer(String playerName)
-	{
-		if(playerName.equals(this.playerName))
-			return true;
-		return false;
-	}
-
-	/**
 	 * @param armies Sets the number of armies that are on this Region
 	 */
 	public void setArmies(int armies) {
@@ -83,8 +72,8 @@ public class Region {
 	}
 
 	/**
-	 * @param playerName Sets the Name of the player that this Region belongs to
-	 */
+	* @param playerName Sets the Name of the player that this Region belongs to
+	*/
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
 	}
@@ -99,7 +88,7 @@ public class Region {
 	/**
 	 * @return A list of this Region's neighboring Regions
 	 */
-	public LinkedList<Region> getNeighbors() {
+	public ArrayList<Region> getNeighbors() {
 		return neighbors;
 	}
 

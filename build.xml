@@ -1,7 +1,7 @@
 <project name="Warlight" default="compile" basedir=".">
   <property name="src.dir" value="src"/>
   <property name="build.dir" value="bin"/>
-  <property name="main-class" value="bot.BotStarter"/>
+  <property name="main-class" value="bot.BotMain"/>
 
   <target name="clean">
     <delete dir="${build.dir}"/>

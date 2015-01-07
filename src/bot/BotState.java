@@ -49,7 +49,6 @@ public class BotState {
 	{
 		if(key.equals("your_bot")){ //bot's own name
 			myName = value;
-			fullMap.addName(value);
 		}
 		else if(key.equals("opponent_bot")) //opponent's name
 			opponentName = value;
@@ -178,7 +177,7 @@ public class BotState {
 		ArrayList<Region> unknownRegions = new ArrayList<Region>();
 
 		//remove regions which are unknown.
-		for(Region region : visibleMap.regions)
+		for(Region region : visibleMap.getRegions().values())
 			if(region.getPlayerName().equals("unknown"))
 				unknownRegions.add(region);
 		for(Region unknownRegion : unknownRegions)
