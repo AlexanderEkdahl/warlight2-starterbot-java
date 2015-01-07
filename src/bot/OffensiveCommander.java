@@ -24,11 +24,11 @@ public class OffensiveCommander {
 	}
 
 	// placera trupper för anfall
-	public ArrayList<PlaceArmiesMove> Placement(int forces, Map currentMap) {
+	public ArrayList<PlaceArmiesMove> Placement(int forces, BotState currentState) {
 		EvaluatePriorities();
 
 		LinkedList<Region> tempNeighbors;
-		LinkedList<Region> owned = currentMap.getOwned();
+		LinkedList<Region> owned = currentState.getFullMap().getOwned();
 
 		// hitta region som tillhör superregion med högst prioritet som vi har
 		// tillgång till
@@ -62,9 +62,10 @@ public class OffensiveCommander {
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(myName,
 					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
-
+			
+			available.remove(baseOfAttack);
 		}
-		available.remove(baseOfAttack);
+		
 
 		// resten anfaller eller förflyttas
 		for (Region r : available) {
