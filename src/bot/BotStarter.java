@@ -135,7 +135,7 @@ public class BotStarter implements Bot {
 //		}
 //
 //		return attackTransferMoves;
-		return oc.Attack();
+		return oc.Attack(state);
 	}
 
 	public static void main(String[] args) {

@@ -34,7 +34,7 @@ public class OffensiveCommander {
 		// tillgång till
 		int currentBest = Integer.MAX_VALUE;
 
-		outer: for (Region r : owned) {
+		for (Region r : owned) {
 			tempNeighbors = r.getNeighbors();
 			for (Region n : tempNeighbors) {
 				if (ranking.indexOf(n.getSuperRegion()) < currentBest
@@ -47,7 +47,6 @@ public class OffensiveCommander {
 			}
 
 		}
-
 		// alla på samma tile
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		placeArmiesMoves.add(new PlaceArmiesMove(myName, baseOfAttack, forces));
@@ -55,23 +54,47 @@ public class OffensiveCommander {
 
 	}
 
-	public ArrayList<AttackTransferMove> Attack() {
+	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 
-		// full fart
+		LinkedList<Region> available = currentState.getFullMap().getOwned();
+		// huvudattack
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(myName,
 					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
 
-		} else {
-			// finns ingen attack planerad
-
 		}
+		available.remove(baseOfAttack);
+
+		// resten anfaller eller förflyttas
+		for (Region r : available) {
+			if (r.getArmies() > 1) {
+				improvisedAction(r);
+
+			}
+		}
+
 		EvaluatePriorities();
 
 		baseOfAttack = null;
 		targetRegion = null;
 		return attackTransferMoves;
+
+	}
+
+	private AttackTransferMove improvisedAction(Region r) {
+		LinkedList<Region> tempNeighbors = r.getNeighbors();
+		for (Region n : tempNeighbors) {
+			if (!n.ownedByPlayer(myName)) {
+				return (new AttackTransferMove(myName, r, n, r.getArmies() - 1));
+
+			}
+		}
+
+		// fanns ingen att anfalla, förflytta ist till nån position
+
+		return (new AttackTransferMove(myName, r, r.getNeighbors().get(0),
+				r.getArmies() - 1));
 
 	}
 
