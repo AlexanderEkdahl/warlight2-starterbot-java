@@ -82,6 +82,13 @@ public class BotMain implements Bot {
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
 		while (armiesLeft > 0) {
+			if (currentProposalnr >= proposals.size()) {
+				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
+						.getVisibleMap()
+						.getOwnedRegions(state.getMyPlayerName()).get(0),
+						armiesLeft));
+				return orders;
+			}
 			currentProposal = proposals.get(currentProposalnr);
 			if (currentProposal.getRequiredForces() > armiesLeft) {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
@@ -95,12 +102,7 @@ public class BotMain implements Bot {
 								.getRequiredForces()));
 				armiesLeft -= currentProposal.getRequiredForces();
 			}
-
 			currentProposalnr++;
-			if (currentProposalnr >= proposals.size()) {
-				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
-						currentProposal.getRegion(), armiesLeft));
-			}
 
 		}
 		return orders;

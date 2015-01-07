@@ -98,11 +98,12 @@ public class OffensiveCommander extends TemplateCommander {
 				state.getMyPlayerName()));
 
 		for (SuperRegion s : hasPresence) {
-			if (s.getArmiesReward() > 1) {
-				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), s) < cheapestCost) {
-					cheapest = s;
-				}
+			if (Values
+					.calculateRequiredForcesAttack(state.getMyPlayerName(), s) < cheapestCost) {
+				cheapest = s;
+				cheapestCost = Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), s);
+
 			}
 
 		}
