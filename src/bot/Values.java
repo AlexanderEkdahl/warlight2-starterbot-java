@@ -22,23 +22,23 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 		SuperRegion superRegion = currentRegion.getSuperRegion();
 
 		float value = Values.startingRegion(superRegion.getInitialNeutralCount(), superRegion.getArmiesReward());
-		if (value > maxValue) {
+		if (value >= maxValue) {
 			maxValue = value;
 			maxRegion = currentRegion;
 		}
 	}
-	
+
 	return maxRegion;
-	
+
 }
 
 public static int calculateRequiredForcesAttack(String myName, Region r){
-	
+
 	// these numbers will be prone to change
 	if (r.getPlayerName().equals(myName)){
 		return 0;
 	}
-	
+
 	int armySize = r.getArmies();
 	if (armySize <= 2){
 		return armySize +1;
@@ -53,22 +53,22 @@ public static int calculateRequiredForcesAttack(String myName, Region r){
 		return (int) (armySize * 1.5);
 	}
 
-	
+
 }
 
 public static int calculateRequiredForcesAttack(String myName, SuperRegion s){
 	int totalRequired = 0;
 	ArrayList<Region> regions = s.getSubRegions();
-	
+
 	// must leave one dude on each tile
 	totalRequired += regions.size();
-	
+
 	for (Region r : regions){
 		totalRequired += calculateRequiredForcesAttack(myName,r);
 	}
-	
-	
+
+
 	return totalRequired;
-	
+
 }
 }
