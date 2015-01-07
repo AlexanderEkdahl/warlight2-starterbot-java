@@ -38,6 +38,9 @@ public static int calculateRequiredForcesAttack(String myName, Region r){
 	if (r.getPlayerName().equals(myName)){
 		return 0;
 	}
+	if (r.getPlayerName().equals("unknown")){
+		return 5;
+	}
 
 	int armySize = r.getArmies();
 	if (armySize <= 2){
