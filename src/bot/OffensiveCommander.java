@@ -23,16 +23,17 @@ public class OffensiveCommander {
 		ranking = currentState.getFullMap().getSuperRegions();
 	}
 
-	// placera trupper för anfall
-	public ArrayList<PlaceArmiesMove> Placement(int forces, BotState currentState) {
+	// placera trupper f-r anfall
+	public ArrayList<PlaceArmiesMove> Placement(int forces,
+			BotState currentState) {
 		EvaluatePriorities();
 
 		LinkedList<Region> tempNeighbors;
-		LinkedList<Region> owned = currentState.getVisibleMap().getOwned(currentState);
-	
+		LinkedList<Region> owned = currentState.getVisibleMap().getOwned(
+				currentState);
 
-		// hitta region som tillhör superregion med högst prioritet som vi har
-		// tillgång till
+		// hitta region som tillh-r superregion med h-gst prioritet som vi har
+		// tillg-ng till
 		int currentBest = Integer.MAX_VALUE;
 
 		for (Region r : owned) {
@@ -48,7 +49,7 @@ public class OffensiveCommander {
 			}
 
 		}
-		// alla på samma tile
+		// alla p- samma tile
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		placeArmiesMoves.add(new PlaceArmiesMove(myName, baseOfAttack, forces));
 		return placeArmiesMoves;
@@ -58,19 +59,20 @@ public class OffensiveCommander {
 	public ArrayList<AttackTransferMove> Attack(BotState currentState) {
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 
-		LinkedList<Region> available = currentState.getVisibleMap().getOwned(currentState);
-//		System.out.println("THERES NO ONE HERE IS THERE? " + currentState.getVisibleMap().getOwned(currentState).size());
+		LinkedList<Region> available = currentState.getVisibleMap().getOwned(
+				currentState);
+		// System.out.println("THERES NO ONE HERE IS THERE? " +
+		// currentState.getVisibleMap().getOwned(currentState).size());
 		// huvudattack
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(myName,
 					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
-			
+
 			available.remove(baseOfAttack);
 		}
-		
 
-		// resten anfaller eller förflyttas
-		
+		// resten anfaller eller f-rflyttas
+
 		for (Region r : available) {
 			if (r.getArmies() > 1) {
 				improvisedAction(r);
