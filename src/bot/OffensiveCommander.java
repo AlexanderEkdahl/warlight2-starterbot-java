@@ -61,9 +61,7 @@ public class OffensiveCommander {
 
 		LinkedList<Region> available = currentState.getVisibleMap().getOwned(
 				currentState);
-		// System.out.println("THERES NO ONE HERE IS THERE? " +
-		// currentState.getVisibleMap().getOwned(currentState).size());
-		// huvudattack
+		// planned main attack
 		if (targetRegion != null && baseOfAttack != null) {
 			attackTransferMoves.add(new AttackTransferMove(myName,
 					baseOfAttack, targetRegion, baseOfAttack.getArmies() - 1));
@@ -71,11 +69,11 @@ public class OffensiveCommander {
 			available.remove(baseOfAttack);
 		}
 
-		// resten anfaller eller f-rflyttas
+		// resten anfaller eller f-rflyttas randomly
 
 		for (Region r : available) {
 			if (r.getArmies() > 1) {
-				improvisedAction(r);
+				attackTransferMoves.add(improvisedAction(r));
 
 			}
 		}
