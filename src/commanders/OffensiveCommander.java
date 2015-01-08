@@ -2,6 +2,7 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 import concepts.ActionProposal;
@@ -13,7 +14,7 @@ import map.*;
 import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 5;
+	private static final int rewardMultiplier = 50;
 	private static final int costMultiplier = 1;
 
 	@Override
@@ -22,7 +23,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
-			selfImportance = 10;
+			selfImportance = 100;
 		} else {
 			selfImportance = 1;
 		}
@@ -32,7 +33,6 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Plan p : plans) {
 			p.setWeight(p.getWeight() + selfImportance);
 		}
-		// System.out.println("there are " + plans.size() + " plans");
 		PlacementProposal tempProposal;
 		for (Plan p : plans) {
 			tempProposal = prepareAttack(p, state);
@@ -41,7 +41,6 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 
 		}
-		// System.out.println("attackplans: " + attackPlans.size());
 		return attackPlans;
 	}
 
@@ -50,14 +49,11 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 
-		// System.out.println("i own " + owned.size());
 
 		ArrayList<Region> neighbors;
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
-				// System.out.println("the player who owns this sector is: "
-				// + n.getPlayerName());
 				if (n.getSuperRegion().equals(sr)
 						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
 					return new PlacementProposal(p.getWeight(), r,
@@ -73,12 +69,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 	private ArrayList<Plan> calculatePlans(BotState state) {
 		ArrayList<Plan> plans = new ArrayList<Plan>();
-		SuperRegion cheapest = null;
-		int cheapestCost = Integer.MAX_VALUE;
-		// find the cheapest where we have presence or neighbors that still
-		// gives a reward
 		HashSet<SuperRegion> possibleTargets = new HashSet<SuperRegion>();
-		ArrayList<Region> neighbors;
 
 		possibleTargets.addAll(state.getVisibleMap().getSuperRegions());
 
@@ -94,7 +85,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 	private int calculateWorth(SuperRegion s, BotState state) {
 		if (s.getArmiesReward() < 1) {
-			return Integer.MIN_VALUE;
+			return -1000;
 		} else {
 			int pathCost = 100;
 			for (Region r : s.getSubRegions()) {
@@ -102,7 +93,6 @@ public class OffensiveCommander extends TemplateCommander {
 					pathCost = 0;
 					break;
 				}
-
 			}
 			int cost = Values.calculateRequiredForcesAttack(
 					state.getMyPlayerName(), s);
@@ -122,6 +112,7 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Plan p : attackPlans) {
 			p.setWeight(p.getWeight() + selfImportance);
 		}
+		Collections.sort(attackPlans);
 		ArrayList<Region> neighbors;
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
@@ -149,12 +140,15 @@ public class OffensiveCommander extends TemplateCommander {
 						break outerLoop;
 
 					}
+					
+					// if here then none of the targets available was worth attacking
+					available.remove(r);
 				}
 			}
 
 		}
 
-		// move idle units up to the most important superregion with low
+		// move idle units up to the most important superRegion with high
 		// importance
 
 		SuperRegion importantSuperRegion = attackPlans.get(0).getSr();
@@ -170,12 +164,11 @@ public class OffensiveCommander extends TemplateCommander {
 							return 1;
 						}
 					});
-
 			pathfinder.execute(r);
 
 			for (Region subr : importantSuperRegion.getSubRegions()) {
 				if (!subr.equals(r)) {
-					proposals.add(new ActionProposal(selfImportance - 5, r,
+					proposals.add(new ActionProposal(selfImportance - 10, r,
 							pathfinder.getPath(subr).get(1), r.getArmies() - 1,
 							attackPlans.get(0)));
 					break;

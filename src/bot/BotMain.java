@@ -78,12 +78,14 @@ public class BotMain implements Bot {
 		// TODO decide how to merge proposals
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
-		Collections.sort(proposals);
+		proposals.addAll(gc.getPlacementProposals(state));
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
+		System.err.println("\tgetPlaceArmiesMoves");
 		while (armiesLeft > 0) {
 			if (currentProposalnr >= proposals.size()) {
+				
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
 						.getVisibleMap()
 						.getOwnedRegions(state.getMyPlayerName()).get(0),
@@ -106,6 +108,7 @@ public class BotMain implements Bot {
 			currentProposalnr++;
 
 		}
+
 		return orders;
 	}
 
@@ -124,15 +127,22 @@ public class BotMain implements Bot {
 				.getOwnedRegions(state.getMyPlayerName());
 
 		proposals.addAll(oc.getActionProposals(state));
+		proposals.addAll(gc.getActionProposals(state));
 
 		Collections.sort(proposals);
 
 		int currentProposalnr = 0;
 		ActionProposal currentProposal;
 
+		System.err.println("\tAttackTransferMove");
 		while (availableRegions.size() > 0
 				&& currentProposalnr < proposals.size()) {
 			currentProposal = proposals.get(currentProposalnr);
+			System.err.println("Executing proposal with priority "
+					+ currentProposal.getWeight() + " move from "
+					+ currentProposal.getOrigin().getId() + " to "
+					+ currentProposal.getTarget().getId());
+			availableRegions.remove(currentProposal.getOrigin());
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
 					currentProposal.getOrigin(), currentProposal.getTarget(),
 					currentProposal.getForces()));

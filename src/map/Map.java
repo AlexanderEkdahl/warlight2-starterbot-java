@@ -27,7 +27,7 @@ public class Map {
 
 	/**
 	 * add a Region to the map
-	 *
+	 * 
 	 * @param region
 	 *            : Region to be added
 	 */
@@ -37,7 +37,7 @@ public class Map {
 
 	/**
 	 * add a SuperRegion to the map
-	 *
+	 * 
 	 * @param superRegion
 	 *            : SuperRegion to be added
 	 */
@@ -81,15 +81,15 @@ public class Map {
 	}
 
 	/**
-	* @return : the list of all Regions in this map
-	*/
+	 * @return : the list of all Regions in this map
+	 */
 	public HashMap<Integer, Region> getRegions() {
 		return regions;
 	}
 
 	/**
-	* @return : the list of all Regions in this map
-	*/
+	 * @return : the list of all Regions in this map
+	 */
 	public Collection<Region> getRegionList() {
 		return regions.values();
 	}
@@ -144,6 +144,41 @@ public class Map {
 
 		return owned;
 
+	}
+
+	private int getSuspectedOwnedRegion(Region region, String opponentPlayerName) {
+		if (region.getPlayerName().equals(opponentPlayerName)) {
+			return 1;
+		} else if (region.getPlayerName().equals("unknown")) {
+			return 0;
+		} else
+			return -10000;
+	}
+
+	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion,
+			String opponentPlayerName) {
+		int total = 0;
+		for (Region r : superRegion.getSubRegions()) {
+			total += getSuspectedOwnedRegion(r, opponentPlayerName);
+		}
+		if (total > 0) {
+			return true;
+		}
+		return false;
+
+	}
+
+	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(
+			String opponentPlayerName) {
+		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
+		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
+		for (SuperRegion sr : getSuperRegions()) {
+			if (getSuspectedOwnedSuperRegion(sr, opponentPlayerName))
+				suspected.add(sr);
+
+		}
+
+		return suspected;
 	}
 
 }

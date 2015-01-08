@@ -7,6 +7,10 @@ import map.Region;
 import map.SuperRegion;
 
 public class Values {
+	public static final int costMultiplierEnemy = 1;
+	public static final int costMultiplierNeutral = 4;
+	public static final int staticCostUnknown = 10;
+	public static final int staticCostOwned = 5;
   private static float startingRegion(int neutrals, int reward) {
     if (reward == 0) {
       return Integer.MIN_VALUE;
@@ -32,29 +36,47 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 
 }
 
+public static int calculateWeighedCost(String enemyName, Region r){
+	if (r.getPlayerName().equals(enemyName)) {
+		return r.getArmies() * costMultiplierEnemy;
+	} else if (r.getPlayerName().equals("neutral")) {
+		return r.getArmies()
+				* costMultiplierNeutral;
+	} else if (r.getPlayerName().equals("unknown")) {
+		return staticCostUnknown;
+	}
+	return staticCostOwned;
+}
+	
+
+
 public static int calculateRequiredForcesAttack(String myName, Region r){
 
 	// these numbers will be prone to change
-	if (r.getPlayerName().equals(myName)){
-		return 0;
-	}
-	if (r.getPlayerName().equals("unknown")){
+	
+	int armySize = r.getArmies();
+	if (r.getPlayerName() == null){
 		return 5;
 	}
-
-	int armySize = r.getArmies();
-	if (armySize <= 2){
-		return armySize +1;
+	else if (r.getPlayerName().equals(myName)){
+		return 0;
 	}
-	if (armySize <= 3){
+	
+	else if (armySize <= 2){
+		return armySize + 1;
+	}
+	else if (armySize <= 3){
 		return armySize + 2;
 	}
-	else if (armySize <= 5){
+	 else if (armySize <= 5){
 		return armySize + 3;
 	}
-	else{
+	 else{
 		return (int) (armySize * 1.5);
 	}
+	
+	
+	
 
 
 }
@@ -70,7 +92,7 @@ public static int calculateRequiredForcesAttack(String myName, SuperRegion s){
 		totalRequired += calculateRequiredForcesAttack(myName,r);
 	}
 
-
+//	System.err.println("The calculated cost of attacking the SuperRegion " + s.getId() + " is " + totalRequired);
 	return totalRequired;
 
 }
