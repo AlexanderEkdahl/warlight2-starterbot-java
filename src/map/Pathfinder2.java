@@ -156,7 +156,7 @@ public class Pathfinder2 {
     return pathfinderWeighter.weight(nodeA, nodeB);
   }
 
-  public static void main(String[] args) {
+  public static void test(String[] args) {
     Map m = new Map();
 
     SuperRegion superRegion = new SuperRegion(0, 0);
