@@ -137,7 +137,7 @@ public class OffensiveCommander extends TemplateCommander {
 		// move idle units up to the front
 
 		for (Region r : available) {
-			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+			Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 					new PathfinderWeighter() {
 						public int weight(Region nodeA, Region nodeB) {
 							return 1;
@@ -147,10 +147,10 @@ public class OffensiveCommander extends TemplateCommander {
 			pathfinder.execute(r);
 
 			for (Region sr : target.getSubRegions()) {
-				if (!sr.getPlayerName().equals(state.getMyPlayerName())) {
+				if (!sr.equals(r)) {
 					proposals.add(new ActionProposal(selfImportance - 10, r,
-							pathfinder.getPath(target.getSubRegions().get(0))
-									.get(1), r.getArmies() - 1));
+							pathfinder.getPath(sr).get(1), r.getArmies() - 1));
+					break;
 				}
 			}
 		}
