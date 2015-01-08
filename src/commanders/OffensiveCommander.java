@@ -1,39 +1,24 @@
 package commanders;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
+import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
 import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
-
-	private AttackTransferMove improvisedAction(Region r, BotState currentState) {
-		ArrayList<Region> tempNeighbors = r.getNeighbors();
-		for (Region n : tempNeighbors) {
-			if (!n.getPlayerName().equals(currentState.getMyPlayerName())) {
-				return (new AttackTransferMove(currentState.getMyPlayerName(),
-						r, n, r.getArmies() - 1));
-
-			}
-		}
-
-		// nobody to attack
-
-		return (new AttackTransferMove(currentState.getMyPlayerName(), r, r
-				.getNeighbors().get(0), r.getArmies() - 1));
-
-	}
+	private static final int rewardMultiplier = 5;
+	private static final int costMultiplier = 1;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 		Map currentMap = state.getVisibleMap();
-
-		// pathfinder.execute(a);
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
@@ -42,133 +27,151 @@ public class OffensiveCommander extends TemplateCommander {
 			selfImportance = 1;
 		}
 
-		SuperRegion wantedSuperRegion = calculateWantedSuperRegion(state);
-		ArrayList<PlacementProposal> attackPlans = prepareAttack(
-				wantedSuperRegion, state);
+		ArrayList<Plan> plans = calculatePlans(state);
+		ArrayList<PlacementProposal> attackPlans = new ArrayList<PlacementProposal>();
+		for (Plan p : plans) {
+			p.setWeight(p.getWeight() + selfImportance);
+		}
 
+		for (Plan p : plans) {
+			attackPlans.add(prepareAttack(p, state));
+		}
 		return attackPlans;
 	}
 
-	private ArrayList<PlacementProposal> prepareAttack(
-			SuperRegion wantedSuperRegion, BotState state) {
-		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
+	private PlacementProposal prepareAttack(Plan p, BotState state) {
+		SuperRegion sr = p.getSr();
+		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
+				state.getMyPlayerName());
 
-		HashSet<Region> possibleBases = new HashSet<Region>();
 		ArrayList<Region> neighbors;
-		for (Region r : state.getVisibleMap().getOwnedRegions(
-				state.getMyPlayerName())) {
+		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
-				if (n.getSuperRegion().equals(wantedSuperRegion)
+				if (n.getSuperRegion().equals(sr)
 						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
-					possibleBases.add(r);
+					return new PlacementProposal(p.getWeight(), r,
+							Values.calculateRequiredForcesAttack(
+									state.getMyPlayerName(), sr), p);
 				}
 			}
 
 		}
+		return null;
 
-		// create proposals that are based on the appreciated cost of attacking
-		// and the forces available
-		for (Region r : possibleBases) {
-			proposals.add(new PlacementProposal(selfImportance, r, Values
-					.calculateRequiredForcesAttack(state.getMyPlayerName(),
-							wantedSuperRegion)
-					- r.getArmies()));
-		}
-		return proposals;
 	}
 
-	private SuperRegion calculateWantedSuperRegion(BotState state) {
+	private ArrayList<Plan> calculatePlans(BotState state) {
+		ArrayList<Plan> plans = new ArrayList<Plan>();
 		SuperRegion cheapest = null;
 		int cheapestCost = Integer.MAX_VALUE;
 		// find the cheapest where we have presence or neighbors that still
 		// gives a reward
-		HashSet<SuperRegion> hasPresence = new HashSet<SuperRegion>();
+		HashSet<SuperRegion> possibleTargets = new HashSet<SuperRegion>();
 		ArrayList<Region> neighbors;
 
-		for (Region r : state.getVisibleMap().getOwnedRegions(
-				state.getMyPlayerName())) {
-			neighbors = r.getNeighbors();
-			for (Region n : neighbors) {
-				hasPresence.add(n.getSuperRegion());
-			}
-		}
+		possibleTargets.addAll(state.getVisibleMap().getSuperRegions());
+
 		// exclude owned superregions
-		hasPresence.removeAll((state.getVisibleMap().getOwnedSuperRegions(state
-				.getMyPlayerName())));
+		possibleTargets.removeAll((state.getVisibleMap()
+				.getOwnedSuperRegions(state.getMyPlayerName())));
 
-		for (SuperRegion s : hasPresence) {
-			if (Values
-					.calculateRequiredForcesAttack(state.getMyPlayerName(), s) < cheapestCost) {
-				cheapest = s;
-				cheapestCost = Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), s);
+		for (SuperRegion s : possibleTargets) {
+			plans.add(new Plan(s, calculateWorth(s, state)));
+		}
+		return plans;
+	}
+
+	private int calculateWorth(SuperRegion s, BotState state) {
+		if (s.getArmiesReward() < 1) {
+			return Integer.MIN_VALUE;
+		} else {
+			int pathCost = 100;
+			for (Region r : s.getSubRegions()) {
+				if (r.getPlayerName().equals(state.getMyPlayerName())) {
+					pathCost = 0;
+					break;
+				}
 
 			}
+			int cost = Values.calculateRequiredForcesAttack(
+					state.getMyPlayerName(), s);
+			int reward = s.getArmiesReward();
+			return (reward * rewardMultiplier) - (cost * costMultiplier)
+					- pathCost;
 
 		}
-		return cheapest;
 	}
 
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		SuperRegion target = calculateWantedSuperRegion(state);
-		int forcesRequired = Values.calculateRequiredForcesAttack(
-				state.getMyPlayerName(), target);
+		ArrayList<Plan> attackPlans = calculatePlans(state);
+
+		for (Plan p : attackPlans) {
+			p.setWeight(p.getWeight() + selfImportance);
+		}
 		ArrayList<Region> neighbors;
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
+		for (Plan p : attackPlans) {
+			int forcesRequired = Values.calculateRequiredForcesAttack(
+					state.getMyPlayerName(), p.getSr());
 
-		for (Region r : owned) {
-			neighbors = r.getNeighbors();
-			for (Region n : neighbors) {
-				if (n.getSuperRegion().equals(target)
-						&& !(n.getPlayerName().equals(state.getMyPlayerName()))
-						&& r.getArmies() > Values
-								.calculateRequiredForcesAttack(
-										state.getMyPlayerName(), n)) {
-					int forcesAvailable = r.getArmies() - 1;
-					int forcesDisposed = Math.min(forcesAvailable,
-							forcesRequired);
-					proposals.add(new ActionProposal(selfImportance, r, n,
-							forcesDisposed));
-					forcesRequired--;
-					available.remove(r);
+			outerLoop: for (Region r : owned) {
+				neighbors = r.getNeighbors();
+				for (Region n : neighbors) {
+					if (n.getSuperRegion().equals(p.getSr())
+							&& !(n.getPlayerName().equals(state
+									.getMyPlayerName()))
+							&& r.getArmies() > Values
+									.calculateRequiredForcesAttack(
+											state.getMyPlayerName(), n)) {
+						int forcesAvailable = r.getArmies() - 1;
+						int forcesDisposed = Math.min(forcesAvailable,
+								forcesRequired);
+						proposals.add(new ActionProposal(p.getWeight(), r, n,
+								forcesDisposed, p));
+						available.remove(r);
+						break outerLoop;
 
+					}
 				}
 			}
+
 		}
 
 		// move idle units up to the wanted SuperRegion either through own area
-		// or enemy
+		// or enemy area
 
-		for (Region r : available) {
-			final String myName = state.getMyPlayerName();
-			Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
-					new PathfinderWeighter() {
-						public int weight(Region nodeA, Region nodeB) {
-							if (!nodeB.getPlayerName().equals(myName)) {
-								return nodeB.getArmies();
-							}
-							return 0;
-						}
-					});
-
-			pathfinder.execute(r);
-
-			for (Region sr : target.getSubRegions()) {
-				if (!sr.equals(r)) {
-					proposals.add(new ActionProposal(selfImportance - 10, r,
-							pathfinder.getPath(sr).get(1), r.getArmies() - 1));
-					break;
-				}
-			}
-		}
+		// for (Region r : available) {
+		// final String myName = state.getMyPlayerName();
+		// Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+		// new PathfinderWeighter() {
+		// public int weight(Region nodeA, Region nodeB) {
+		// if (!nodeB.getPlayerName().equals(myName)) {
+		// return nodeB.getArmies();
+		// }
+		// return 1;
+		// }
+		// });
+		//
+		// pathfinder.execute(r);
+		//
+		// for (Region subr : target.getSubRegions()) {
+		// if (!subr.equals(r)) {
+		// proposals.add(new ActionProposal(selfImportance - 10, r,
+		// pathfinder.getPath(sr).get(1), r.getArmies() - 1,
+		// new Plan(target)));
+		// break;
+		// }
+		// }
+		// }
 
 		return proposals;
+
 	}
 }

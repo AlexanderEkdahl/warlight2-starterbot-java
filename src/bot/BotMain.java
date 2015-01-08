@@ -90,17 +90,17 @@ public class BotMain implements Bot {
 				return orders;
 			}
 			currentProposal = proposals.get(currentProposalnr);
-			if (currentProposal.getRequiredForces() > armiesLeft) {
+			if (currentProposal.getForces() > armiesLeft) {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
-						currentProposal.getRegion(), armiesLeft));
+						currentProposal.getTarget(), armiesLeft));
 				armiesLeft = 0;
 			}
 
 			else {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
-						currentProposal.getRegion(), currentProposal
-								.getRequiredForces()));
-				armiesLeft -= currentProposal.getRequiredForces();
+						currentProposal.getTarget(), currentProposal
+								.getForces()));
+				armiesLeft -= currentProposal.getForces();
 			}
 			currentProposalnr++;
 
@@ -134,7 +134,7 @@ public class BotMain implements Bot {
 			currentProposal = proposals.get(currentProposalnr);
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
 					currentProposal.getOrigin(), currentProposal.getTarget(),
-					currentProposal.getRequiredForces()));
+					currentProposal.getForces()));
 
 			currentProposalnr++;
 		}

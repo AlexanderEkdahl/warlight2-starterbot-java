@@ -4,15 +4,10 @@ import bot.BotState;
 import map.Region;
 import move.PlaceArmiesMove;
 
-public class PlacementProposal implements Comparable<PlacementProposal> {
-	private float weight;
-	private Region region;
-	private int requiredForces;
+public class PlacementProposal extends TemplateProposal{
 
-	public PlacementProposal(float weight, Region region, int requiredForces) {
-		this.weight = weight;
-		this.region = region;
-		this.requiredForces = requiredForces;
+	public PlacementProposal(float weight, Region region, int requiredForces, Plan plan) {
+		super(weight, region, requiredForces, plan);
 	}
 
 	public float getWeight() {
@@ -23,29 +18,20 @@ public class PlacementProposal implements Comparable<PlacementProposal> {
 		this.weight = weight;
 	}
 
-	public Region getRegion() {
-		return region;
+	public Region getTarget() {
+		return target;
 	}
 
-	public void setRegion(Region region) {
-		this.region = region;
+	public void setTarget(Region target) {
+		this.target = target;
 	}
 
-	public int getRequiredForces() {
-		return requiredForces;
+	public int getdForces() {
+		return forces;
 	}
 
-	public void setRequiredForces(int requiredForces) {
-		this.requiredForces = requiredForces;
-	}
-
-	@Override
-	public int compareTo(PlacementProposal otherProposal) {
-		if ((otherProposal).getWeight() > weight) {
-			return -1;
-		} else {
-			return 1;
-		}
+	public void setf(int forces) {
+		this.forces = forces;
 	}
 
 }

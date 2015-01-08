@@ -2,17 +2,12 @@ package concepts;
 
 import map.Region;
 
-public class ActionProposal implements Comparable<ActionProposal> {
-	private float weight;
+public class ActionProposal extends TemplateProposal {
 	private Region origin;
-	private Region target;
-	private int requiredForces;
 
-	public ActionProposal(float weight, Region origin, Region target, int requiredForces) {
+	public ActionProposal(float weight, Region origin, Region target, int requiredForces, Plan plan) {
+		super(weight,target,requiredForces, plan);
 		this.origin = origin;
-		this.target = target;
-		this.weight = weight;
-		this.requiredForces = requiredForces;
 	}
 
 	public float getWeight() {
@@ -39,21 +34,13 @@ public class ActionProposal implements Comparable<ActionProposal> {
 		this.target = target;
 	}
 
-	public int getRequiredForces() {
-		return requiredForces;
+	public int getForces() {
+		return forces;
 	}
 
-	public void setRequiredForces(int requiredForces) {
-		this.requiredForces = requiredForces;
+	public void setForcess(int forces) {
+		this.forces = forces;
 	}
 
-	@Override
-	public int compareTo(ActionProposal otherProposal) {
-		if (otherProposal.getWeight() > weight) {
-			return -1;
-		} else {
-			return 1;
-		}
-	}
 
 }
