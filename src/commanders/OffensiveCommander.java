@@ -115,32 +115,46 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		SuperRegion target = calculateWantedSuperRegion(state);
+		int forcesRequired = Values.calculateRequiredForcesAttack(
+				state.getMyPlayerName(), target);
 		ArrayList<Region> neighbors;
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
+
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
 				if (n.getSuperRegion().equals(target)
 						&& !(n.getPlayerName().equals(state.getMyPlayerName()))
-						&& r.getArmies() > 1) {
-					proposals.add(new ActionProposal(selfImportance, r, n, r
-							.getArmies() - 1));
+						&& r.getArmies() > Values
+								.calculateRequiredForcesAttack(
+										state.getMyPlayerName(), n)) {
+					int forcesAvailable = r.getArmies() - 1;
+					int forcesDisposed = Math.min(forcesAvailable,
+							forcesRequired);
+					proposals.add(new ActionProposal(selfImportance, r, n,
+							forcesDisposed));
+					forcesRequired--;
 					available.remove(r);
 
 				}
 			}
 		}
 
-		// move idle units up to the front
+		// move idle units up to the wanted SuperRegion either through own area
+		// or enemy
 
 		for (Region r : available) {
+			final String myName = state.getMyPlayerName();
 			Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 					new PathfinderWeighter() {
 						public int weight(Region nodeA, Region nodeB) {
-							return 1;
+							if (!nodeB.getPlayerName().equals(myName)) {
+								return nodeB.getArmies();
+							}
+							return 0;
 						}
 					});
 
