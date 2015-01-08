@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class Pathfinder {
   private final Collection<Region> nodes;
@@ -117,8 +118,23 @@ public class Pathfinder {
     return path;
   }
 
-  public Region getNearestOwnedRegion(Region source) {
-    return null;
+  public Region getNearestOwnedRegion(Region origin, String name) {
+    // TODO: Use BFS instead - this sucks
+    Region nearest = null;
+    int minimumDistance = Integer.MAX_VALUE;
+
+    this.execute(origin);
+
+    for (Region region : settledNodes) {
+      if (region.getPlayerName().equals(name)) {
+        if (getShortestDistance(region) <= minimumDistance) {
+          minimumDistance = getShortestDistance(region);
+          nearest = region;
+        }
+      }
+    }
+
+    return nearest;
   }
 
   private static void test() {
