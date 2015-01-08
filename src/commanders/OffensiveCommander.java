@@ -32,10 +32,16 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Plan p : plans) {
 			p.setWeight(p.getWeight() + selfImportance);
 		}
-
+		// System.out.println("there are " + plans.size() + " plans");
+		PlacementProposal tempProposal;
 		for (Plan p : plans) {
-			attackPlans.add(prepareAttack(p, state));
+			tempProposal = prepareAttack(p, state);
+			if (tempProposal != null) {
+				attackPlans.add(prepareAttack(p, state));
+			}
+
 		}
+		// System.out.println("attackplans: " + attackPlans.size());
 		return attackPlans;
 	}
 
@@ -44,10 +50,14 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 
+		// System.out.println("i own " + owned.size());
+
 		ArrayList<Region> neighbors;
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
+				// System.out.println("the player who owns this sector is: "
+				// + n.getPlayerName());
 				if (n.getSuperRegion().equals(sr)
 						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
 					return new PlacementProposal(p.getWeight(), r,
@@ -144,32 +154,34 @@ public class OffensiveCommander extends TemplateCommander {
 
 		}
 
-		// move idle units up to the wanted SuperRegion either through own area
-		// or enemy area
+		// move idle units up to the most important superregion with low
+		// importance
 
-		// for (Region r : available) {
-		// final String myName = state.getMyPlayerName();
-		// Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
-		// new PathfinderWeighter() {
-		// public int weight(Region nodeA, Region nodeB) {
-		// if (!nodeB.getPlayerName().equals(myName)) {
-		// return nodeB.getArmies();
-		// }
-		// return 1;
-		// }
-		// });
-		//
-		// pathfinder.execute(r);
-		//
-		// for (Region subr : target.getSubRegions()) {
-		// if (!subr.equals(r)) {
-		// proposals.add(new ActionProposal(selfImportance - 10, r,
-		// pathfinder.getPath(sr).get(1), r.getArmies() - 1,
-		// new Plan(target)));
-		// break;
-		// }
-		// }
-		// }
+		SuperRegion importantSuperRegion = attackPlans.get(0).getSr();
+
+		for (Region r : available) {
+			final String myName = state.getMyPlayerName();
+			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+					new PathfinderWeighter() {
+						public int weight(Region nodeA, Region nodeB) {
+							if (!nodeB.getPlayerName().equals(myName)) {
+								return nodeB.getArmies();
+							}
+							return 1;
+						}
+					});
+
+			pathfinder.execute(r);
+
+			for (Region subr : importantSuperRegion.getSubRegions()) {
+				if (!subr.equals(r)) {
+					proposals.add(new ActionProposal(selfImportance - 5, r,
+							pathfinder.getPath(subr).get(1), r.getArmies() - 1,
+							attackPlans.get(0)));
+					break;
+				}
+			}
+		}
 
 		return proposals;
 

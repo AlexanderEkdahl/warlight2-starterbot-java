@@ -2,6 +2,10 @@ package concepts;
 
 import java.util.ArrayList;
 
+
+
+///// 200 % undone
+
 public class ProposalMerger {
 
 	public static ArrayList<TemplateProposal> merge (ArrayList<TemplateProposal> list1, ArrayList<TemplateProposal> list2){
@@ -21,12 +25,12 @@ public class ProposalMerger {
 					// add 1 / 2 of the others weight to them
 					addedWeight += p2.getWeight()/2;
 					if (mergedProposals.contains(p2)){
-						int p2Weight = 
-						mergedProposals.remove(p2);
+//						int p2Weight = 
+//						mergedProposals.remove(p2);
 					}
-					p2.setWeight(p1.getWeight() / 2 + p2.getWeight());
-					mergedProposals.add(p2);
-					attached = true;
+//					p2.setWeight(p1.getWeight() / 2 + p2.getWeight());
+//					mergedProposals.add(p2);
+//					attached = true;
 				}	
 			}
 			

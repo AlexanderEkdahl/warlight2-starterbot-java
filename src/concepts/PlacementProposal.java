@@ -26,12 +26,13 @@ public class PlacementProposal extends TemplateProposal{
 		this.target = target;
 	}
 
-	public int getdForces() {
+	public int getForces() {
 		return forces;
 	}
 
-	public void setf(int forces) {
+	public void setForces(int forces) {
 		this.forces = forces;
 	}
+	
 
 }

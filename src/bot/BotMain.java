@@ -79,6 +79,7 @@ public class BotMain implements Bot {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
 		Collections.sort(proposals);
+		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
 		while (armiesLeft > 0) {

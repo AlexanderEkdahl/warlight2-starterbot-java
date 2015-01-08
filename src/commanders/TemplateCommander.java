@@ -8,13 +8,14 @@ import bot.BotState;
 
 public abstract class TemplateCommander {
 	protected int selfImportance;
-	
-	public TemplateCommander(){
+
+	public TemplateCommander() {
 		selfImportance = 0;
 	}
 
-	
-public abstract ArrayList<PlacementProposal> getPlacementProposals(BotState state);
-public abstract ArrayList<ActionProposal> getActionProposals(BotState state);
+	public abstract ArrayList<PlacementProposal> getPlacementProposals(
+			BotState state);
+
+	public abstract ArrayList<ActionProposal> getActionProposals(BotState state);
 
 }
