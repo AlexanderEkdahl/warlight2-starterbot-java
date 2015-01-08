@@ -121,23 +121,26 @@ public class Pathfinder2 {
     return getComputedDistance(target);
   }
 
-  // public List<Region> getPlayerInnerRegions(String playerName) {
-  //   ArrayList<Region> innerRegions = new ArrayList<Region>();
-  //
-  //   for (Iterator<Region> iterator = new BFSIterator(map.getOwnedRegions(playerName)); iterator.hasNext();) {
-  //     Region next = iterator.next();
-  //
-  //     for (Region neighbor : next.getNeighbors()) {
-  //       if (!neighbor.getPlayerName().equals(playerName)) {
-  //         continue;
-  //       }
-  //     }
-  //
-  //     innerRegions.add(next);
-  //   }
-  //
-  //   return innerRegions;
-  // }
+  public List<Region> getPlayerInnerRegions(Map map, String playerName) {
+    ArrayList<Region> innerRegions = new ArrayList<Region>();
+
+    outer:
+    for (Iterator<Region> iterator = new BFSIterator(map.getOwnedRegions(playerName)); iterator.hasNext();) {
+      Region next = iterator.next();
+
+      for (Region neighbor : next.getNeighbors()) {
+        System.out.println(next.getId() + " neighbor " + neighbor.getPlayerName());
+        if (!neighbor.getPlayerName().equals(playerName)) {
+          System.out.println("Neighboring other stuff");
+          continue outer;
+        }
+      }
+
+      innerRegions.add(next);
+    }
+
+    return innerRegions;
+  }
 
   private int getComputedDistance(Region node) {
     Integer d = distances.get(node);
@@ -160,38 +163,38 @@ public class Pathfinder2 {
     SuperRegion superRegion2 = new SuperRegion(0, 0);
     m.add(superRegion);
 
-    Region a = new Region(1, superRegion, "player1", 0);
-    Region b = new Region(2, superRegion, "player1", 0);
-    Region c = new Region(3, superRegion, "player1", 0);
-    Region d = new Region(4, superRegion2, "player2", 0);
-    Region e = new Region(5, superRegion2, "player2", 0);
+    Region node1 = new Region(1, superRegion, "player1", 0);
+    Region node2 = new Region(2, superRegion, "player1", 0);
+    Region node3 = new Region(3, superRegion, "player1", 0);
+    Region node4 = new Region(4, superRegion2, "player2", 0);
+    Region node5 = new Region(5, superRegion2, "player2", 0);
 
-    a.addNeighbor(c);
-    c.addNeighbor(b);
-    b.addNeighbor(e);
-    // c.addNeighbor(d);
-    d.addNeighbor(e);
+    node1.addNeighbor(node3);
+    node3.addNeighbor(node2);
+    node2.addNeighbor(node5);
+    // node3.addNeighbor(node4);
+    node4.addNeighbor(node5);
 
-    m.add(a);
-    m.add(b);
-    m.add(c);
-    m.add(d);
-    m.add(e);
+    m.add(node1);
+    m.add(node2);
+    m.add(node3);
+    m.add(node4);
+    m.add(node5);
 
     Pathfinder2 pathfinder2 = new Pathfinder2();
 
-    for (Region region : pathfinder2.getShortestPath(a, b)) {
-      System.out.print(region.getId() + " ");
-    }
-    System.out.println();
+    // for (Region region : pathfinder2.getShortestPath(node1, node2)) {
+    //   System.out.print(region.getId() + " ");
+    // }
+    // System.out.println();
 
-    // Region nearest = pathfinder2.getNearestOwnedRegion(c, "player1");
+    // Region nearest = pathfinder2.getNearestOwnedRegion(node3, "player1");
 
-    // System.out.println(pathfinder2.getDistanceBetweenRegions(a, d));
+    // System.out.println(pathfinder2.getDistanceBetweenRegions(node1, node4));
     // pathfinder2.getPlayerInnerRegions("player1");
 
-    // for (Region region : pathfinder2.getPlayerInnerRegions("player1")) {
-    //   System.out.println(region.getId());
-    // }
+    for (Region region : pathfinder2.getPlayerInnerRegions(m, "player1")) {
+      System.out.println(region.getId());
+    }
   }
 }
