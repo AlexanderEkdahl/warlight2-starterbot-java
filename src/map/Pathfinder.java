@@ -20,6 +20,14 @@ public class Pathfinder {
     this.pathfinderWeighter = pathfinderWeighter;
   }
 
+  public Pathfinder(Map map) {
+    this(map, new PathfinderWeighter() {
+      public int weight(Region nodeA, Region nodeB) {
+        return 1;
+      }
+    });
+  }
+
   public void execute(Region source) {
     settledNodes = new HashSet<Region>();
     unSettledNodes = new HashSet<Region>();
@@ -107,6 +115,10 @@ public class Pathfinder {
     // Put it into the correct order
     Collections.reverse(path);
     return path;
+  }
+
+  public Region getNearestOwnedRegion(Region source) {
+    return null;
   }
 
   private static void test() {

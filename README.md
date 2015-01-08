@@ -8,7 +8,7 @@
 
 Run simple integration test from the commandline
 
-    ant jar && java -jar bin/Warlight.jar < fixtures/simple
+    ant clean jar && java -jar bin/Warlight.jar < fixtures/simple
 
 # Links
 
