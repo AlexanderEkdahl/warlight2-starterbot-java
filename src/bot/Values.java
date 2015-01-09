@@ -36,7 +36,7 @@ public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegion
 
 }
 
-public static int calculateWeighedCost(String enemyName, Region r){
+public static int calculateRegionWeighedCost(String enemyName, Region r){
 	if (r.getPlayerName().equals(enemyName)) {
 		return r.getArmies() * costMultiplierEnemy;
 	} else if (r.getPlayerName().equals("neutral")) {
@@ -47,6 +47,14 @@ public static int calculateWeighedCost(String enemyName, Region r){
 	}
 	return staticCostOwned;
 }
+
+public static int calculateSuperRegionWeighedCost(String enemyName, SuperRegion sr){
+	int totalCost = 0;
+	for (Region r : sr.getSubRegions()){
+		totalCost += calculateRegionWeighedCost(enemyName, r);
+	}
+	return totalCost;
+}
 	
 
 
@@ -55,7 +63,7 @@ public static int calculateRequiredForcesAttack(String myName, Region r){
 	// these numbers will be prone to change
 	
 	int armySize = r.getArmies();
-	if (r.getPlayerName() == null){
+	if (r.getPlayerName().equals("unknown")){
 		return 5;
 	}
 	else if (r.getPlayerName().equals(myName)){

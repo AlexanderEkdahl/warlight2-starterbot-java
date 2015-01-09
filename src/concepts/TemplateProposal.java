@@ -57,6 +57,9 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 	public int compareTo(TemplateProposal otherProposal) {
 		if (otherProposal.getWeight() > weight) {
 			return 1;
+		} else if (otherProposal.getWeight() == weight) {
+			return 0;
+
 		} else {
 			return -1;
 		}

@@ -140,7 +140,6 @@ public class BotMain implements Bot {
 				&& currentProposalnr < proposals.size()) {
 			currentProposal = proposals.get(currentProposalnr);
 			System.err.println(currentProposal.toString());
-
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
 					currentProposal.getOrigin(), currentProposal.getTarget(),
 					currentProposal.getForces()));

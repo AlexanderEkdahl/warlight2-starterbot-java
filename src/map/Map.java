@@ -181,4 +181,34 @@ public class Map {
 		return suspected;
 	}
 
+	public ArrayList<Region> getOwnedFrontRegions(BotState state) {
+
+		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
+		ArrayList<Region> neighbors;
+		ArrayList<Region> front = new ArrayList<Region>();
+		for (Region r : owned) {
+			neighbors = r.getNeighbors();
+			for (Region n : neighbors) {
+				if (n.getPlayerName().equals(state.getOpponentPlayerName())) {
+					front.add(r);
+				}
+			}
+		}
+
+		return front;
+
+	}
+
+	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
+		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
+		ArrayList<Region> rFront = getOwnedFrontRegions(state);
+		for (Region r : rFront) {
+			if (!sFront.contains(r.getSuperRegion())) {
+				sFront.add(r.getSuperRegion());
+			}
+		}
+
+		return sFront;
+	}
+
 }
