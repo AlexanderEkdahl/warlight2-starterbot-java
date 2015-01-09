@@ -5,13 +5,15 @@ import java.util.*;
 public class Pathfinder2 {
     private PathfinderWeighter pathfinderWeighter;
     private HashMap<Region, Integer> distances;
+    private Map map;
 
-    public Pathfinder2(PathfinderWeighter pathfinderWeighter) {
+    public Pathfinder2(Map map, PathfinderWeighter pathfinderWeighter) {
+        this.map = map;
         this.pathfinderWeighter = pathfinderWeighter;
     }
 
-    public Pathfinder2() {
-        this(new PathfinderWeighter() {
+    public Pathfinder2(Map map) {
+        this(map, new PathfinderWeighter() {
             public int weight(Region nodeA, Region nodeB) {
                 return 1;
             }
@@ -20,6 +22,24 @@ public class Pathfinder2 {
 
     public Iterator<Region> iterator(Region origin) {
         return new BFSIterator(origin);
+    }
+
+    public class Path {
+      private int distance;
+      private LinkedList<Region> path;
+
+      private Path(int distance, LinkedList<Region> path) {
+          this.distance = distance;
+          this.path = path;
+      }
+
+      public int getDistance() {
+        return distance;
+      }
+
+      public List<Region> getPath() {
+        return path;
+      }
     }
 
     private class BFSIterator implements Iterator<Region> {
@@ -76,6 +96,32 @@ public class Pathfinder2 {
         return null;
     }
 
+    public Path getShortestPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
+      Region origin = null;
+      Region target = null;
+
+      for (Iterator<Region> iterator = new BFSIterator(map.getOwnedRegions(playerName)); iterator.hasNext(); ) {
+        Region next = iterator.next();
+
+        if (next.getSuperRegion() == superRegion) {
+            target = next;
+            // This may result in a suboptimal region found
+            break;
+        }
+      }
+
+      for (Iterator<Region> iterator = new BFSIterator(superRegion.getSubRegions()); iterator.hasNext(); ) {
+        Region next = iterator.next();
+
+        if (next.getPlayerName().equals(playerName)) {
+          origin = next;
+          break;
+        }
+      }
+
+      return getShortestPath(origin, target);
+    }
+
     public Region getNearestOwnedRegion(Region origin, String playerName) {
         for (Iterator<Region> iterator = new BFSIterator(origin); iterator.hasNext(); ) {
             Region next = iterator.next();
@@ -88,7 +134,7 @@ public class Pathfinder2 {
         return null;
     }
 
-    public List<Region> getShortestPath(Region origin, Region target) {
+    public Path getShortestPath(Region origin, Region target) {
         HashMap<Region, Region> previous = new HashMap<Region, Region>();
         distances = new HashMap<Region, Integer>();
         distances.put(origin, 0);
@@ -119,7 +165,7 @@ public class Pathfinder2 {
             path.addFirst(step);
         }
 
-        return path;
+        return new Path(getComputedDistance(target), path);
     }
 
     public int getDistanceBetweenRegions(Region origin, Region target) {
@@ -162,7 +208,7 @@ public class Pathfinder2 {
         return pathfinderWeighter.weight(nodeA, nodeB);
     }
 
-    public static void test(String[] args) {
+    public static void main(String[] args) {
         Map m = new Map();
 
         SuperRegion superRegion = new SuperRegion(0, 0);
@@ -187,20 +233,22 @@ public class Pathfinder2 {
         m.add(node4);
         m.add(node5);
 
-        Pathfinder2 pathfinder2 = new Pathfinder2();
+        Pathfinder2 pathfinder2 = new Pathfinder2(m);
 
-        // for (Region region : pathfinder2.getShortestPath(node1, node2)) {
-        //   System.out.print(region.getId() + " ");
-        // }
-        // System.out.println();
+        Path path = pathfinder2.getShortestPath(node1, node5);
+        System.out.println("Path weight: " + path.getDistance());
+        for (Region region : path.getPath()) {
+          System.out.print(region.getId() + " ");
+        }
+        System.out.println();
 
         // Region nearest = pathfinder2.getNearestOwnedRegion(node3, "player1");
 
         // System.out.println(pathfinder2.getDistanceBetweenRegions(node1, node4));
         // pathfinder2.getPlayerInnerRegions("player1");
 
-        for (Region region : pathfinder2.getPlayerInnerRegions(m, "player1")) {
-            System.out.println(region.getId());
-        }
+        // for (Region region : pathfinder2.getPlayerInnerRegions(m, "player1")) {
+        //     System.out.println(region.getId());
+        // }
     }
 }
