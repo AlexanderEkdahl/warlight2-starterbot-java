@@ -1,5 +1,7 @@
 package map;
 
+import java.util.*;
+
 public class Pathfinder2 {
     private PathfinderWeighter pathfinderWeighter;
     private HashMap<Region, Integer> distances;
