@@ -142,11 +142,11 @@ public class BotMain implements Bot {
 					+ currentProposal.getWeight() + " move from "
 					+ currentProposal.getOrigin().getId() + " to "
 					+ currentProposal.getTarget().getId());
-			availableRegions.remove(currentProposal.getOrigin());
+			
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
 					currentProposal.getOrigin(), currentProposal.getTarget(),
 					currentProposal.getForces()));
-
+			availableRegions.remove(currentProposal.getOrigin());
 			currentProposalnr++;
 		}
 

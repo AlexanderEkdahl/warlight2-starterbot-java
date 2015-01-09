@@ -23,7 +23,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
-			selfImportance = 100;
+			selfImportance = 1000;
 		} else {
 			selfImportance = 1;
 		}
@@ -132,8 +132,7 @@ public class OffensiveCommander extends TemplateCommander {
 									.calculateRequiredForcesAttack(
 											state.getMyPlayerName(), n)) {
 						int forcesAvailable = r.getArmies() - 1;
-						int forcesDisposed = Math.min(forcesAvailable,
-								forcesRequired);
+						int forcesDisposed = forcesAvailable;
 						proposals.add(new ActionProposal(p.getWeight(), r, n,
 								forcesDisposed, p));
 						available.remove(r);
@@ -141,8 +140,6 @@ public class OffensiveCommander extends TemplateCommander {
 
 					}
 					
-					// if here then none of the targets available was worth attacking
-					available.remove(r);
 				}
 			}
 
@@ -168,7 +165,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 			for (Region subr : importantSuperRegion.getSubRegions()) {
 				if (!subr.equals(r)) {
-					proposals.add(new ActionProposal(selfImportance - 10, r,
+					proposals.add(new ActionProposal(selfImportance - 100, r,
 							pathfinder.getPath(subr).get(1), r.getArmies() - 1,
 							attackPlans.get(0)));
 					break;
