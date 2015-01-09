@@ -30,11 +30,19 @@ public class Pathfinder2 {
       }
 
       public int getDistance() {
-        return distance;
+          return distance;
       }
 
       public List<Region> getPath() {
-        return path;
+          return path;
+      }
+
+      public Region getOrigin() {
+          return path.getFirst();
+      }
+
+      public Region getTarget() {
+          return path.getLast();
       }
     }
 
@@ -130,43 +138,74 @@ public class Pathfinder2 {
         return null;
     }
 
-    public Path getShortestPath(Region origin, Region target) {
-        HashMap<Region, Region> previous = new HashMap<Region, Region>();
-        distances = new HashMap<Region, Integer>();
-        distances.put(origin, 0);
-
-        for (Iterator<Region> iterator = new BFSIterator(origin); iterator.hasNext(); ) {
-            Region next = iterator.next();
-
-            for (Region neighbor : next.getNeighbors()) {
-                int distance = getComputedDistance(next) + pathfinderWeighter.weight(next, neighbor);
-
-                if (distance < getComputedDistance(neighbor)) {
-                    distances.put(neighbor, distance);
-                    previous.put(neighbor, next);
-                }
-            }
+    static <K,V extends Comparable<? super V>> SortedSet<java.util.Map.Entry<K,V>> entriesSortedByValues(java.util.Map<K,V> map) {
+      SortedSet<java.util.Map.Entry<K,V>> sortedEntries = new TreeSet<java.util.Map.Entry<K,V>>(
+      new Comparator<java.util.Map.Entry<K,V>>() {
+        @Override public int compare(java.util.Map.Entry<K,V> e1, java.util.Map.Entry<K,V> e2) {
+          int res = e1.getValue().compareTo(e2.getValue());
+          return res != 0 ? res : 1; // Special fix to preserve items with equal values
         }
-
-        LinkedList<Region> path = new LinkedList<Region>();
-        Region step = target;
-
-        if (previous.get(step) == null) {
-            throw new RuntimeException("There should always be a way");
-        }
-
-        path.addFirst(step);
-        while (previous.get(step) != null) {
-            step = previous.get(step);
-            path.addFirst(step);
-        }
-
-        return new Path(getComputedDistance(target), path);
+      }
+      );
+      sortedEntries.addAll(map.entrySet());
+      return sortedEntries;
     }
 
-    public int getDistanceBetweenRegions(Region origin, Region target) {
-        getShortestPath(origin, target);
-        return getComputedDistance(target);
+    public Iterator<Path> distanceIterator(Collection<Region> regions) {
+      HashMap<Region, Region> previous = new HashMap<Region, Region>();
+      distances = new HashMap<Region, Integer>();
+
+      for (Region region : regions) {
+        distances.put(region, 0);
+      }
+
+      for (Iterator<Region> iterator = new BFSIterator(regions); iterator.hasNext(); ) {
+        Region next = iterator.next();
+
+        for (Region neighbor : next.getNeighbors()) {
+          int distance = getComputedDistance(next) + pathfinderWeighter.weight(next, neighbor);
+
+          if (distance < getComputedDistance(neighbor)) {
+            distances.put(neighbor, distance);
+            previous.put(neighbor, next);
+          }
+        }
+      }
+
+      LinkedList<Path> paths = new LinkedList<Path>();
+
+      for (java.util.Map.Entry<Region, Integer> entry  : entriesSortedByValues(distances)) {
+        LinkedList<Region> path = new LinkedList<Region>();
+        Region step = entry.getKey();
+
+        if (previous.get(step) != null) {
+          path.addFirst(step);
+          while (previous.get(step) != null) {
+            step = previous.get(step);
+            path.addFirst(step);
+          }
+
+          paths.add(new Path(entry.getValue(), path));
+        }
+      }
+
+      return paths.iterator();
+    }
+
+    public Iterator<Path> distanceIterator(Region origin) {
+      return distanceIterator(java.util.Collections.singleton(origin));
+    }
+
+    public Path getShortestPath(Region origin, Region target) {
+      for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
+        Path next = iterator.next();
+
+        if (next.getTarget() == target) {
+          return next;
+        }
+      }
+
+      return null;
     }
 
     public List<Region> getPlayerInnerRegions(Map map, String playerName) {
@@ -194,7 +233,7 @@ public class Pathfinder2 {
         Integer d = distances.get(node);
 
         if (d == null) {
-            return 100000;
+            return Integer.MAX_VALUE;
         } else {
             return d;
         }
@@ -227,12 +266,18 @@ public class Pathfinder2 {
 
         Pathfinder2 pathfinder2 = new Pathfinder2(m);
 
-        // Path path = pathfinder2.getShortestPath(node1, node5);
-        // System.out.println("Path weight: " + path.getDistance());
-        // for (Region region : path.getPath()) {
-        //   System.out.print(region.getId() + " ");
+        // Iterator<Path> it = pathfinder2.distanceIterator(node1);
+        // while (it.hasNext()){
+        //   System.out.println(it.next().getTarget());
         // }
-        // System.out.println();
+
+
+        Path path = pathfinder2.getShortestPath(node1, node4);
+        System.out.println("Path weight: " + path.getDistance());
+        for (Region region : path.getPath()) {
+          System.out.print(region.getId() + " ");
+        }
+        System.out.println();
 
         // Region nearest = pathfinder2.getNearestOwnedRegion(node3, "player1");
 
