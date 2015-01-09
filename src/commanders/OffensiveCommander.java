@@ -14,8 +14,9 @@ import map.*;
 import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 50;
+	private static final int rewardMultiplier = 40;
 	private static final int costMultiplier = 1;
+	private static final int staticRegionBonus = 10;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -49,7 +50,6 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 
-
 		ArrayList<Region> neighbors;
 		for (Region r : owned) {
 			neighbors = r.getNeighbors();
@@ -58,7 +58,8 @@ public class OffensiveCommander extends TemplateCommander {
 						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
 					return new PlacementProposal(p.getWeight(), r,
 							Values.calculateRequiredForcesAttack(
-									state.getMyPlayerName(), sr), p);
+									state.getMyPlayerName(), sr), p,
+							"OffensiveCommander");
 				}
 			}
 
@@ -97,8 +98,8 @@ public class OffensiveCommander extends TemplateCommander {
 			int cost = Values.calculateRequiredForcesAttack(
 					state.getMyPlayerName(), s);
 			int reward = s.getArmiesReward();
-			return (reward * rewardMultiplier) - (cost * costMultiplier)
-					- pathCost;
+			return (reward * rewardMultiplier) + staticRegionBonus
+					- (cost * costMultiplier) - pathCost;
 
 		}
 	}
@@ -134,12 +135,12 @@ public class OffensiveCommander extends TemplateCommander {
 						int forcesAvailable = r.getArmies() - 1;
 						int forcesDisposed = forcesAvailable;
 						proposals.add(new ActionProposal(p.getWeight(), r, n,
-								forcesDisposed, p));
+								forcesDisposed, p, "OffensiveCommander"));
 						available.remove(r);
 						break outerLoop;
 
 					}
-					
+
 				}
 			}
 
@@ -167,7 +168,7 @@ public class OffensiveCommander extends TemplateCommander {
 				if (!subr.equals(r)) {
 					proposals.add(new ActionProposal(selfImportance - 100, r,
 							pathfinder.getPath(subr).get(1), r.getArmies() - 1,
-							attackPlans.get(0)));
+							attackPlans.get(0), "OffensiveCommander"));
 					break;
 				}
 			}

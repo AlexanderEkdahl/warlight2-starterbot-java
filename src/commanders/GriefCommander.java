@@ -99,7 +99,7 @@ public class GriefCommander extends TemplateCommander {
 
 		demands += Values.calculateRequiredForcesAttack(myName, targetRegion);
 		float worth = p.getWeight() - totalCost;
-		return new PlacementProposal(worth, nearestRegion, demands, p);
+		return new PlacementProposal(worth, nearestRegion, demands, p, "GriefCommander");
 
 	}
 
@@ -180,10 +180,10 @@ public class GriefCommander extends TemplateCommander {
 		int calculatedForcesRequired = Values.calculateRequiredForcesAttack(state.getMyPlayerName(), bestTarget);
 		
 		if (calculatedForcesRequired > r.getArmies()){
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r, r.getArmies()-1, bestPlan);
+			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r, r.getArmies()-1, bestPlan, "GriefCommander");
 		}
 		else{
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r, bestTarget, r.getArmies()-1, bestPlan);
+			return new ActionProposal(bestPlan.getWeight() - totalCost, r, bestTarget, r.getArmies()-1, bestPlan, "GriefCommander");
 		}
 		
 

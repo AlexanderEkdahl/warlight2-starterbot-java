@@ -82,10 +82,9 @@ public class BotMain implements Bot {
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
-		System.err.println("\tgetPlaceArmiesMoves");
+		System.err.println("\tPlaceArmiesMoves");
 		while (armiesLeft > 0) {
 			if (currentProposalnr >= proposals.size()) {
-				
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
 						.getVisibleMap()
 						.getOwnedRegions(state.getMyPlayerName()).get(0),
@@ -93,6 +92,7 @@ public class BotMain implements Bot {
 				return orders;
 			}
 			currentProposal = proposals.get(currentProposalnr);
+			System.err.println(currentProposal.toString());
 			if (currentProposal.getForces() > armiesLeft) {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
 						currentProposal.getTarget(), armiesLeft));
@@ -103,6 +103,7 @@ public class BotMain implements Bot {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
 						currentProposal.getTarget(), currentProposal
 								.getForces()));
+
 				armiesLeft -= currentProposal.getForces();
 			}
 			currentProposalnr++;
@@ -138,11 +139,8 @@ public class BotMain implements Bot {
 		while (availableRegions.size() > 0
 				&& currentProposalnr < proposals.size()) {
 			currentProposal = proposals.get(currentProposalnr);
-			System.err.println("Executing proposal with priority "
-					+ currentProposal.getWeight() + " move from "
-					+ currentProposal.getOrigin().getId() + " to "
-					+ currentProposal.getTarget().getId());
-			
+			System.err.println(currentProposal.toString());
+
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
 					currentProposal.getOrigin(), currentProposal.getTarget(),
 					currentProposal.getForces()));

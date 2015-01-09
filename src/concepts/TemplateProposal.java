@@ -7,12 +7,15 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 	protected Region target;
 	protected int forces;
 	protected Plan plan;
+	protected String issuedBy;
 
-	public TemplateProposal(float weight, Region target, int forces, Plan plan) {
+	public TemplateProposal(float weight, Region target, int forces, Plan plan,
+			String issuedBy) {
 		this.weight = weight;
 		this.target = target;
 		this.forces = forces;
 		this.plan = plan;
+		this.issuedBy = issuedBy;
 	}
 
 	public Plan getPlan() {
@@ -47,6 +50,10 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 		this.forces = forces;
 	}
 
+	public String getIssuedBy() {
+		return issuedBy;
+	}
+
 	public int compareTo(TemplateProposal otherProposal) {
 		if (otherProposal.getWeight() > weight) {
 			return 1;
@@ -55,9 +62,6 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 		}
 	}
 
-	public String toString() {
-		return "This proposal has a weight of " + weight + " a target of " + target.getId()
-				+ " with " + forces + " forces.";
-	}
+	public abstract String toString();
 
 }

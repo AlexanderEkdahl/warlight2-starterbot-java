@@ -4,35 +4,18 @@ import bot.BotState;
 import map.Region;
 import move.PlaceArmiesMove;
 
-public class PlacementProposal extends TemplateProposal{
+public class PlacementProposal extends TemplateProposal {
 
-	public PlacementProposal(float weight, Region region, int requiredForces, Plan plan) {
-		super(weight, region, requiredForces, plan);
+	public PlacementProposal(float weight, Region region, int requiredForces,
+			Plan plan, String issuedBy) {
+		super(weight, region, requiredForces, plan, issuedBy);
 	}
 
-	public float getWeight() {
-		return weight;
+	@Override
+	public String toString() {
+		return "Weight: " + weight + " Region: " + target + " Forces: "
+				+ forces + " Issued By: " + issuedBy + " Plan: "
+				+ plan.getSr().getId() + " Plan weight: " + plan.getWeight();
 	}
-
-	public void setWeight(int weight) {
-		this.weight = weight;
-	}
-
-	public Region getTarget() {
-		return target;
-	}
-
-	public void setTarget(Region target) {
-		this.target = target;
-	}
-
-	public int getForces() {
-		return forces;
-	}
-
-	public void setForces(int forces) {
-		this.forces = forces;
-	}
-	
 
 }
