@@ -36,7 +36,7 @@ public class Pathfinder2 {
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
       Path path = iterator.next();
 
-      if (next.getPlayerName().equals(playerName)) {
+      if (path.getTarget().getPlayerName().equals(playerName)) {
         return path;
       }
     }
@@ -50,6 +50,18 @@ public class Pathfinder2 {
 
       if (next.getTarget() == target) {
         return next;
+      }
+    }
+
+    return null;
+  }
+
+  public Path getShortestPathToSuperRegionFromRegion(SuperRegion superRegion, Region origin) {
+    for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
+      Path path = iterator.next();
+
+      if (path.getTarget().getSuperRegion() == superRegion) {
+        return path;
       }
     }
 
