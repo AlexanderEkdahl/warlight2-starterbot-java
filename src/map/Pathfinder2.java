@@ -59,6 +59,12 @@ public class Pathfinder2 {
     }
 
     public Region getNearestOwnedRegionToSuperRegion(SuperRegion superRegion, String playerName) {
+        for (Region region : superRegion.getSubRegions()) {
+          if (region.getPlayerName().equals(playerName)) {
+            return region;
+          }
+        }
+
         for (Iterator<Region> iterator = new BFSIterator(superRegion.getSubRegions()); iterator.hasNext(); ) {
             Region next = iterator.next();
 
