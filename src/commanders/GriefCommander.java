@@ -92,14 +92,15 @@ public class GriefCommander extends TemplateCommander {
 		int totalCost = 0;
 		int demands = 0;
 		for (int i = 1; i < path.size(); i++) {
-			totalCost += Values.calculateWeighedCost(enemyName, path.get(i));
+			totalCost += Values.calculateRegionWeighedCost(enemyName, path.get(i));
 			demands += Values
 					.calculateRequiredForcesAttack(myName, path.get(i));
 		}
 
 		demands += Values.calculateRequiredForcesAttack(myName, targetRegion);
 		float worth = p.getWeight() - totalCost;
-		return new PlacementProposal(worth, nearestRegion, demands, p, "GriefCommander");
+		return new PlacementProposal(worth, nearestRegion, demands, p,
+				"GriefCommander");
 
 	}
 
@@ -117,21 +118,25 @@ public class GriefCommander extends TemplateCommander {
 				state.getMyPlayerName());
 
 		ActionProposal tempProposal;
-		if (plans.size() > 0){
+		if (plans.size() > 0) {
 			for (Region r : owned) {
+				if (r.getArmies() < 2) {
+					break;
+				}
 				tempProposal = createOrder(r, state, plans);
-				if (tempProposal != null){
-					
+				if (tempProposal != null) {
+
 				}
 				proposals.add(createOrder(r, state, plans));
 			}
 		}
-		
+
 		return proposals;
 	}
 
 	private ActionProposal createOrder(Region r, BotState state,
 			ArrayList<Plan> plans) {
+
 		final String enemyName = state.getOpponentPlayerName();
 		Map map = state.getVisibleMap();
 		float maxWorth = Integer.MIN_VALUE;
@@ -157,37 +162,36 @@ public class GriefCommander extends TemplateCommander {
 							return Values.staticCostOwned;
 						}
 					});
-			
+
 			pathfinder.execute(r);
-			
+
 			// should be the closest in the region, not .get(0)
 			path = pathfinder.getPath(p.getSr().getSubRegions().get(0));
 			for (int i = 1; i < path.size(); i++) {
-				totalCost += Values.calculateWeighedCost(enemyName, path.get(i));
+				totalCost += Values
+						.calculateRegionWeighedCost(enemyName, path.get(i));
 
 			}
 			float currentWorth = p.getWeight() - totalCost;
-			
-			if (maxWorth < currentWorth){
+
+			if (maxWorth < currentWorth) {
 				maxWorth = currentWorth;
 				bestTarget = path.get(1);
 				bestPlan = p;
 			}
-			
 
 		}
-		
-		int calculatedForcesRequired = Values.calculateRequiredForcesAttack(state.getMyPlayerName(), bestTarget);
-		
-		if (calculatedForcesRequired > r.getArmies()){
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r, r.getArmies()-1, bestPlan, "GriefCommander");
-		}
-		else{
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r, bestTarget, r.getArmies()-1, bestPlan, "GriefCommander");
-		}
-		
 
-		
+		int calculatedForcesRequired = Values.calculateRequiredForcesAttack(
+				state.getMyPlayerName(), bestTarget);
+
+		if (calculatedForcesRequired > r.getArmies()) {
+			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r,
+					r.getArmies() - 1, bestPlan, "GriefCommander");
+		} else {
+			return new ActionProposal(bestPlan.getWeight() - totalCost, r,
+					bestTarget, r.getArmies() - 1, bestPlan, "GriefCommander");
+		}
 
 	}
 }

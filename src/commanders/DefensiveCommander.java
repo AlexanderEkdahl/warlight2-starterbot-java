@@ -2,32 +2,49 @@ package commanders;
 
 import java.util.ArrayList;
 
+///////////// 201 % undone
+
+import map.Region;
 import map.SuperRegion;
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
+import concepts.Plan;
 import bot.BotState;
 
 public class DefensiveCommander extends TemplateCommander {
+	private static final int staticRewardDefence = 10;
+	private static final int rewardDefenseImportanceMultiplier = 15;
+	private static final int enemyTroopMatching = 1;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-		if (state.getVisibleMap().getOwnedSuperRegions(state.getMyPlayerName()).size() < 1){
-			return null;
-		}
-		SuperRegion vulnerable = calculateVulnerableSuperRegion();
-		ArrayList<PlacementProposal> proposals = organizeDefense(vulnerable);
-		return proposals;
+
+		ArrayList<Region> vulnerableRegions = state.getVisibleMap()
+				.getOwnedFrontRegions(state);
+		ArrayList<SuperRegion> vulnerableSuperRegions = state.getVisibleMap()
+				.getOwnedFrontSuperRegions(state);
+		ArrayList<Plan> proposals = calculatePlans(vulnerableSuperRegions);
+		return null;
 	}
 
-	private ArrayList<PlacementProposal> organizeDefense(SuperRegion vulnerable) {
-		// TODO Auto-generated method stub
+	private ArrayList<Plan> calculatePlans(ArrayList<SuperRegion> vulnerableSuperRegions) {
+		ArrayList<Plan> plans = new ArrayList<Plan>();
+		int enemyForces;
+		int reward;
+		
+		ArrayList<Region> enemyFront = new ArrayList<Region>();
+		
+		for (SuperRegion s : vulnerableSuperRegions){
+//			for ()
+			
+		}
 		return null;
 	}
 
 	private SuperRegion calculateVulnerableSuperRegion() {
 		return null;
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -36,5 +53,9 @@ public class DefensiveCommander extends TemplateCommander {
 		return null;
 	}
 
+	private ArrayList<Plan> calculatePlans(BotState state) {
+		return null;
+
+	}
 
 }

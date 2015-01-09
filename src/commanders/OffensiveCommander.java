@@ -11,11 +11,12 @@ import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
+import map.Pathfinder2.Path;
 import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
-	private static final int costMultiplier = 1;
+	private static final int costMultiplier = 4;
 	private static final int staticRegionBonus = 10;
 
 	@Override
@@ -39,6 +40,7 @@ public class OffensiveCommander extends TemplateCommander {
 			tempProposal = prepareAttack(p, state);
 			if (tempProposal != null) {
 				attackPlans.add(prepareAttack(p, state));
+
 			}
 
 		}
@@ -49,22 +51,22 @@ public class OffensiveCommander extends TemplateCommander {
 		SuperRegion sr = p.getSr();
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
+		final String oname = state.getOpponentPlayerName();
+		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
+				new PathfinderWeighter() {
+					public int weight(Region nodeA, Region nodeB) {
+						return Values.calculateRegionWeighedCost(oname, nodeB);
 
-		ArrayList<Region> neighbors;
-		for (Region r : owned) {
-			neighbors = r.getNeighbors();
-			for (Region n : neighbors) {
-				if (n.getSuperRegion().equals(sr)
-						&& !n.getPlayerName().equals(state.getMyPlayerName())) {
-					return new PlacementProposal(p.getWeight(), r,
-							Values.calculateRequiredForcesAttack(
-									state.getMyPlayerName(), sr), p,
-							"OffensiveCommander");
-				}
-			}
+					}
+				});
 
-		}
-		return null;
+		Path path = pathfinder
+				.getShortestPathToSuperRegionFromRegionOwnedByPlayer(sr,
+						state.getMyPlayerName());
+		int SuperregionCost = Values.calculateSuperRegionWeighedCost(
+				state.getOpponentPlayerName(), p.getSr());
+		return new PlacementProposal(p.getWeight() - path.getDistance(), path
+				.getPath().get(0), path.getDistance(), p, "OffensiveCommander");
 
 	}
 
@@ -86,20 +88,10 @@ public class OffensiveCommander extends TemplateCommander {
 
 	private int calculateWorth(SuperRegion s, BotState state) {
 		if (s.getArmiesReward() < 1) {
-			return -1000;
+			return -100;
 		} else {
-			int pathCost = 100;
-			for (Region r : s.getSubRegions()) {
-				if (r.getPlayerName().equals(state.getMyPlayerName())) {
-					pathCost = 0;
-					break;
-				}
-			}
-			int cost = Values.calculateRequiredForcesAttack(
-					state.getMyPlayerName(), s);
 			int reward = s.getArmiesReward();
-			return (reward * rewardMultiplier) + staticRegionBonus
-					- (cost * costMultiplier) - pathCost;
+			return ((reward * rewardMultiplier) + staticRegionBonus);
 
 		}
 	}
@@ -107,7 +99,6 @@ public class OffensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-
 		ArrayList<Plan> attackPlans = calculatePlans(state);
 
 		for (Plan p : attackPlans) {
@@ -119,6 +110,47 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
+		Region closest;
+		final String mName = state.getMyPlayerName();
+		final String eName = state.getOpponentPlayerName();
+		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
+				new PathfinderWeighter() {
+					public int weight(Region nodeA, Region nodeB) {
+						if (nodeB.getPlayerName().equals(mName)) {
+							return 5;
+						} else {
+							return Values.calculateRegionWeighedCost(eName,
+									nodeB);
+						}
+
+					}
+				});
+		
+		
+		int cost = 0;
+		for (Region r : available){
+			for (Plan p : attackPlans){
+				pathfinder
+				
+			}
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		/// EVERYTHING UNDER IS OLD SHIT
+
 		for (Plan p : attackPlans) {
 			int forcesRequired = Values.calculateRequiredForcesAttack(
 					state.getMyPlayerName(), p.getSr());
@@ -151,7 +183,12 @@ public class OffensiveCommander extends TemplateCommander {
 
 		SuperRegion importantSuperRegion = attackPlans.get(0).getSr();
 
+		Path path = pathfinder.get;
+
 		for (Region r : available) {
+			if (r.getArmies() < 2) {
+				break;
+			}
 			final String myName = state.getMyPlayerName();
 			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
 					new PathfinderWeighter() {
