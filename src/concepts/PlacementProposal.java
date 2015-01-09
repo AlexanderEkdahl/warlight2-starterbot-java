@@ -13,7 +13,7 @@ public class PlacementProposal extends TemplateProposal {
 
 	@Override
 	public String toString() {
-		return "Weight: " + weight + " Region: " + target + " Forces: "
+		return "Weight: " + weight + " Region: " + target.getId() + " Forces: "
 				+ forces + " Issued By: " + issuedBy + " Plan: "
 				+ plan.getSr().getId() + " Plan weight: " + plan.getWeight();
 	}

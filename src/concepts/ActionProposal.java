@@ -17,7 +17,7 @@ public class ActionProposal extends TemplateProposal {
 
 	@Override
 	public String toString() {
-		return "Weight: " + weight + " Region: " + target + " From: " + origin
+		return "Weight: " + weight + " Region: " + target.getId() + " From: " + origin.getId()
 				+ " Forces: " + forces + " Issued By: " + issuedBy + " Plan: "
 				+ plan.getSr().getId() + " Plan weight: " + plan.getWeight();
 	}
