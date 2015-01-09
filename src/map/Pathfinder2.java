@@ -20,6 +20,42 @@ public class Pathfinder2 {
     });
   }
 
+  public Path getShortestPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
+    for (Iterator<Path> iterator = distanceIterator(map.getOwnedRegions(playerName)); iterator.hasNext(); ) {
+      Path path = iterator.next();
+
+      if (path.getTarget().getSuperRegion() == superRegion) {
+        return path;
+      }
+    }
+
+    return null;
+  }
+
+  public Path getShortestPathToRegionOwnedByPlayer(Region origin, String playerName) {
+    for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
+      Path path = iterator.next();
+
+      if (next.getPlayerName().equals(playerName)) {
+        return path;
+      }
+    }
+
+    return null;
+  }
+
+  public Path getShortestPath(Region origin, Region target) {
+    for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
+      Path next = iterator.next();
+
+      if (next.getTarget() == target) {
+        return next;
+      }
+    }
+
+    return null;
+  }
+
   public class Path {
     private int distance;
     private LinkedList<Region> path;
@@ -82,48 +118,6 @@ public class Pathfinder2 {
     }
   }
 
-  public Region getNearestOwnedRegionToSuperRegion(SuperRegion superRegion, String playerName) {
-    for (Region region : superRegion.getSubRegions()) {
-      if (region.getPlayerName().equals(playerName)) {
-        return region;
-      }
-    }
-
-    for (Iterator<Region> iterator = new BFSIterator(superRegion.getSubRegions()); iterator.hasNext(); ) {
-      Region next = iterator.next();
-
-      if (next.getPlayerName().equals(playerName)) {
-        return next;
-      }
-    }
-
-    return null;
-  }
-
-  public Path getShortestPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
-    for (Iterator<Path> iterator = distanceIterator(map.getOwnedRegions(playerName)); iterator.hasNext(); ) {
-      Path path = iterator.next();
-
-      if (path.getTarget().getSuperRegion() == superRegion) {
-        return path;
-      }
-    }
-
-    return null;
-  }
-
-  public Region getNearestOwnedRegion(Region origin, String playerName) {
-    for (Iterator<Region> iterator = new BFSIterator(origin); iterator.hasNext(); ) {
-      Region next = iterator.next();
-
-      if (next.getPlayerName().equals(playerName)) {
-        return next;
-      }
-    }
-
-    return null;
-  }
-
   static <K,V extends Comparable<? super V>> SortedSet<java.util.Map.Entry<K,V>> entriesSortedByValues(java.util.Map<K,V> map) {
     SortedSet<java.util.Map.Entry<K,V>> sortedEntries = new TreeSet<java.util.Map.Entry<K,V>>(
     new Comparator<java.util.Map.Entry<K,V>>() {
@@ -137,7 +131,7 @@ public class Pathfinder2 {
     return sortedEntries;
   }
 
-  public Iterator<Path> distanceIterator(Collection<Region> regions) {
+  private Iterator<Path> distanceIterator(Collection<Region> regions) {
     HashMap<Region, Region> previous = new HashMap<Region, Region>();
     distances = new HashMap<Region, Integer>();
 
@@ -178,41 +172,8 @@ public class Pathfinder2 {
     return paths.iterator();
   }
 
-  public Iterator<Path> distanceIterator(Region origin) {
+  private Iterator<Path> distanceIterator(Region origin) {
     return distanceIterator(java.util.Collections.singleton(origin));
-  }
-
-  public Path getShortestPath(Region origin, Region target) {
-    for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
-      Path next = iterator.next();
-
-      if (next.getTarget() == target) {
-        return next;
-      }
-    }
-
-    return null;
-  }
-
-  public List<Region> getPlayerInnerRegions(Map map, String playerName) {
-    ArrayList<Region> innerRegions = new ArrayList<Region>();
-
-    outer:
-    for (Iterator<Region> iterator = new BFSIterator(map.getOwnedRegions(playerName)); iterator.hasNext(); ) {
-      Region next = iterator.next();
-
-      for (Region neighbor : next.getNeighbors()) {
-        System.out.println(next.getId() + " neighbor " + neighbor.getPlayerName());
-        if (!neighbor.getPlayerName().equals(playerName)) {
-          System.out.println("Neighboring other stuff");
-          continue outer;
-        }
-      }
-
-      innerRegions.add(next);
-    }
-
-    return innerRegions;
   }
 
   private int getComputedDistance(Region node) {
