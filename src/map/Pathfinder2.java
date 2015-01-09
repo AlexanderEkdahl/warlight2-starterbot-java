@@ -20,10 +20,6 @@ public class Pathfinder2 {
         });
     }
 
-    public Iterator<Region> iterator(Region origin) {
-        return new BFSIterator(origin);
-    }
-
     public class Path {
       private int distance;
       private LinkedList<Region> path;
@@ -143,7 +139,7 @@ public class Pathfinder2 {
             Region next = iterator.next();
 
             for (Region neighbor : next.getNeighbors()) {
-                int distance = getComputedDistance(next) + getNodeDistance(next, neighbor);
+                int distance = getComputedDistance(next) + pathfinderWeighter.weight(next, neighbor);
 
                 if (distance < getComputedDistance(neighbor)) {
                     distances.put(neighbor, distance);
@@ -204,10 +200,6 @@ public class Pathfinder2 {
         }
     }
 
-    private int getNodeDistance(Region nodeA, Region nodeB) {
-        return pathfinderWeighter.weight(nodeA, nodeB);
-    }
-
     public static void main(String[] args) {
         Map m = new Map();
 
@@ -235,12 +227,12 @@ public class Pathfinder2 {
 
         Pathfinder2 pathfinder2 = new Pathfinder2(m);
 
-        Path path = pathfinder2.getShortestPath(node1, node5);
-        System.out.println("Path weight: " + path.getDistance());
-        for (Region region : path.getPath()) {
-          System.out.print(region.getId() + " ");
-        }
-        System.out.println();
+        // Path path = pathfinder2.getShortestPath(node1, node5);
+        // System.out.println("Path weight: " + path.getDistance());
+        // for (Region region : path.getPath()) {
+        //   System.out.print(region.getId() + " ");
+        // }
+        // System.out.println();
 
         // Region nearest = pathfinder2.getNearestOwnedRegion(node3, "player1");
 
