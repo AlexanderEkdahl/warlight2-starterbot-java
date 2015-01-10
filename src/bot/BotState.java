@@ -29,8 +29,6 @@ public class BotState {
 											// contains all the regions and how
 											// they are connected, doesn't
 											// change after initialization
-	private Map visibleMap; // This map represents everything the player can
-							// see, updated at the end of each round.
 
 	private ArrayList<Region> pickableStartingRegions; // 2 randomly chosen
 														// regions from each
@@ -153,10 +151,9 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
-		visibleMap = fullMap.getMapCopy();
 		for (int i = 1; i < mapInput.length; i++) {
 			try {
-				Region region = visibleMap.getRegion(Integer
+				Region region = fullMap.getRegion(Integer
 						.parseInt(mapInput[i]));
 				String playerName = mapInput[i + 1];
 				int armies = Integer.parseInt(mapInput[i + 2]);
@@ -169,14 +166,6 @@ public class BotState {
 						+ e.getMessage());
 			}
 		}
-		ArrayList<Region> unknownRegions = new ArrayList<Region>();
-
-		// remove regions which are unknown.
-		for (Region region : visibleMap.getRegions().values())
-			if (region.getPlayerName().equals("unknown"))
-				unknownRegions.add(region);
-		for (Region unknownRegion : unknownRegions)
-			visibleMap.getRegions().remove(unknownRegion);
 	}
 
 	// Parses a list of the opponent's moves every round.
@@ -187,21 +176,21 @@ public class BotState {
 			try {
 				Move move;
 				if (moveInput[i + 1].equals("place_armies")) {
-					Region region = visibleMap.getRegion(Integer
+					Region region = fullMap.getRegion(Integer
 							.parseInt(moveInput[i + 2]));
 					String playerName = moveInput[i];
 					int armies = Integer.parseInt(moveInput[i + 3]);
 					move = new PlaceArmiesMove(playerName, region, armies);
 					i += 3;
 				} else if (moveInput[i + 1].equals("attack/transfer")) {
-					Region fromRegion = visibleMap.getRegion(Integer
+					Region fromRegion = fullMap.getRegion(Integer
 							.parseInt(moveInput[i + 2]));
 					if (fromRegion == null) // might happen if the region isn't
 											// visible
 						fromRegion = fullMap.getRegion(Integer
 								.parseInt(moveInput[i + 2]));
 
-					Region toRegion = visibleMap.getRegion(Integer
+					Region toRegion = fullMap.getRegion(Integer
 							.parseInt(moveInput[i + 3]));
 					if (toRegion == null) // might happen if the region isn't
 											// visible
@@ -241,10 +230,6 @@ public class BotState {
 	}
 
 	public Map getVisibleMap() {
-		return visibleMap;
-	}
-
-	public Map getFullMap() {
 		return fullMap;
 	}
 
