@@ -26,7 +26,7 @@ public class Pathfinder2 {
 				.getOwnedRegions(playerName)); iterator.hasNext();) {
 			Path path = iterator.next();
 
-			if (path.getTarget().getSuperRegion() == superRegion) {
+			if (path.getTarget().getSuperRegion().getId() == superRegion.getId()) {
 				return path;
 			}
 		}
