@@ -21,7 +21,7 @@ public class Region {
     private boolean wasteland;
 
     public Region(int id, SuperRegion superRegion) {
-        this(id, superRegion, "unkown", 0);
+        this(id, superRegion, "unknown", 0);
     }
 
     public Region(int id, SuperRegion superRegion, String playerName, int armies) {

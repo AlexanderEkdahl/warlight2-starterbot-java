@@ -198,7 +198,7 @@ public class Pathfinder2 {
     }
   }
 
-  public static void main(String[] args) {
+  public static void blargh(String[] args) {
     Map m = new Map();
 
     SuperRegion superRegion = new SuperRegion(0, 0);

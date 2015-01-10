@@ -141,21 +141,23 @@ public class OffensiveCommander extends TemplateCommander {
 			bestPath = null;
 			maxWeight = Integer.MIN_VALUE;
 			for (Plan p : attackPlans) {
-				currentPath = pathfinder
-						.getShortestPathToSuperRegionFromRegion(p.getSr(), r);
+				for (Region unOwnedRegion : state.getVisibleMap()
+						.getUnOwnedRegionsInSuperRegion(
+								state.getMyPlayerName(), p.getSr())) {
+					currentPath = pathfinder.getShortestPath(r, unOwnedRegion);
+					costOfPath = currentPath.getDistance()
+							- Values.calculateRegionWeighedCost(eName,
+									currentPath.getTarget());
+					currentCost = costOfPath
+							+ Values.calculateSuperRegionWeighedCost(eName,
+									p.getSr());
+					currentWeight = p.getWeight() - currentCost;
 
-				costOfPath = currentPath.getDistance()
-						- Values.calculateRegionWeighedCost(eName,
-								currentPath.getTarget());
-				currentCost = costOfPath
-						+ Values.calculateSuperRegionWeighedCost(eName,
-								p.getSr());
-				currentWeight = p.getWeight() - currentCost;
-
-				if (currentWeight > maxWeight) {
-					maxWeight = currentWeight;
-					bestPath = currentPath;
-					bestPlan = p;
+					if (currentWeight > maxWeight) {
+						maxWeight = currentWeight;
+						bestPath = currentPath;
+						bestPlan = p;
+					}
 				}
 
 			}

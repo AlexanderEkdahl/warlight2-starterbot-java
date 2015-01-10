@@ -145,6 +145,19 @@ public class Map {
 		return owned;
 
 	}
+	
+	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s){
+		ArrayList<Region> unOwned = new ArrayList<Region>();
+		for (Region r : s.getSubRegions()){
+			if (!r.getPlayerName().equals(name)){
+				unOwned.add(r);
+			}
+		}
+		
+		return unOwned;
+		
+	}
+
 
 	private int getSuspectedOwnedRegion(Region region, String opponentPlayerName) {
 		if (region.getPlayerName().equals(opponentPlayerName)) {
