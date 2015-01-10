@@ -20,7 +20,7 @@ public class Pathfinder2 {
     });
   }
 
-  public Path getShortestPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
+  public Path getPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
     for (Iterator<Path> iterator = distanceIterator(map.getOwnedRegions(playerName)); iterator.hasNext(); ) {
       Path path = iterator.next();
 
@@ -32,7 +32,7 @@ public class Pathfinder2 {
     return null;
   }
 
-  public Path getShortestPathToRegionOwnedByPlayer(Region origin, String playerName) {
+  public Path getPathToRegionOwnedByPlayer(Region origin, String playerName) {
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
       Path path = iterator.next();
 
@@ -44,7 +44,7 @@ public class Pathfinder2 {
     return null;
   }
 
-  public Path getShortestPath(Region origin, Region target) {
+  public Path getPath(Region origin, Region target) {
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
       Path next = iterator.next();
 
@@ -56,7 +56,7 @@ public class Pathfinder2 {
     return null;
   }
 
-  public Path getShortestPathToSuperRegionFromRegion(SuperRegion superRegion, Region origin) {
+  public Path getPathToSuperRegionFromRegion(SuperRegion superRegion, Region origin) {
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
       Path path = iterator.next();
 
@@ -68,7 +68,7 @@ public class Pathfinder2 {
     return null;
   }
 
-  public List<Path> getShortestPathToAllRegionsNotOwnedByPlayerFromRegion(Region origin, String playerName) {
+  public List<Path> getPathToAllRegionsNotOwnedByPlayerFromRegion(Region origin, String playerName) {
     ArrayList<Path> paths = new ArrayList<Path>();
 
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
