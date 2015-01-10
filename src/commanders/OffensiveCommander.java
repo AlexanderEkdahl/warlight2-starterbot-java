@@ -22,12 +22,12 @@ public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
 	private static final int staticRegionBonus = 10;
 	private static final int offencePenaltyOfMovingThroughOwnRegion = 5;
-	private HashMap<SuperRegion, Float> worth;;
+	private HashMap<Integer, Float> worth;;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 		Map currentMap = state.getVisibleMap();
-		worth = new HashMap<SuperRegion, Float>();
+		worth = new HashMap<Integer, Float>();
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
@@ -37,20 +37,21 @@ public class OffensiveCommander extends TemplateCommander {
 		}
 
 		worth = calculatePlans(state);
-		ArrayList<PlacementProposal> attackPlans = new ArrayList<PlacementProposal>();
+		ArrayList<PlacementProposal> attackPlans;
 		PlacementProposal tempProposal;
-		Set<SuperRegion> keys = worth.keySet();
-		prepareAttacks(worth, state);
+		Set<Integer> keys = worth.keySet();
+		attackPlans = prepareAttacks(worth, state);
 
 		return attackPlans;
 	}
 
 	private ArrayList<PlacementProposal> prepareAttacks(
-			HashMap<SuperRegion, Float> worth, BotState state) {
+			HashMap<Integer, Float> worth, BotState state) {
 
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		final String oName = state.getOpponentPlayerName();
 		String mName = state.getMyPlayerName();
+		Map map = state.getVisibleMap();
 
 		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
 				new PathfinderWeighter() {
@@ -60,27 +61,29 @@ public class OffensiveCommander extends TemplateCommander {
 					}
 				});
 
-		Set<SuperRegion> keys = worth.keySet();
-		for (SuperRegion s : keys) {
+		Set<Integer> keys = worth.keySet();
+		for (Integer s : keys) {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
-					s, state.getMyPlayerName());
+					map.getSuperRegion(s), state.getMyPlayerName());
 
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(oName, path.getTarget())
-					+ Values.calculateSuperRegionWeighedCost(oName, s);
-			int required = Values.calculateRequiredForcesAttack(mName, s);
+					+ Values.calculateSuperRegionWeighedCost(oName,
+							map.getSuperRegion(s));
+			int required = Values.calculateRequiredForcesAttack(mName,
+					map.getSuperRegion(s));
 
 			float value = worth.get(s) - cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), s,
-					required, "OffensiveCommander"));
+			proposals.add(new PlacementProposal(value, path.getOrigin(), map
+					.getSuperRegion(s), required, "OffensiveCommander"));
 
 		}
 
-		return null;
+		return proposals;
 	}
 
-	private HashMap<SuperRegion, Float> calculatePlans(BotState state) {
-		HashMap<SuperRegion, Float> worth = new HashMap<SuperRegion, Float>();
+	private HashMap<Integer, Float> calculatePlans(BotState state) {
+		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
 		ArrayList<SuperRegion> possibleTargets = state.getFullMap()
 				.getSuperRegions();
 
@@ -89,7 +92,7 @@ public class OffensiveCommander extends TemplateCommander {
 				.getOwnedSuperRegions(state.getMyPlayerName())));
 
 		for (SuperRegion s : possibleTargets) {
-			worth.put(s, calculateWorth(s, state) + selfImportance);
+			worth.put(s.getId(), calculateWorth(s, state) + selfImportance);
 		}
 		return worth;
 	}
@@ -107,13 +110,12 @@ public class OffensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		HashMap<SuperRegion, Float> ranking = calculatePlans(state);
+		HashMap<Integer, Float> ranking = calculatePlans(state);
 
-		Set<SuperRegion> keys = ranking.keySet();
+		Set<Integer> keys = ranking.keySet();
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
 		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
-		Region closest;
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
 		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
@@ -150,6 +152,9 @@ public class OffensiveCommander extends TemplateCommander {
 					mName);
 
 			for (Path path : paths) {
+				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
+					break;
+				}
 				float currentPathCost = path.getDistance()
 						- Values.calculateRegionWeighedCost(eName,
 								path.getTarget());
@@ -157,31 +162,28 @@ public class OffensiveCommander extends TemplateCommander {
 						.calculateSuperRegionWeighedCost(eName, path
 								.getTarget().getSuperRegion());
 				float currentWorth = ranking.get(path.getTarget()
-						.getSuperRegion());
+						.getSuperRegion().getId());
 				currentWeight = currentWorth - currentSuperRegionCost
 						- currentPathCost;
 
 				if (currentWeight > maxWeight) {
 					maxWeight = currentWeight;
-					bestPath = currentPath;
+					bestPath = path;
 					bestPlan = path.getTarget().getSuperRegion();
 				}
 
-				if (currentPath != null) {
-					int calculatedTotalCost = Values
-							.calculateRequiredForcesAttack(mName, bestPath
-									.getTarget().getSuperRegion())
-							+ bestPath.getDistance()
-							- Values.calculateRegionWeighedCost(eName,
-									bestPath.getTarget());
+			}
+			if (bestPath != null) {
+				int calculatedTotalCost = Values.calculateRequiredForcesAttack(
+						mName, bestPath.getTarget().getSuperRegion())
+						+ bestPath.getDistance()
+						- Values.calculateRegionWeighedCost(eName,
+								bestPath.getTarget());
 
-					int deployed = Math.min(calculatedTotalCost,
-							r.getArmies() - 1);
-					proposals.add(new ActionProposal(maxWeight, r, bestPath
-							.getPath().get(1), deployed, bestPlan,
-							"OffensiveCommander"));
-				}
-
+				int deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
+				proposals.add(new ActionProposal(maxWeight, r, bestPath
+						.getPath().get(1), deployed, bestPlan,
+						"OffensiveCommander"));
 			}
 		}
 

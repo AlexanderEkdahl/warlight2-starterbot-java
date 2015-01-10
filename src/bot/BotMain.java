@@ -82,7 +82,8 @@ public class BotMain implements Bot {
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
-		System.err.println("Round: " + state.getRoundNumber() + " PlaceArmiesMoves");
+		System.err.println("Round: " + state.getRoundNumber()
+				+ " PlaceArmiesMoves");
 		while (armiesLeft > 0) {
 			if (currentProposalnr >= proposals.size()) {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
@@ -135,7 +136,8 @@ public class BotMain implements Bot {
 		int currentProposalnr = 0;
 		ActionProposal currentProposal;
 
-		System.err.println("Round: " + state.getRoundNumber() + " AttackTransferMove");
+		System.err.println("Round: " + state.getRoundNumber()
+				+ " AttackTransferMove");
 		while (availableRegions.size() > 0
 				&& currentProposalnr < proposals.size()) {
 			currentProposal = proposals.get(currentProposalnr);
