@@ -87,9 +87,8 @@ public class BotMain implements Bot {
 		while (armiesLeft > 0) {
 			if (currentProposalnr >= proposals.size()) {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
-						.getVisibleMap()
-						.getOwnedRegions(state.getMyPlayerName()).get(0),
-						armiesLeft));
+						.getFullMap().getOwnedRegions(state.getMyPlayerName())
+						.get(0), armiesLeft));
 				return orders;
 			}
 			currentProposal = proposals.get(currentProposalnr);
@@ -125,11 +124,12 @@ public class BotMain implements Bot {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		ArrayList<Region> availableRegions = state.getVisibleMap()
+		ArrayList<Region> availableRegions = state.getFullMap()
 				.getOwnedRegions(state.getMyPlayerName());
 
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
+		System.err.println("There are: " + proposals.size() + " proposals ");
 
 		Collections.sort(proposals);
 

@@ -52,35 +52,6 @@ public class Map {
 	}
 
 	/**
-	 * @return : a new Map object exactly the same as this one
-	 */
-	public Map getMapCopy() {
-		Map newMap = new Map();
-
-		for (SuperRegion sr : superRegions) // copy superRegions
-		{
-			SuperRegion newSuperRegion = new SuperRegion(sr.getId(),
-					sr.getArmiesReward());
-			newMap.add(newSuperRegion);
-		}
-		for (Region r : regions.values()) // copy regions
-		{
-			Region newRegion = new Region(r.getId(), newMap.getSuperRegion(r
-					.getSuperRegion().getId()), r.getPlayerName(),
-					r.getArmies());
-			newMap.add(newRegion);
-		}
-		for (Region r : regions.values()) // add neighbors to copied regions
-		{
-			Region newRegion = newMap.getRegion(r.getId());
-			for (Region neighbor : r.getNeighbors())
-				newRegion.addNeighbor(newMap.getRegion(neighbor.getId()));
-		}
-
-		return newMap;
-	}
-
-	/**
 	 * @return : the list of all Regions in this map
 	 */
 	public HashMap<Integer, Region> getRegions() {

@@ -20,14 +20,13 @@ import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
-	private static final int staticRegionBonus = 10;
+	private static final int staticRegionBonus = 40;
 	private static final int offencePenaltyOfMovingThroughOwnRegion = 5;
-	private HashMap<Integer, Float> worth;;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-		Map currentMap = state.getVisibleMap();
-		worth = new HashMap<Integer, Float>();
+		Map currentMap = state.getFullMap();
+		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
 
 		// if we don't have any super regions, prioritize expansion greatly
 		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
@@ -51,9 +50,9 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		final String oName = state.getOpponentPlayerName();
 		String mName = state.getMyPlayerName();
-		Map map = state.getVisibleMap();
+		Map map = state.getFullMap();
 
-		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
+		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						return Values.calculateRegionWeighedCost(oName, nodeB);
@@ -64,16 +63,19 @@ public class OffensiveCommander extends TemplateCommander {
 		Set<Integer> keys = worth.keySet();
 		for (Integer s : keys) {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
-					map.getSuperRegion(s), state.getMyPlayerName());
-
+					map.getSuperRegion(s.intValue()), state.getMyPlayerName());
+			
+			int required = Values.calculateRequiredForcesAttack(mName,
+					map.getSuperRegion(s));
+			if (path == null){
+				System.err.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER");
+			}
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(oName, path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(oName,
 							map.getSuperRegion(s));
-			int required = Values.calculateRequiredForcesAttack(mName,
-					map.getSuperRegion(s));
 
-			float value = worth.get(s) - cost;
+			float value = worth.get(s) / cost;
 			proposals.add(new PlacementProposal(value, path.getOrigin(), map
 					.getSuperRegion(s), required, "OffensiveCommander"));
 
@@ -88,18 +90,19 @@ public class OffensiveCommander extends TemplateCommander {
 				.getSuperRegions();
 
 		// exclude owned superregions
-		possibleTargets.removeAll((state.getVisibleMap()
-				.getOwnedSuperRegions(state.getMyPlayerName())));
+		// possibleTargets.removeAll((state.getFullMap()
+		// .getOwnedSuperRegions(state.getMyPlayerName())));
 
 		for (SuperRegion s : possibleTargets) {
 			worth.put(s.getId(), calculateWorth(s, state) + selfImportance);
 		}
+		System.err.println("THERE ARE " + worth.size() + " REGIONS AVAILABLE");
 		return worth;
 	}
 
 	private float calculateWorth(SuperRegion s, BotState state) {
 		if (s.getArmiesReward() < 1) {
-			return -100;
+			return -1;
 		} else {
 			int reward = s.getArmiesReward();
 			return ((reward * rewardMultiplier) + staticRegionBonus);
@@ -112,13 +115,11 @@ public class OffensiveCommander extends TemplateCommander {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<Integer, Float> ranking = calculatePlans(state);
 
-		Set<Integer> keys = ranking.keySet();
-		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
+		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
-		ArrayList<Region> available = (ArrayList<Region>) owned.clone();
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
-		Pathfinder2 pathfinder = new Pathfinder2(state.getVisibleMap(),
+		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						if (nodeB.getPlayerName().equals(mName)) {
@@ -132,29 +133,25 @@ public class OffensiveCommander extends TemplateCommander {
 				});
 
 		float maxWeight;
-		float currentCost;
 		float currentWeight;
-		float costOfPath;
 		Path bestPath;
-		Path currentPath = null;
 		SuperRegion bestPlan = null;
+		ArrayList<Path> paths;
 
 		// calculate plans for every sector
 		for (Region r : available) {
 			if (r.getArmies() < 2) {
-				break;
+				continue;
 			}
 
 			bestPath = null;
 			maxWeight = Integer.MIN_VALUE;
-			ArrayList<Path> paths;
+
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
 					mName);
-
+			System.err.println("there are: " + paths.size() + " paths");
 			for (Path path : paths) {
-				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
-					break;
-				}
+
 				float currentPathCost = path.getDistance()
 						- Values.calculateRegionWeighedCost(eName,
 								path.getTarget());
@@ -163,8 +160,8 @@ public class OffensiveCommander extends TemplateCommander {
 								.getTarget().getSuperRegion());
 				float currentWorth = ranking.get(path.getTarget()
 						.getSuperRegion().getId());
-				currentWeight = currentWorth - currentSuperRegionCost
-						- currentPathCost;
+				currentWeight = currentWorth
+						/ (currentSuperRegionCost + currentPathCost);
 
 				if (currentWeight > maxWeight) {
 					maxWeight = currentWeight;
@@ -179,8 +176,12 @@ public class OffensiveCommander extends TemplateCommander {
 						+ bestPath.getDistance()
 						- Values.calculateRegionWeighedCost(eName,
 								bestPath.getTarget());
+				int deployed;
+				if (r.getArmies() / 2 > calculatedTotalCost) {
+					calculatedTotalCost = r.getArmies() / 2;
+				}
 
-				int deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
+				deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
 				proposals.add(new ActionProposal(maxWeight, r, bestPath
 						.getPath().get(1), deployed, bestPlan,
 						"OffensiveCommander"));

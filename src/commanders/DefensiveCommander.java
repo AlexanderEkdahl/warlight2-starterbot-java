@@ -19,9 +19,9 @@ public class DefensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 
-		ArrayList<Region> vulnerableRegions = state.getVisibleMap()
+		ArrayList<Region> vulnerableRegions = state.getFullMap()
 				.getOwnedFrontRegions(state);
-		ArrayList<SuperRegion> vulnerableSuperRegions = state.getVisibleMap()
+		ArrayList<SuperRegion> vulnerableSuperRegions = state.getFullMap()
 				.getOwnedFrontSuperRegions(state);
 		ArrayList<Plan> proposals = calculatePlans(vulnerableSuperRegions);
 		return null;

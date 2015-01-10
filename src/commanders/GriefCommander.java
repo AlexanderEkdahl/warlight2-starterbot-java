@@ -26,7 +26,7 @@ public class GriefCommander extends TemplateCommander {
 		if (state.getRoundNumber() < 3) {
 			return proposals;
 		}
-		ArrayList<Region> enemyRegions = state.getVisibleMap().getOwnedRegions(
+		ArrayList<Region> enemyRegions = state.getFullMap().getOwnedRegions(
 				state.getOpponentPlayerName());
 
 		ArrayList<Plan> plans = calculatePlans(state);
@@ -39,7 +39,7 @@ public class GriefCommander extends TemplateCommander {
 	}
 
 	private ArrayList<Plan> calculatePlans(BotState state) {
-		ArrayList<SuperRegion> enemySuperRegions = state.getVisibleMap()
+		ArrayList<SuperRegion> enemySuperRegions = state.getFullMap()
 				.getSuspectedOwnedSuperRegions(state.getOpponentPlayerName());
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 
@@ -63,7 +63,7 @@ public class GriefCommander extends TemplateCommander {
 
 		final String myName = state.getMyPlayerName();
 		final String enemyName = state.getOpponentPlayerName();
-		Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						if (nodeB.getPlayerName().equals(enemyName)) {
@@ -99,7 +99,7 @@ public class GriefCommander extends TemplateCommander {
 		}
 
 		demands += Values.calculateRequiredForcesAttack(myName, targetRegion);
-		float worth = p.getWeight() - totalCost;
+		float worth = p.getWeight() / totalCost;
 		return new PlacementProposal(worth, nearestRegion, p.getSr(), demands,
 				"GriefCommander");
 
@@ -115,14 +115,14 @@ public class GriefCommander extends TemplateCommander {
 		}
 		ArrayList<Plan> plans = calculatePlans(state);
 
-		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
+		ArrayList<Region> owned = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
 
 		ActionProposal tempProposal;
 		if (plans.size() > 0) {
 			for (Region r : owned) {
 				if (r.getArmies() < 2) {
-					break;
+					continue;
 				}
 				tempProposal = createOrder(r, state, plans);
 				if (tempProposal != null) {
@@ -139,7 +139,7 @@ public class GriefCommander extends TemplateCommander {
 			ArrayList<Plan> plans) {
 
 		final String enemyName = state.getOpponentPlayerName();
-		Map map = state.getVisibleMap();
+		Map map = state.getFullMap();
 		float maxWorth = Integer.MIN_VALUE;
 		SuperRegion sr;
 		LinkedList<Region> path;
@@ -148,7 +148,7 @@ public class GriefCommander extends TemplateCommander {
 		Plan bestPlan = null;
 		for (Plan p : plans) {
 			sr = p.getSr();
-			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+			Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 					new PathfinderWeighter() {
 						public int weight(Region nodeA, Region nodeB) {
 							if (nodeB.getPlayerName().equals(enemyName)) {
@@ -173,7 +173,7 @@ public class GriefCommander extends TemplateCommander {
 						path.get(i));
 
 			}
-			float currentWorth = p.getWeight() - totalCost;
+			float currentWorth = p.getWeight() / totalCost;
 
 			if (maxWorth < currentWorth) {
 				maxWorth = currentWorth;

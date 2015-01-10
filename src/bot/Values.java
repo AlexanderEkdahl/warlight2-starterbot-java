@@ -72,11 +72,11 @@ public class Values {
 		}
 
 		else if (armySize <= 2) {
-			return armySize + 1;
+			return armySize + 4;
 		} else if (armySize <= 3) {
-			return armySize + 2;
+			return armySize + 5;
 		} else if (armySize <= 5) {
-			return armySize + 3;
+			return armySize + 7;
 		} else {
 			return (int) (armySize * 1.5);
 		}
@@ -87,8 +87,6 @@ public class Values {
 		int totalRequired = 0;
 		ArrayList<Region> regions = s.getSubRegions();
 
-		// must leave one dude on each tile
-		totalRequired += regions.size();
 
 		for (Region r : regions) {
 			totalRequired += calculateRequiredForcesAttack(myName, r);

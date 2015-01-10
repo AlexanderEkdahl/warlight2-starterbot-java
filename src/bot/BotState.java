@@ -25,7 +25,7 @@ public class BotState {
 	private String myName = "";
 	private String opponentName = "";
 
-	private final Map fullMap = new Map(); // This map is known from the start,
+	private Map fullMap = new Map(); // This map is known from the start,
 											// contains all the regions and how
 											// they are connected, doesn't
 											// change after initialization
@@ -229,7 +229,7 @@ public class BotState {
 		return roundNumber;
 	}
 
-	public Map getVisibleMap() {
+	public Map getFullMap() {
 		return fullMap;
 	}
 
