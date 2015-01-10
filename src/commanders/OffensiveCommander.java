@@ -16,7 +16,6 @@ import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
-	private static final int costMultiplier = 4;
 	private static final int staticRegionBonus = 10;
 
 	@Override
@@ -105,7 +104,6 @@ public class OffensiveCommander extends TemplateCommander {
 			p.setWeight(p.getWeight() + selfImportance);
 		}
 		Collections.sort(attackPlans);
-		ArrayList<Region> neighbors;
 
 		ArrayList<Region> owned = state.getVisibleMap().getOwnedRegions(
 				state.getMyPlayerName());
@@ -125,93 +123,124 @@ public class OffensiveCommander extends TemplateCommander {
 
 					}
 				});
-		
-		
-		int cost = 0;
-		for (Region r : available){
-			for (Plan p : attackPlans){
-				pathfinder
-				
-			}
-		}
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/// EVERYTHING UNDER IS OLD SHIT
 
-		for (Plan p : attackPlans) {
-			int forcesRequired = Values.calculateRequiredForcesAttack(
-					state.getMyPlayerName(), p.getSr());
+		float maxWeight;
+		float currentCost;
+		float currentWeight;
+		float costOfPath;
+		Path bestPath;
+		Path currentPath = null;
+		Plan bestPlan = null;
 
-			outerLoop: for (Region r : owned) {
-				neighbors = r.getNeighbors();
-				for (Region n : neighbors) {
-					if (n.getSuperRegion().equals(p.getSr())
-							&& !(n.getPlayerName().equals(state
-									.getMyPlayerName()))
-							&& r.getArmies() > Values
-									.calculateRequiredForcesAttack(
-											state.getMyPlayerName(), n)) {
-						int forcesAvailable = r.getArmies() - 1;
-						int forcesDisposed = forcesAvailable;
-						proposals.add(new ActionProposal(p.getWeight(), r, n,
-								forcesDisposed, p, "OffensiveCommander"));
-						available.remove(r);
-						break outerLoop;
-
-					}
-
-				}
-			}
-
-		}
-
-		// move idle units up to the most important superRegion with high
-		// importance
-
-		SuperRegion importantSuperRegion = attackPlans.get(0).getSr();
-
-		Path path = pathfinder.get;
-
+		// calculate plans for every sector
 		for (Region r : available) {
 			if (r.getArmies() < 2) {
 				break;
 			}
-			final String myName = state.getMyPlayerName();
-			Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
-					new PathfinderWeighter() {
-						public int weight(Region nodeA, Region nodeB) {
-							if (!nodeB.getPlayerName().equals(myName)) {
-								return nodeB.getArmies();
-							}
-							return 1;
-						}
-					});
-			pathfinder.execute(r);
 
-			for (Region subr : importantSuperRegion.getSubRegions()) {
-				if (!subr.equals(r)) {
-					proposals.add(new ActionProposal(selfImportance - 100, r,
-							pathfinder.getPath(subr).get(1), r.getArmies() - 1,
-							attackPlans.get(0), "OffensiveCommander"));
-					break;
+			bestPath = null;
+			maxWeight = Integer.MIN_VALUE;
+			for (Plan p : attackPlans) {
+				currentPath = pathfinder
+						.getShortestPathToSuperRegionFromRegion(p.getSr(), r);
+
+				costOfPath = currentPath.getDistance()
+						- Values.calculateRegionWeighedCost(eName,
+								currentPath.getTarget());
+				currentCost = costOfPath
+						+ Values.calculateSuperRegionWeighedCost(eName,
+								p.getSr());
+				currentWeight = p.getWeight() - currentCost;
+
+				if (currentWeight > maxWeight) {
+					maxWeight = currentWeight;
+					bestPath = currentPath;
+					bestPlan = p;
 				}
+
 			}
+			if (currentPath != null) {
+				int calculatedTotalCost = Values.calculateRequiredForcesAttack(
+						mName, bestPath.getTarget().getSuperRegion())
+						+ bestPath.getDistance()
+						- Values.calculateRegionWeighedCost(eName,
+								bestPath.getTarget());
+
+				int deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
+				proposals.add(new ActionProposal(maxWeight, r, bestPath
+						.getPath().get(1), deployed, bestPlan,
+						"OffensiveCommander"));
+			}
+
 		}
 
 		return proposals;
-
 	}
 }
+
+// / EVERYTHING UNDER HERE IS OLD SHIT
+//
+// for (Plan p : attackPlans) {
+// int forcesRequired = Values.calculateRequiredForcesAttack(
+// state.getMyPlayerName(), p.getSr());
+//
+// outerLoop: for (Region r : owned) {
+// neighbors = r.getNeighbors();
+// for (Region n : neighbors) {
+// if (n.getSuperRegion().equals(p.getSr())
+// && !(n.getPlayerName().equals(state
+// .getMyPlayerName()))
+// && r.getArmies() > Values
+// .calculateRequiredForcesAttack(
+// state.getMyPlayerName(), n)) {
+// int forcesAvailable = r.getArmies() - 1;
+// int forcesDisposed = forcesAvailable;
+// proposals.add(new ActionProposal(p.getWeight(), r, n,
+// forcesDisposed, p, "OffensiveCommander"));
+// available.remove(r);
+// break outerLoop;
+//
+// }
+//
+// }
+// }
+//
+// }
+//
+// // move idle units up to the most important superRegion with high
+// // importance
+//
+// SuperRegion importantSuperRegion = attackPlans.get(0).getSr();
+//
+// Path path = pathfinder.get;
+//
+// for (Region r : available) {
+// if (r.getArmies() < 2) {
+// break;
+// }
+// final String myName = state.getMyPlayerName();
+// Pathfinder pathfinder = new Pathfinder(state.getVisibleMap(),
+// new PathfinderWeighter() {
+// public int weight(Region nodeA, Region nodeB) {
+// if (!nodeB.getPlayerName().equals(myName)) {
+// return nodeB.getArmies();
+// }
+// return 1;
+// }
+// });
+// pathfinder.execute(r);
+//
+// for (Region subr : importantSuperRegion.getSubRegions()) {
+// if (!subr.equals(r)) {
+// proposals.add(new ActionProposal(selfImportance - 100, r,
+// pathfinder.getPath(subr).get(1), r.getArmies() - 1,
+// attackPlans.get(0), "OffensiveCommander"));
+// break;
+// }
+// }
+// }
+//
+// return proposals;
+//
+// }
+
