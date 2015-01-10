@@ -68,7 +68,7 @@ public class Pathfinder2 {
     return null;
   }
 
-  public List<Path> getPathToAllRegionsNotOwnedByPlayerFromRegion(Region origin, String playerName) {
+  public ArrayList<Path> getPathToAllRegionsNotOwnedByPlayerFromRegion(Region origin, String playerName) {
     ArrayList<Path> paths = new ArrayList<Path>();
 
     for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext(); ) {
