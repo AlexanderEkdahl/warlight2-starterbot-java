@@ -25,12 +25,13 @@ public class Pathfinder2 {
 		for (Iterator<Path> iterator = distanceIterator(map
 				.getOwnedRegions(playerName)); iterator.hasNext();) {
 			Path path = iterator.next();
-
+			System.err.println("PATH STUFF: " + path.getTarget());
 			if (path.getTarget().getSuperRegion().getId() == superRegion.getId()) {
 				return path;
 			}
 		}
 
+		System.err.println("OMG, WE'RE ALL GONNA DIE!!");
 		return null;
 	}
 
