@@ -1,13 +1,13 @@
 package concepts;
 
-import map.Region;
+import map.*;
 
 public class ActionProposal extends TemplateProposal {
 	private Region origin;
 
 	public ActionProposal(float weight, Region origin, Region target,
-			int requiredForces, Plan plan, String issuedBy) {
-		super(weight, target, requiredForces, plan, issuedBy);
+			int requiredForces, SuperRegion plan, String issuedBy) {
+		super(weight, target, plan, requiredForces, issuedBy);
 		this.origin = origin;
 	}
 
@@ -17,9 +17,9 @@ public class ActionProposal extends TemplateProposal {
 
 	@Override
 	public String toString() {
-		return "Weight: " + weight + " Region: " + target.getId() + " From: " + origin.getId()
-				+ " Forces: " + forces + " Issued By: " + issuedBy + " Plan: "
-				+ plan.getSr().getId() + " Plan weight: " + plan.getWeight();
+		return "Weight: " + weight + " Region: " + target.getId() + " From: "
+				+ origin.getId() + " Forces: " + forces + " Issued By: "
+				+ issuedBy + " Plan: " + plan.getId();
 	}
 
 }

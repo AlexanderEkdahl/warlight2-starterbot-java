@@ -92,14 +92,15 @@ public class GriefCommander extends TemplateCommander {
 		int totalCost = 0;
 		int demands = 0;
 		for (int i = 1; i < path.size(); i++) {
-			totalCost += Values.calculateRegionWeighedCost(enemyName, path.get(i));
+			totalCost += Values.calculateRegionWeighedCost(enemyName,
+					path.get(i));
 			demands += Values
 					.calculateRequiredForcesAttack(myName, path.get(i));
 		}
 
 		demands += Values.calculateRequiredForcesAttack(myName, targetRegion);
 		float worth = p.getWeight() - totalCost;
-		return new PlacementProposal(worth, nearestRegion, demands, p,
+		return new PlacementProposal(worth, nearestRegion, p.getSr(), demands,
 				"GriefCommander");
 
 	}
@@ -168,8 +169,8 @@ public class GriefCommander extends TemplateCommander {
 			// should be the closest in the region, not .get(0)
 			path = pathfinder.getPath(p.getSr().getSubRegions().get(0));
 			for (int i = 1; i < path.size(); i++) {
-				totalCost += Values
-						.calculateRegionWeighedCost(enemyName, path.get(i));
+				totalCost += Values.calculateRegionWeighedCost(enemyName,
+						path.get(i));
 
 			}
 			float currentWorth = p.getWeight() - totalCost;
@@ -187,10 +188,11 @@ public class GriefCommander extends TemplateCommander {
 
 		if (calculatedForcesRequired > r.getArmies()) {
 			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r,
-					r.getArmies() - 1, bestPlan, "GriefCommander");
+					r.getArmies() - 1, bestPlan.getSr(), "GriefCommander");
 		} else {
 			return new ActionProposal(bestPlan.getWeight() - totalCost, r,
-					bestTarget, r.getArmies() - 1, bestPlan, "GriefCommander");
+					bestTarget, r.getArmies() - 1, bestPlan.getSr(),
+					"GriefCommander");
 		}
 
 	}
