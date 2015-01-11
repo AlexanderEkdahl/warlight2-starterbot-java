@@ -129,7 +129,6 @@ public class BotMain implements Bot {
 
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
-		System.err.println("There are: " + proposals.size() + " proposals ");
 
 		Collections.sort(proposals);
 

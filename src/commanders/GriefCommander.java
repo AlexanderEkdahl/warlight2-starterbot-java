@@ -1,18 +1,21 @@
 package commanders;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import map.Map;
 import map.Pathfinder;
+import map.Pathfinder2;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
+import map.Pathfinder2.Path;
 import bot.BotState;
 import bot.Values;
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
-import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
 	public static final int valueDenialMultiplier = 20;
@@ -29,81 +32,75 @@ public class GriefCommander extends TemplateCommander {
 		ArrayList<Region> enemyRegions = state.getFullMap().getOwnedRegions(
 				state.getOpponentPlayerName());
 
-		ArrayList<Plan> plans = calculatePlans(state);
+		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
+		worth = calculatePlans(state);
 
-		for (Plan p : plans) {
-			proposals.add(prepareAttack(p, state));
+		ArrayList<PlacementProposal> attackPlans;
+		attackPlans = prepareAttacks(worth, state);
+
+		return attackPlans;
+	}
+
+	private ArrayList<PlacementProposal> prepareAttacks(
+			HashMap<Integer, Float> worth, BotState state) {
+		Set<Integer> keys = worth.keySet();
+		final String oName = state.getOpponentPlayerName();
+		final String mName = state.getMyPlayerName();
+		Map map = state.getFullMap();
+		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
+
+		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+				new PathfinderWeighter() {
+					public int weight(Region nodeA, Region nodeB) {
+						return Values.calculateRegionWeighedCost(oName, nodeB);
+
+					}
+				});
+
+		for (Integer s : keys) {
+			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
+					map.getSuperRegion(s), state.getMyPlayerName());
+
+			
+			if (path == null) {
+				System.err
+						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, GRIEFCOMMANDER CAN'T PLACE");
+				continue;
+			}
+			int required = path.getDistance();
+			float cost = path.getDistance()
+					- Values.calculateRegionWeighedCost(oName, path.getTarget())
+					+ Values.calculateSuperRegionWeighedCost(oName,
+							map.getSuperRegion(s));
+
+			float value = worth.get(s) / cost;
+			proposals.add(new PlacementProposal(value, path.getOrigin(), map
+					.getSuperRegion(s), required, "GriefCommander"));
+
 		}
 
 		return proposals;
 	}
 
-	private ArrayList<Plan> calculatePlans(BotState state) {
+	private HashMap<Integer, Float> calculatePlans(BotState state) {
 		ArrayList<SuperRegion> enemySuperRegions = state.getFullMap()
 				.getSuspectedOwnedSuperRegions(state.getOpponentPlayerName());
-		ArrayList<Plan> plans = new ArrayList<Plan>();
+
+		HashMap<Integer, Float> plans = new HashMap<Integer, Float>();
 
 		for (SuperRegion s : enemySuperRegions) {
 			// for every super region they have, calculate how to execute an
-			// eventual attack and how much it would cost/be worth
+			// eventual attack and how much it would be worth
 
-			int reward = s.getArmiesReward();
+			float reward = s.getArmiesReward();
 
-			plans.add(new Plan(s, reward * valueDenialMultiplier));
+			plans.put(s.getId(), reward * valueDenialMultiplier);
 
 		}
 		return plans;
 	}
 
-	private PlacementProposal prepareAttack(Plan p, BotState state) {
 
-		SuperRegion s = p.getSr();
-		Region nearestRegion;
-		LinkedList<Region> path;
-
-		final String myName = state.getMyPlayerName();
-		final String enemyName = state.getOpponentPlayerName();
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
-				new PathfinderWeighter() {
-					public int weight(Region nodeA, Region nodeB) {
-						if (nodeB.getPlayerName().equals(enemyName)) {
-							return nodeB.getArmies()
-									* Values.costMultiplierEnemy;
-						} else if (nodeB.getPlayerName().equals("neutral")) {
-							return nodeB.getArmies()
-									* Values.costMultiplierNeutral;
-						} else if (nodeB.getPlayerName().equals("unknown")) {
-							return Values.staticCostUnknown;
-						}
-						return Values.staticCostOwned;
-					}
-				});
-		// targetRegion should be changed to closest, right now it isn't
-		Region targetRegion = s.getSubRegions().get(0);
-		nearestRegion = pathfinder.getNearestOwnedRegion(targetRegion,
-				state.getMyPlayerName());
-
-		pathfinder.execute(nearestRegion);
-		path = pathfinder.getPath(targetRegion);
-
-		// calculate how worth it the path would be
-		// and how many would be needed
-
-		int totalCost = 0;
-		int demands = 0;
-		for (int i = 1; i < path.size(); i++) {
-			totalCost += Values.calculateRegionWeighedCost(enemyName,
-					path.get(i));
-			demands += Values
-					.calculateRequiredForcesAttack(myName, path.get(i));
-		}
-
-		demands += Values.calculateRequiredForcesAttack(myName, targetRegion);
-		float worth = p.getWeight() / totalCost;
-		return new PlacementProposal(worth, nearestRegion, p.getSr(), demands,
-				"GriefCommander");
-
-	}
 
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
@@ -113,7 +110,7 @@ public class GriefCommander extends TemplateCommander {
 		if (state.getRoundNumber() < 3) {
 			return proposals;
 		}
-		ArrayList<Plan> plans = calculatePlans(state);
+		HashMap<Integer, Float> plans = calculatePlans(state);
 
 		ArrayList<Region> owned = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
