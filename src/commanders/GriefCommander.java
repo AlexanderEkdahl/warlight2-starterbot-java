@@ -62,8 +62,7 @@ public class GriefCommander extends TemplateCommander {
 					map.getSuperRegion(s), state.getMyPlayerName());
 
 			if (path == null) {
-				System.err
-						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, GRIEFCOMMANDER CANNOT PLACE");
+				// Super region is already controlled
 				continue;
 			}
 			int required = path.getDistance();

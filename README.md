@@ -23,8 +23,8 @@ Pathfinder2 pathfinder2 = new Pathfinder2(m);
 
 Path path = pathfinder2.getShortestPathToSuperRegionFromRegionOwnedByPlayer(superRegion, "player1");
 
-System.out.println("Total distance: " + path.getDistance());
-System.out.println("Origin region: " + path.getOrigin());
+System.err.println("Total distance: " + path.getDistance());
+System.err.println("Origin region: " + path.getOrigin());
 
 for (Region region : path.getPath()) {
   System.out.print(region);

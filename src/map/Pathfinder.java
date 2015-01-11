@@ -168,11 +168,11 @@ public class Pathfinder {
     });
     pathfinder.execute(a);
 
-    System.out.println(pathfinder.getShortestDistance(c));
+    System.err.println(pathfinder.getShortestDistance(c));
 
     for (Region node : pathfinder.getPath(c)) {
-      System.out.print(node.getId() + " ");
+      System.err.print(node.getId() + " ");
     }
-    System.out.println();
+    System.err.println();
   }
 }

@@ -19,15 +19,12 @@ import move.PlaceArmiesMove;
 import move.AttackTransferMove;
 
 public class BotParser {
-
 	final Scanner scan;
-
 	final Bot bot;
-
 	BotState currentState;
 
-	public BotParser(Bot bot, InputStream in) {
-		this.scan = new Scanner(in);
+	public BotParser(Bot bot) {
+		this.scan = new Scanner(System.in);
 		this.bot = bot;
 		this.currentState = new BotState();
 	}
@@ -38,15 +35,15 @@ public class BotParser {
 			if (line.length() == 0) {
 				continue;
 			}
-			System.err.println("Input: " + line);
+			System.err.println("Input(" + currentState.getRoundNumber() + "): " + line);
+
 			String[] parts = line.split(" ");
 			if (parts[0].equals("pick_starting_region")) {
-				// pick which regions you want to start with
 				currentState.setPickableStartingRegions(parts);
 				Region startingRegion = bot.getStartingRegion(currentState,
 						Long.valueOf(parts[1]));
 
-				System.out.println(startingRegion.getId());
+				output(Integer.toString(startingRegion.getId()));
 			} else if (parts.length == 3 && parts[0].equals("go")) {
 				// we need to do a move
 				String output = "";
@@ -66,9 +63,9 @@ public class BotParser {
 						output = output.concat(move.getString() + ",");
 				}
 				if (output.length() > 0)
-					System.out.println(output);
+					output(output);
 				else
-					System.out.println("No moves");
+				output("No moves");
 			} else if (parts[0].equals("settings")) {
 				// update settings
 				currentState.updateSettings(parts[1], parts[2]);
@@ -87,4 +84,8 @@ public class BotParser {
 		}
 	}
 
+	private void output(String s) {
+		System.err.println("Output(" + currentState.getRoundNumber() + "): " + s);
+		System.out.println(s);
+	}
 }

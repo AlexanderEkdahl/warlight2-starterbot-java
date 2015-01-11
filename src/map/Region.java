@@ -19,6 +19,7 @@ public class Region {
     private int armies;
     private String playerName;
     private boolean wasteland;
+    private boolean visible;
 
     public Region(int id, SuperRegion superRegion) {
         this(id, superRegion, "unknown", 0);
@@ -117,4 +118,11 @@ public class Region {
         return wasteland;
     }
 
+    public void setVisible(boolean visible) {
+      this.visible = visible;
+    }
+
+    public boolean getVisible() {
+      return visible;
+    }
 }

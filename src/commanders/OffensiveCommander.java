@@ -59,8 +59,7 @@ public class OffensiveCommander extends TemplateCommander {
 			int required = Values.calculateRequiredForcesAttack(mName,
 					map.getSuperRegion(s));
 			if (path == null) {
-				System.err
-						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CANNOT PLACE");
+				// Super region is already controlled
 				continue;
 			}
 			float cost = path.getDistance()

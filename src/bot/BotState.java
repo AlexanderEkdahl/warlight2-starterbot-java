@@ -37,9 +37,6 @@ public class BotState {
 														// can chose to start
 														// with
 
-	private ArrayList<Move> opponentMoves; // list of all the opponent's moves,
-											// reset at the end of each round
-
 	private int startingArmies; // number of armies the player can place on map
 	private int maxRounds;
 	private int roundNumber;
@@ -49,7 +46,6 @@ public class BotState {
 								// timebank per requested move
 
 	public BotState() {
-		opponentMoves = new ArrayList<Move>();
 		roundNumber = 0;
 	}
 
@@ -123,13 +119,26 @@ public class BotState {
 			for (i = 2; i < mapInput.length; i++) {
 				try {
 					Region region = fullMap.getRegion(Integer
-							.parseInt(mapInput[i]));
+					.parseInt(mapInput[i]));
 					region.setWasteland(true);
 				} catch (Exception e) {
 					System.err.println("Unable to parse wastelands "
-							+ e.getMessage());
+					+ e.getMessage());
 				}
 			}
+		} else if (mapInput[1].equals("opponent_starting_regions")) {
+			for (i = 2; i < mapInput.length; i++) {
+				try {
+					Region region = fullMap.getRegion(Integer
+					.parseInt(mapInput[i]));
+					region.setPlayerName(opponentName);
+				} catch (Exception e) {
+					System.err.println("Unable to parse opponent_starting_regions "
+					+ e.getMessage());
+				}
+			}
+		} else {
+			System.err.println("Did not parse previous setup_map");
 		}
 	}
 
@@ -151,7 +160,6 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
-		System.err.println("Updating map");
 		for (int i = 1; i < mapInput.length; i++) {
 			try {
 				Region region = fullMap.getRegion(Integer
@@ -162,7 +170,6 @@ public class BotState {
 				region.setPlayerName(playerName);
 				region.setArmies(armies);
 				i += 2;
-				System.err.println("\tUpdating region: " + region);
 			} catch (Exception e) {
 				System.err.println("Unable to parse Map Update "
 						+ e.getMessage());
@@ -170,49 +177,8 @@ public class BotState {
 		}
 	}
 
-	// Parses a list of the opponent's moves every round.
-	// Clears it at the start, so only the moves of this round are stored.
 	public void readOpponentMoves(String[] moveInput) {
-		opponentMoves.clear();
-		for (int i = 1; i < moveInput.length; i++) {
-			try {
-				Move move;
-				if (moveInput[i + 1].equals("place_armies")) {
-					Region region = fullMap.getRegion(Integer
-							.parseInt(moveInput[i + 2]));
-					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i + 3]);
-					move = new PlaceArmiesMove(playerName, region, armies);
-					i += 3;
-				} else if (moveInput[i + 1].equals("attack/transfer")) {
-					Region fromRegion = fullMap.getRegion(Integer
-							.parseInt(moveInput[i + 2]));
-					if (fromRegion == null) // might happen if the region isn't
-											// visible
-						fromRegion = fullMap.getRegion(Integer
-								.parseInt(moveInput[i + 2]));
-
-					Region toRegion = fullMap.getRegion(Integer
-							.parseInt(moveInput[i + 3]));
-					if (toRegion == null) // might happen if the region isn't
-											// visible
-						toRegion = fullMap.getRegion(Integer
-								.parseInt(moveInput[i + 3]));
-
-					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i + 4]);
-					move = new AttackTransferMove(playerName, fromRegion,
-							toRegion, armies);
-					i += 4;
-				} else { // never happens
-					continue;
-				}
-				opponentMoves.add(move);
-			} catch (Exception e) {
-				System.err.println("Unable to parse Opponent moves "
-						+ e.getMessage());
-			}
-		}
+		// Does nothing for now, current is state is given from update_map
 	}
 
 	public String getMyPlayerName() {
@@ -233,10 +199,6 @@ public class BotState {
 
 	public Map getFullMap() {
 		return fullMap;
-	}
-
-	public ArrayList<Move> getOpponentMoves() {
-		return opponentMoves;
 	}
 
 	public ArrayList<Region> getPickableStartingRegions() {
