@@ -15,10 +15,6 @@ public class BotMain implements Bot {
 	private DefensiveCommander dc;
 	private GriefCommander gc;
 
-	public static void main(String[] args) {
-		new BotParser(new BotMain()).run();
-	}
-
 	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
