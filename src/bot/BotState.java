@@ -151,6 +151,7 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
+		System.err.println("Updating map");
 		for (int i = 1; i < mapInput.length; i++) {
 			try {
 				Region region = fullMap.getRegion(Integer
@@ -161,6 +162,7 @@ public class BotState {
 				region.setPlayerName(playerName);
 				region.setArmies(armies);
 				i += 2;
+				System.err.println("\tUpdating region: " + region);
 			} catch (Exception e) {
 				System.err.println("Unable to parse Map Update "
 						+ e.getMessage());

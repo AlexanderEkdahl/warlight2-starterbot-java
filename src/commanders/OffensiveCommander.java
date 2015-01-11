@@ -60,7 +60,7 @@ public class OffensiveCommander extends TemplateCommander {
 					map.getSuperRegion(s));
 			if (path == null) {
 				System.err
-						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CAN'T PLACE");
+						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CANNOT PLACE");
 				continue;
 			}
 			float cost = path.getDistance()

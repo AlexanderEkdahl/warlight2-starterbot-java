@@ -38,6 +38,7 @@ public class BotParser {
 			if (line.length() == 0) {
 				continue;
 			}
+			System.err.println("Input: " + line);
 			String[] parts = line.split(" ");
 			if (parts[0].equals("pick_starting_region")) {
 				// pick which regions you want to start with

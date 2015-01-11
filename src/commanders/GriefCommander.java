@@ -63,7 +63,7 @@ public class GriefCommander extends TemplateCommander {
 
 			if (path == null) {
 				System.err
-						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, GRIEFCOMMANDER CAN'T PLACE");
+						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, GRIEFCOMMANDER CANNOT PLACE");
 				continue;
 			}
 			int required = path.getDistance();
