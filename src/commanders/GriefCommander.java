@@ -173,10 +173,16 @@ public class GriefCommander extends TemplateCommander {
 				}
 
 				deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
-				proposals
-						.add(new ActionProposal(maxWeight, r, bestPath
-								.getPath().get(1), deployed, bestPlan,
-								"GriefCommander"));
+
+				if (Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), bestPath.getPath().get(1)) > deployed) {
+					continue;
+				} else {
+					proposals.add(new ActionProposal(maxWeight, r, bestPath
+							.getPath().get(1), deployed, bestPlan,
+							"GriefCommander"));
+				}
+
 			}
 		}
 

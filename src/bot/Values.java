@@ -72,7 +72,7 @@ public class Values {
 		}
 
 		else if (armySize <= 2) {
-			return armySize + 2;
+			return armySize + 3;
 		} else if (armySize <= 3) {
 			return armySize + 4;
 		} else if (armySize <= 5) {

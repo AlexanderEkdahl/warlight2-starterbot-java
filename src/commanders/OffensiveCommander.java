@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
 import bot.BotState;
@@ -56,11 +55,12 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Integer s : keys) {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
 					map.getSuperRegion(s), state.getMyPlayerName());
-			
+
 			int required = Values.calculateRequiredForcesAttack(mName,
 					map.getSuperRegion(s));
-			if (path == null){
-				System.err.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CAN'T PLACE");
+			if (path == null) {
+				System.err
+						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CAN'T PLACE");
 				continue;
 			}
 			float cost = path.getDistance()
@@ -170,15 +170,22 @@ public class OffensiveCommander extends TemplateCommander {
 						+ bestPath.getDistance()
 						- Values.calculateRegionWeighedCost(eName,
 								bestPath.getTarget());
+				int calculatedRegionCost;
 				int deployed;
 				if (r.getArmies() / 2 > calculatedTotalCost) {
 					calculatedTotalCost = r.getArmies() / 2;
 				}
 
 				deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
-				proposals.add(new ActionProposal(maxWeight, r, bestPath
-						.getPath().get(1), deployed, bestPlan,
-						"OffensiveCommander"));
+				if (Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), bestPath.getPath().get(1)) > deployed) {
+					continue;
+				} else {
+					proposals.add(new ActionProposal(maxWeight, r, bestPath
+							.getPath().get(1), deployed, bestPlan,
+							"OffensiveCommander"));
+				}
+
 			}
 		}
 
