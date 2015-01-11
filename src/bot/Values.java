@@ -53,7 +53,7 @@ public class Values {
 
 	public static int calculateSuperRegionWeighedCost(String enemyName,
 			SuperRegion sr) {
-		int totalCost = 0;
+		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
 			totalCost += calculateRegionWeighedCost(enemyName, r);
 		}
@@ -68,7 +68,7 @@ public class Values {
 		if (r.getPlayerName().equals("unknown")) {
 			return 5;
 		} else if (r.getPlayerName().equals(myName)) {
-			return 0;
+			return 1;
 		}
 
 		else if (armySize <= 2) {
@@ -84,9 +84,8 @@ public class Values {
 	}
 
 	public static int calculateRequiredForcesAttack(String myName, SuperRegion s) {
-		int totalRequired = 0;
+		int totalRequired = 1;
 		ArrayList<Region> regions = s.getSubRegions();
-
 
 		for (Region r : regions) {
 			totalRequired += calculateRequiredForcesAttack(myName, r);
