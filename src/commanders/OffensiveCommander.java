@@ -142,6 +142,9 @@ public class OffensiveCommander extends TemplateCommander {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
 					mName);
 			for (Path path : paths) {
+				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
+					continue;
+				}
 
 				float currentPathCost = path.getDistance()
 						- Values.calculateRegionWeighedCost(eName,

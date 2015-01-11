@@ -145,6 +145,9 @@ public class GriefCommander extends TemplateCommander {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
 					mName);
 			for (Path path : paths) {
+				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
+					continue;
+				}
 
 				float currentPathCost = path.getDistance();
 				float currentWorth = ranking.get(path.getTarget()
