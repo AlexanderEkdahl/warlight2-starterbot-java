@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 ///////////// 201 % undone
 
+import java.util.HashMap;
+
 import map.Region;
 import map.SuperRegion;
 import concepts.ActionProposal;
@@ -18,7 +20,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-
+		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
 		ArrayList<Region> vulnerableRegions = state.getFullMap()
 				.getOwnedFrontRegions(state);
 		ArrayList<SuperRegion> vulnerableSuperRegions = state.getFullMap()
@@ -47,15 +49,18 @@ public class DefensiveCommander extends TemplateCommander {
 
 	}
 
-	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	private ArrayList<Plan> calculatePlans(BotState state) {
 		return null;
 
+	}
+
+	@Override
+	public ArrayList<ActionProposal> getActionProposals(BotState state,
+			AttackSatisfaction as) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

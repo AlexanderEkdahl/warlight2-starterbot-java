@@ -15,6 +15,10 @@ public class BotMain implements Bot {
 	private DefensiveCommander dc;
 	private GriefCommander gc;
 
+	public static void main(String[] args) {
+		new BotParser(new BotMain()).run();
+	}
+
 	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
@@ -80,8 +84,8 @@ public class BotMain implements Bot {
 				.getOwnedRegions(state.getMyPlayerName());
 
 		AttackSatisfaction as = new AttackSatisfaction(state, state.getFullMap().getSuperRegions());
-		proposals.addAll(oc.getActionProposals(state), as);
-		proposals.addAll(gc.getActionProposals(state), as);
+		proposals.addAll(oc.getActionProposals(state, as));
+		proposals.addAll(gc.getActionProposals(state, as));
 
 		Collections.sort(proposals);
 

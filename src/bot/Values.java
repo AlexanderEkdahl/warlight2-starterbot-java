@@ -10,7 +10,7 @@ public class Values {
 	public static final int costMultiplierEnemy = 1;
 	public static final int costMultiplierNeutral = 3;
 	public static final int staticCostUnknown = 10;
-	public static final int staticCostOwned = 4;
+	public static final int staticCostOwned = 8;
 	public static final int staticCostUnknownEnemy = 10;
 
 	private static float startingRegion(int neutrals, int reward) {
@@ -49,7 +49,6 @@ public class Values {
 			else{
 				return staticCostUnknownEnemy;
 			}
-			
 		} else if (r.getPlayerName().equals("neutral")) {
 			return r.getArmies() * costMultiplierNeutral;
 		} else if (r.getPlayerName().equals("unknown")) {
