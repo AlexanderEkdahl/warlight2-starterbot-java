@@ -1,22 +1,16 @@
 package commanders;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import java.util.HashSet;
-import java.util.List;
 
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
-import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
 import map.Pathfinder2.Path;
-import move.AttackTransferMove;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
@@ -37,8 +31,6 @@ public class OffensiveCommander extends TemplateCommander {
 
 		worth = calculatePlans(state);
 		ArrayList<PlacementProposal> attackPlans;
-		PlacementProposal tempProposal;
-		Set<Integer> keys = worth.keySet();
 		attackPlans = prepareAttacks(worth, state);
 
 		return attackPlans;
@@ -63,12 +55,13 @@ public class OffensiveCommander extends TemplateCommander {
 		Set<Integer> keys = worth.keySet();
 		for (Integer s : keys) {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
-					map.getSuperRegion(s.intValue()), state.getMyPlayerName());
+					map.getSuperRegion(s), state.getMyPlayerName());
 			
 			int required = Values.calculateRequiredForcesAttack(mName,
 					map.getSuperRegion(s));
 			if (path == null){
-				System.err.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER");
+				System.err.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, OFFENSIVECOMMANDER CAN'T PLACE");
+				continue;
 			}
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(oName, path.getTarget())
@@ -96,7 +89,6 @@ public class OffensiveCommander extends TemplateCommander {
 		for (SuperRegion s : possibleTargets) {
 			worth.put(s.getId(), calculateWorth(s, state) + selfImportance);
 		}
-		System.err.println("THERE ARE " + worth.size() + " REGIONS AVAILABLE");
 		return worth;
 	}
 
@@ -149,7 +141,6 @@ public class OffensiveCommander extends TemplateCommander {
 
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
 					mName);
-			System.err.println("there are: " + paths.size() + " paths");
 			for (Path path : paths) {
 
 				float currentPathCost = path.getDistance()

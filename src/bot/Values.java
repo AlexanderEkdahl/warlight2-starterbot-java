@@ -9,7 +9,7 @@ import map.SuperRegion;
 public class Values {
 	public static final int costMultiplierEnemy = 1;
 	public static final int costMultiplierNeutral = 4;
-	public static final int staticCostUnknown = 10;
+	public static final int staticCostUnknown = 15;
 	public static final int staticCostOwned = 5;
 
 	private static float startingRegion(int neutrals, int reward) {
@@ -72,11 +72,11 @@ public class Values {
 		}
 
 		else if (armySize <= 2) {
-			return armySize + 4;
+			return armySize + 2;
 		} else if (armySize <= 3) {
-			return armySize + 5;
+			return armySize + 4;
 		} else if (armySize <= 5) {
-			return armySize + 7;
+			return armySize + 6;
 		} else {
 			return (int) (armySize * 1.5);
 		}
