@@ -71,25 +71,23 @@ public class BotState {
 	// initial map is given to the bot with all the information except for
 	// player and armies info
 	public void setupMap(String[] mapInput) {
-		int i, regionId, superRegionId, wastelandId, reward;
-
 		if (mapInput[1].equals("super_regions")) {
-			for (i = 2; i < mapInput.length; i++) {
+			for (int i = 2; i < mapInput.length; i++) {
 				try {
-					superRegionId = Integer.parseInt(mapInput[i]);
+					int superRegionId = Integer.parseInt(mapInput[i]);
 					i++;
-					reward = Integer.parseInt(mapInput[i]);
+					int reward = Integer.parseInt(mapInput[i]);
 					fullMap.add(new SuperRegion(superRegionId, reward));
 				} catch (Exception e) {
 					System.err.println("Unable to parse SuperRegions");
 				}
 			}
 		} else if (mapInput[1].equals("regions")) {
-			for (i = 2; i < mapInput.length; i++) {
+			for (int i = 2; i < mapInput.length; i++) {
 				try {
-					regionId = Integer.parseInt(mapInput[i]);
+					int regionId = Integer.parseInt(mapInput[i]);
 					i++;
-					superRegionId = Integer.parseInt(mapInput[i]);
+					int superRegionId = Integer.parseInt(mapInput[i]);
 					SuperRegion superRegion = fullMap
 							.getSuperRegion(superRegionId);
 					fullMap.add(new Region(regionId, superRegion));
@@ -99,7 +97,7 @@ public class BotState {
 				}
 			}
 		} else if (mapInput[1].equals("neighbors")) {
-			for (i = 2; i < mapInput.length; i++) {
+			for (int i = 2; i < mapInput.length; i++) {
 				try {
 					Region region = fullMap.getRegion(Integer
 							.parseInt(mapInput[i]));
@@ -116,7 +114,7 @@ public class BotState {
 				}
 			}
 		} else if (mapInput[1].equals("wastelands")) {
-			for (i = 2; i < mapInput.length; i++) {
+			for (int i = 2; i < mapInput.length; i++) {
 				try {
 					Region region = fullMap.getRegion(Integer
 					.parseInt(mapInput[i]));
@@ -127,7 +125,7 @@ public class BotState {
 				}
 			}
 		} else if (mapInput[1].equals("opponent_starting_regions")) {
-			for (i = 2; i < mapInput.length; i++) {
+			for (int i = 2; i < mapInput.length; i++) {
 				try {
 					Region region = fullMap.getRegion(Integer
 					.parseInt(mapInput[i]));
@@ -146,9 +144,8 @@ public class BotState {
 	public void setPickableStartingRegions(String[] mapInput) {
 		pickableStartingRegions = new ArrayList<Region>();
 		for (int i = 2; i < mapInput.length; i++) {
-			int regionId;
 			try {
-				regionId = Integer.parseInt(mapInput[i]);
+				int regionId = Integer.parseInt(mapInput[i]);
 				Region pickableRegion = fullMap.getRegion(regionId);
 				pickableStartingRegions.add(pickableRegion);
 			} catch (Exception e) {
