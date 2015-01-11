@@ -44,28 +44,28 @@ public class BotParser {
 						Long.valueOf(parts[1]));
 
 				output(Integer.toString(startingRegion.getId()));
-			} else if (parts.length == 3 && parts[0].equals("go")) {
-				// we need to do a move
+			} else if (parts[0].equals("go")) {
 				String output = "";
+
 				if (parts[1].equals("place_armies")) {
-					// place armies
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot
 							.getPlaceArmiesMoves(currentState,
 									Long.valueOf(parts[2]));
 					for (PlaceArmiesMove move : placeArmiesMoves)
 						output = output.concat(move.getString() + ",");
-				} else if (parts[1].equals("attack/transfer")) {
-					// attack/transfer
+				} else {
 					ArrayList<AttackTransferMove> attackTransferMoves = bot
 							.getAttackTransferMoves(currentState,
 									Long.valueOf(parts[2]));
 					for (AttackTransferMove move : attackTransferMoves)
 						output = output.concat(move.getString() + ",");
 				}
-				if (output.length() > 0)
+
+				if (output.length() > 0) {
 					output(output);
-				else
-				output("No moves");
+				} else {
+					output("No moves");
+				}
 			} else if (parts[0].equals("settings")) {
 				// update settings
 				currentState.updateSettings(parts[1], parts[2]);
