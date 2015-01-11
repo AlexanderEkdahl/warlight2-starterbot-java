@@ -83,8 +83,9 @@ public class BotMain implements Bot {
 		ArrayList<Region> availableRegions = state.getFullMap()
 				.getOwnedRegions(state.getMyPlayerName());
 
-		proposals.addAll(oc.getActionProposals(state));
-		proposals.addAll(gc.getActionProposals(state));
+		AttackSatisfaction as = new AttackSatisfaction(state, state.getFullMap().getSuperRegions());
+		proposals.addAll(oc.getActionProposals(state), as);
+		proposals.addAll(gc.getActionProposals(state), as);
 
 		Collections.sort(proposals);
 

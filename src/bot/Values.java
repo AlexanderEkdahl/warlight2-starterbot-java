@@ -11,6 +11,7 @@ public class Values {
 	public static final int costMultiplierNeutral = 3;
 	public static final int staticCostUnknown = 10;
 	public static final int staticCostOwned = 4;
+	public static final int staticCostUnknownEnemy = 10;
 
 	private static float startingRegion(int neutrals, int reward) {
 		if (reward == 0) {
@@ -42,7 +43,13 @@ public class Values {
 
 	public static int calculateRegionWeighedCost(String enemyName, Region r) {
 		if (r.getPlayerName().equals(enemyName)) {
-			return r.getArmies() * costMultiplierEnemy;
+			if(r.getVisible()){
+				return r.getArmies() * costMultiplierEnemy;
+			}
+			else{
+				return staticCostUnknownEnemy;
+			}
+			
 		} else if (r.getPlayerName().equals("neutral")) {
 			return r.getArmies() * costMultiplierNeutral;
 		} else if (r.getPlayerName().equals("unknown")) {
