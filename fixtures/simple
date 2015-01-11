@@ -27,3 +27,7 @@ setup_map opponent_starting_regions 10 5
 settings starting_armies 5
 
 update_map 8 player1 2 13 player1 2 7 neutral 2 11 neutral 2 9 neutral 2 5 player2 2 16 neutral 2 17 neutral 2 14 neutral 2 15 neutral 2
+
+go place_armies 10000
+
+go attack/transfer 10000
