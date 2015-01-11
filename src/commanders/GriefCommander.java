@@ -18,7 +18,7 @@ import concepts.ActionProposal;
 import concepts.PlacementProposal;
 
 public class GriefCommander extends TemplateCommander {
-	public static final int valueDenialMultiplier = 20;
+	public static final int valueDenialMultiplier = 10;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -61,7 +61,6 @@ public class GriefCommander extends TemplateCommander {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
 					map.getSuperRegion(s), state.getMyPlayerName());
 
-			
 			if (path == null) {
 				System.err
 						.println("ALEX YOU DID IT AGAIN YOU LOUSY EXCUSE OF A PROGRAMMER, GRIEFCOMMANDER CAN'T PLACE");
@@ -100,8 +99,6 @@ public class GriefCommander extends TemplateCommander {
 		return plans;
 	}
 
-
-
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
@@ -110,87 +107,77 @@ public class GriefCommander extends TemplateCommander {
 		if (state.getRoundNumber() < 3) {
 			return proposals;
 		}
-		HashMap<Integer, Float> plans = calculatePlans(state);
+		proposals = new ArrayList<ActionProposal>();
+		HashMap<Integer, Float> ranking = calculatePlans(state);
 
-		ArrayList<Region> owned = state.getFullMap().getOwnedRegions(
+		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
+		final String mName = state.getMyPlayerName();
+		final String eName = state.getOpponentPlayerName();
+		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+				new PathfinderWeighter() {
+					public int weight(Region nodeA, Region nodeB) {
+						if (nodeB.getPlayerName().equals(mName)) {
+							return 5;
+						} else {
+							return Values.calculateRegionWeighedCost(eName,
+									nodeB);
+						}
 
-		ActionProposal tempProposal;
-		if (plans.size() > 0) {
-			for (Region r : owned) {
-				if (r.getArmies() < 2) {
-					continue;
-				}
-				tempProposal = createOrder(r, state, plans);
-				if (tempProposal != null) {
+					}
+				});
 
+		float maxWeight;
+		float currentWeight;
+		Path bestPath;
+		SuperRegion bestPlan = null;
+		ArrayList<Path> paths;
+
+		// calculate plans for every sector
+		for (Region r : available) {
+			if (r.getArmies() < 2) {
+				continue;
+			}
+
+			bestPath = null;
+			maxWeight = Integer.MIN_VALUE;
+
+			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
+					mName);
+			for (Path path : paths) {
+
+				float currentPathCost = path.getDistance();
+				float currentWorth = ranking.get(path.getTarget()
+						.getSuperRegion().getId());
+				currentWeight = currentWorth / currentPathCost;
+
+				if (currentWeight > maxWeight) {
+					maxWeight = currentWeight;
+					bestPath = path;
+					bestPlan = path.getTarget().getSuperRegion();
 				}
-				proposals.add(createOrder(r, state, plans));
+
+			}
+			if (bestPath != null) {
+				int calculatedTotalCost = Values.calculateRequiredForcesAttack(
+						mName, bestPath.getTarget().getSuperRegion())
+						+ bestPath.getDistance()
+						- Values.calculateRegionWeighedCost(eName,
+								bestPath.getTarget());
+				int deployed;
+				if (r.getArmies() / 2 > calculatedTotalCost) {
+					calculatedTotalCost = r.getArmies() / 2;
+				}
+
+				deployed = Math.min(calculatedTotalCost, r.getArmies() - 1);
+				proposals
+						.add(new ActionProposal(maxWeight, r, bestPath
+								.getPath().get(1), deployed, bestPlan,
+								"GriefCommander"));
 			}
 		}
 
 		return proposals;
 	}
 
-	private ActionProposal createOrder(Region r, BotState state,
-			ArrayList<Plan> plans) {
-
-		final String enemyName = state.getOpponentPlayerName();
-		Map map = state.getFullMap();
-		float maxWorth = Integer.MIN_VALUE;
-		SuperRegion sr;
-		LinkedList<Region> path;
-		int totalCost = 0;
-		Region bestTarget = null;
-		Plan bestPlan = null;
-		for (Plan p : plans) {
-			sr = p.getSr();
-			Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
-					new PathfinderWeighter() {
-						public int weight(Region nodeA, Region nodeB) {
-							if (nodeB.getPlayerName().equals(enemyName)) {
-								return nodeB.getArmies()
-										* Values.costMultiplierEnemy;
-							} else if (nodeB.getPlayerName().equals("neutral")) {
-								return nodeB.getArmies()
-										* Values.costMultiplierNeutral;
-							} else if (nodeB.getPlayerName().equals("unknown")) {
-								return Values.staticCostUnknown;
-							}
-							return Values.staticCostOwned;
-						}
-					});
-
-			pathfinder.execute(r);
-
-			// should be the closest in the region, not .get(0)
-			path = pathfinder.getPath(p.getSr().getSubRegions().get(0));
-			for (int i = 1; i < path.size(); i++) {
-				totalCost += Values.calculateRegionWeighedCost(enemyName,
-						path.get(i));
-
-			}
-			float currentWorth = p.getWeight() / totalCost;
-
-			if (maxWorth < currentWorth) {
-				maxWorth = currentWorth;
-				bestTarget = path.get(1);
-				bestPlan = p;
-			}
-
-		}
-
-		int calculatedForcesRequired = Values.calculateRequiredForcesAttack(
-				state.getMyPlayerName(), bestTarget);
-
-		if (calculatedForcesRequired > r.getArmies()) {
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r, r,
-					r.getArmies() - 1, bestPlan.getSr(), "GriefCommander");
-		} else {
-			return new ActionProposal(bestPlan.getWeight() - totalCost, r,
-					bestTarget, r.getArmies() - 1, bestPlan.getSr(),
-					"GriefCommander");
-		}
-
-	}
 }

@@ -8,9 +8,9 @@ import map.SuperRegion;
 
 public class Values {
 	public static final int costMultiplierEnemy = 1;
-	public static final int costMultiplierNeutral = 4;
-	public static final int staticCostUnknown = 15;
-	public static final int staticCostOwned = 5;
+	public static final int costMultiplierNeutral = 3;
+	public static final int staticCostUnknown = 10;
+	public static final int staticCostOwned = 4;
 
 	private static float startingRegion(int neutrals, int reward) {
 		if (reward == 0) {
