@@ -164,17 +164,25 @@ public class Map {
 
 		return suspected;
 	}
+	
 
 	public ArrayList<Region> getOwnedFrontRegions(BotState state) {
 
-		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
+		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(state.getMyPlayerName());
+		ArrayList<Region> ownedRegionsInOwnedSuperRegions = new ArrayList<Region>();
 		ArrayList<Region> neighbors;
 		ArrayList<Region> front = new ArrayList<Region>();
-		for (Region r : owned) {
+		
+		for (SuperRegion s : ownedSuperRegions){
+			ownedRegionsInOwnedSuperRegions.addAll(s.getSubRegions());
+		}
+		
+		for (Region r : ownedRegionsInOwnedSuperRegions) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
 				if (n.getPlayerName().equals(state.getOpponentPlayerName())) {
 					front.add(r);
+					continue;
 				}
 			}
 		}
@@ -182,6 +190,8 @@ public class Map {
 		return front;
 
 	}
+
+	
 
 	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
 		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
@@ -194,5 +204,31 @@ public class Map {
 
 		return sFront;
 	}
+
+	public ArrayList<Region> getPockets(BotState state) {
+		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
+		ArrayList<Region> pockets = new ArrayList<Region>();
+		
+		outerLoop:
+		for (Region r : owned){
+			for (Region n :  r.getNeighbors()){
+				if (n.getPlayerName().equals(state.getMyPlayerName())){
+					continue outerLoop;
+				}
+			}
+			pockets.add(r);
+		}
+		
+		
+		
+		return pockets;
+	}
+
+	public ArrayList<Region> getRewardBlockers(BotState state) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	 
 
 }

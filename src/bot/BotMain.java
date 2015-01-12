@@ -42,13 +42,8 @@ public class BotMain implements Bot {
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
-		while (armiesLeft > 0) {
-			if (currentProposalnr >= proposals.size()) {
-				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state
-						.getFullMap().getOwnedRegions(state.getMyPlayerName())
-						.get(0), armiesLeft));
-				return orders;
-			}
+		while (armiesLeft > 0 && currentProposalnr < proposals.size()) {
+			
 			currentProposal = proposals.get(currentProposalnr);
 			System.err.println(currentProposal.toString());
 			if (currentProposal.getForces() > armiesLeft) {
@@ -68,6 +63,15 @@ public class BotMain implements Bot {
 
 		}
 
+		
+		// add to all regions just in case
+		for (Region r : state.getFullMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			orders.add(new PlaceArmiesMove(state.getMyPlayerName(), r,
+					armiesLeft));
+
+		}
+
 		return orders;
 	}
 
@@ -79,7 +83,8 @@ public class BotMain implements Bot {
 		ArrayList<Region> availableRegions = state.getFullMap()
 				.getOwnedRegions(state.getMyPlayerName());
 
-		AttackSatisfaction as = new AttackSatisfaction(state, state.getFullMap().getSuperRegions());
+		AttackSatisfaction as = new AttackSatisfaction(state, state
+				.getFullMap().getSuperRegions());
 		proposals.addAll(oc.getActionProposals(state, as));
 		proposals.addAll(gc.getActionProposals(state, as));
 
@@ -88,8 +93,7 @@ public class BotMain implements Bot {
 		int currentProposalnr = 0;
 		ActionProposal currentProposal;
 
-		while (availableRegions.size() > 0
-				&& currentProposalnr < proposals.size()) {
+		while (currentProposalnr < proposals.size()) {
 			currentProposal = proposals.get(currentProposalnr);
 			System.err.println(currentProposal.toString());
 			orders.add(new AttackTransferMove(state.getMyPlayerName(),
