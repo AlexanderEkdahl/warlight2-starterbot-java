@@ -4,6 +4,14 @@
 
 - fuck bitches get money
 
+
+## Strategy
+ - Make the bot defend owned SuperRegions if neccesary, possibly important Regions as well, Definitely done by DefensiveCommander.
+ - Make the bot defend and value bridgeheads (solitary regions) , probably best done by DefensiveCommander
+ - Make the bot better at using the appropriate forces when performing an action, not moving them across the map.
+ - Fix the placement bug.
+ - Possibly investigate initial Regoin picking.
+
 # Usage
 
 Run simple integration test from the commandline

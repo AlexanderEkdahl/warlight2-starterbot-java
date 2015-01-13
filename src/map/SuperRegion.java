@@ -77,4 +77,37 @@ public class SuperRegion {
 		return neutrals;
 	}
 	
+	public ArrayList<Region> getFronts(String oName){
+		ArrayList<Region> fronts = new ArrayList<Region>();
+		outerLoop:
+		for (Region r : subRegions){
+			for (Region n : r.getNeighbors()){
+				if (n.getPlayerName().equals(oName)){
+					fronts.add(r);
+					continue outerLoop;
+				}
+			}
+			
+		}
+		return fronts;
+		
+	}
+	
+	public int getTotalThreateningForce(String oName){
+		ArrayList<Region> checked = new ArrayList<Region>();
+		int totalForce = 0;
+		for (Region r : subRegions){
+			for (Region n : r.getNeighbors()){
+				if (n.getPlayerName().equals(oName) && !checked.contains(n)){
+					checked.add(n);
+					totalForce += n.getArmies();
+				}
+			}
+			
+		}
+		
+		return totalForce;
+		
+	}
+	
 }

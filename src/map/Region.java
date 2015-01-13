@@ -126,4 +126,15 @@ public class Region {
     public boolean getVisible() {
       return visible;
     }
+    
+    public int getTotalThreateningForce(String oName){
+    	int totalForce = 0;
+    	for (Region n : neighbors){
+    		if (n.getPlayerName().equals(oName)){
+    			totalForce += n.getArmies();
+    		}
+    		
+    	}
+		return totalForce;
+    }
 }

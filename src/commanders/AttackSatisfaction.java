@@ -14,7 +14,7 @@ public class AttackSatisfaction {
 	public AttackSatisfaction(BotState state, ArrayList<SuperRegion> superRegions){
 		  roomLeft = new HashMap<SuperRegion, Integer>();
 		  for (SuperRegion s : superRegions){
-			  roomLeft.put(s, Values.calculateRequiredForcesAttack(state.getMyPlayerName(), s));
+			  roomLeft.put(s, (int) (Values.calculateRequiredForcesAttack(state.getMyPlayerName(), s)* 1.5));
 		  }
 	}
 
