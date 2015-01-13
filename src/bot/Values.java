@@ -74,7 +74,7 @@ public class Values {
 		if (r.getPlayerName().equals("unknown")) {
 			return 5;
 		} else if (r.getPlayerName().equals(myName)) {
-			return 0;
+			return 1;
 		}
 
 		else if (armySize <= 2) {
