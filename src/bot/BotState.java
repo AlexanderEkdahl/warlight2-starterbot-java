@@ -11,6 +11,7 @@
 package bot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import map.Map;
 import map.Region;
@@ -142,6 +143,7 @@ public class BotState {
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
 		ArrayList<Region> visibleRegions = new ArrayList<Region>();
+		HashSet<Region> invisibleRegions = new HashSet<Region>(map.getRegions().values());
 
 		for (int i = 1; i < mapInput.length; i++) {
 			try {
@@ -159,12 +161,18 @@ public class BotState {
 			}
 		}
 
-		for (Region region : map.getRegions().values()) {
-			region.setVisible(false);
-		}
-
 		for (Region region : visibleRegions) {
 			region.setVisible(true);
+			invisibleRegions.remove(region);
+		}
+
+		for (Region region : invisibleRegions) {
+			region.setVisible(false);
+			if (region.getPlayerName().equals(myName)) {
+				System.err.println("Region: " + region.getId() + "was lost out of sight. Should not pose a problem any longer.");
+				region.setPlayerName(opponentName);
+			}
+			System.err.println(region);
 		}
 	}
 

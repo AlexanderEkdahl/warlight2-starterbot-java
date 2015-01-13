@@ -111,6 +111,7 @@ public class Region {
                 "id=" + id +
                 ", armies=" + armies +
                 ", playerName=" + playerName +
+                ", visible=" + visible +
                 '}';
     }
 
