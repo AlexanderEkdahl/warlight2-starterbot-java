@@ -2,11 +2,13 @@ package bot;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 import commanders.*;
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
 import map.Region;
+import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
@@ -43,7 +45,7 @@ public class BotMain implements Bot {
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
 		while (armiesLeft > 0 && currentProposalnr < proposals.size()) {
-			
+
 			currentProposal = proposals.get(currentProposalnr);
 			System.err.println(currentProposal.toString());
 			if (currentProposal.getForces() > armiesLeft) {
@@ -63,15 +65,6 @@ public class BotMain implements Bot {
 
 		}
 
-		
-		// add to all regions just in case
-		for (Region r : state.getFullMap().getOwnedRegions(
-				state.getMyPlayerName())) {
-			orders.add(new PlaceArmiesMove(state.getMyPlayerName(), r,
-					armiesLeft));
-
-		}
-
 		return orders;
 	}
 
@@ -80,29 +73,70 @@ public class BotMain implements Bot {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		ArrayList<Region> availableRegions = state.getFullMap()
-				.getOwnedRegions(state.getMyPlayerName());
+		HashMap<Region, Integer> available = calculateAvailable(state);
 
-		AttackSatisfaction as = new AttackSatisfaction(state, state
-				.getFullMap().getSuperRegions());
-		proposals.addAll(oc.getActionProposals(state, as));
-		proposals.addAll(gc.getActionProposals(state, as));
+		// HashMap<Region, Integer> regionSatisfied =
+		// calculateRegionSatisfaction();
+		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
+		proposals.addAll(oc.getActionProposals(state));
+		proposals.addAll(gc.getActionProposals(state));
 
 		Collections.sort(proposals);
 
 		int currentProposalnr = 0;
-		ActionProposal currentProposal;
-
 		while (currentProposalnr < proposals.size()) {
-			currentProposal = proposals.get(currentProposalnr);
-			System.err.println(currentProposal.toString());
-			orders.add(new AttackTransferMove(state.getMyPlayerName(),
-					currentProposal.getOrigin(), currentProposal.getTarget(),
-					currentProposal.getForces()));
-			availableRegions.remove(currentProposal.getOrigin());
+			ActionProposal currentProposal = proposals.get(currentProposalnr);
+			Region currentOriginRegion = currentProposal.getOrigin();
+			Region currentTargetRegion = currentProposal.getTarget();
+			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
+					.getSuperRegion();
+			int required = currentProposal.getForces();
+
+			int forcesAvailable = available.get(currentOriginRegion);
+			if (forcesAvailable > 0) {
+				// can't move without any troops dummy
+				int roomLeft = superRegionSatisfied
+						.get(currentTargetSuperRegion);
+				int disposed = Math.min(roomLeft, required);
+
+				if (Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), currentTargetRegion) < disposed) {
+					// doublecheck that it isn't a stupid attack
+					orders.add(new AttackTransferMove(state.getMyPlayerName(),
+							currentOriginRegion, currentTargetRegion, disposed));
+					available.put(currentOriginRegion,
+							available.get(currentOriginRegion) - disposed);
+					System.err.println(currentProposal.toString());
+				}
+
+			}
+			
 			currentProposalnr++;
 		}
 
 		return orders;
+	}
+
+	private HashMap<Region, Integer> calculateAvailable(BotState state) {
+		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
+
+		for (Region r : state.getFullMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			available.put(r, r.getArmies() - 1);
+
+		}
+		return available;
+	}
+
+	private HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
+			BotState state) {
+		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
+		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
+			roomLeft.put(
+					s,
+					(int) (Values.calculateRequiredForcesAttack(
+							state.getMyPlayerName(), s) * 1.5));
+		}
+		return roomLeft;
 	}
 }

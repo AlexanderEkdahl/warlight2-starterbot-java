@@ -102,8 +102,7 @@ public class OffensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state,
-			AttackSatisfaction as) {
+	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<Integer, Float> ranking = calculatePlans(state);
 
@@ -124,82 +123,46 @@ public class OffensiveCommander extends TemplateCommander {
 					}
 				});
 
-		float maxWeight;
 		float currentWeight;
-		Path bestPath;
-		SuperRegion bestPlan = null;
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector
-		HashMap<SuperRegion, Integer> roomLeft = as.getRoomLeft();
 
 		for (Region r : available) {
 			if (r.getArmies() < 2) {
 				continue;
 			}
-
-			bestPath = null;
-			maxWeight = Integer.MIN_VALUE;
-
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r,
 					mName);
 			for (Path path : paths) {
 				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
+					// no interest in this path
 					continue;
 				}
-				if (roomLeft.get(path.getTarget().getSuperRegion()) < 1) {
-					// there is no need to dedicate more forces
-					continue;
-				}
-
+				SuperRegion targetSuperRegion = path.getTarget()
+						.getSuperRegion();
 				float currentPathCost = path.getDistance()
 						- Values.calculateRegionWeighedCost(eName,
 								path.getTarget());
 				float currentSuperRegionCost = Values
-						.calculateSuperRegionWeighedCost(eName, path
-								.getTarget().getSuperRegion());
+						.calculateSuperRegionWeighedCost(eName,
+								targetSuperRegion);
 				float currentWorth = ranking.get(path.getTarget()
 						.getSuperRegion().getId());
 				currentWeight = currentWorth
 						/ (currentSuperRegionCost + currentPathCost);
-
-				if (currentWeight > maxWeight) {
-					maxWeight = currentWeight;
-					bestPath = path;
-					bestPlan = path.getTarget().getSuperRegion();
-				}
-
-			}
-			if (bestPath != null) {
-				SuperRegion targetSuperRegion = bestPath.getTarget().getSuperRegion();
-				int superRegionRemainingCost = roomLeft.get(targetSuperRegion);
-				
 				int totalRequired = 0;
-				for (int i = 1; i < bestPath.getPath().size() - 1; i++) {
-					totalRequired += Values.calculateRequiredForcesAttack(mName,
-							bestPath.getPath().get(i));
+				for (int i = 1; i < path.getPath().size() - 1; i++) {
+					totalRequired += Values.calculateRequiredForcesAttack(
+							mName, path.getPath().get(i));
 				}
-				totalRequired += roomLeft.get(targetSuperRegion);
-				int deployed;
-				if (r.getArmies() / 2 > totalRequired) {
-					totalRequired = r.getArmies() / 2;
-				}
-
-				deployed = Math.min(totalRequired, r.getArmies() - 1);
-				superRegionRemainingCost -= deployed;
-				roomLeft.put(targetSuperRegion, superRegionRemainingCost);
-				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), bestPath.getPath().get(1)) > deployed) {
-					continue;
-				} else {
-					proposals.add(new ActionProposal(maxWeight, r, bestPath
-							.getPath().get(1), deployed, bestPlan,
-							"OffensiveCommander"));
-				}
+				proposals.add(new ActionProposal(currentWeight, r, path
+						.getPath().get(1), totalRequired, targetSuperRegion,
+						"OffensiveCommander"));
 
 			}
+
 		}
-		as.setRoomLeft(roomLeft);
 		return proposals;
 	}
 }

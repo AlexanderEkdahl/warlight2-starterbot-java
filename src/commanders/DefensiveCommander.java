@@ -101,8 +101,7 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state,
-			AttackSatisfaction as) {
+	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		// TODO Auto-generated method stub
 		return proposals;

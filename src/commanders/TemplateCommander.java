@@ -16,6 +16,6 @@ public abstract class TemplateCommander {
 	public abstract ArrayList<PlacementProposal> getPlacementProposals(
 			BotState state);
 
-	public abstract ArrayList<ActionProposal> getActionProposals(BotState state, AttackSatisfaction as);
+	public abstract ArrayList<ActionProposal> getActionProposals(BotState state);
 
 }
