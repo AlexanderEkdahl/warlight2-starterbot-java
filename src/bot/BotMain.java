@@ -73,8 +73,10 @@ public class BotMain implements Bot {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		HashMap<Region, Integer> available = calculateAvailable(state);
+		// HashMap<Region, Integer> available = calculateAvailable(state);
 
+		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
+				state.getMyPlayerName());
 		// HashMap<Region, Integer> regionSatisfied =
 		// calculateRegionSatisfaction();
 		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
@@ -92,9 +94,8 @@ public class BotMain implements Bot {
 					.getSuperRegion();
 			int required = currentProposal.getForces();
 
-			int forcesAvailable = available.get(currentOriginRegion);
-			if (forcesAvailable > 0) {
-				// can't move without any troops dummy
+			if (available.contains(currentOriginRegion)
+					&& superRegionSatisfied.get(currentTargetSuperRegion) > 0) {
 				int roomLeft = superRegionSatisfied
 						.get(currentTargetSuperRegion);
 				int disposed = Math.min(roomLeft, required);
@@ -104,13 +105,15 @@ public class BotMain implements Bot {
 					// doublecheck that it isn't a stupid attack
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
 							currentOriginRegion, currentTargetRegion, disposed));
-					available.put(currentOriginRegion,
-							available.get(currentOriginRegion) - disposed);
+					available.remove(currentOriginRegion);
+					superRegionSatisfied.put(currentTargetSuperRegion,
+							superRegionSatisfied.get(currentTargetSuperRegion)
+									- disposed);
 					System.err.println(currentProposal.toString());
 				}
 
 			}
-			
+
 			currentProposalnr++;
 		}
 
