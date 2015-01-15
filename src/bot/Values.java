@@ -18,7 +18,7 @@ public class Values {
 			return Integer.MIN_VALUE;
 		}
 
-		return (reward * 3) - neutrals;
+		return (reward * 2) / neutrals;
 	}
 
 	public static Region getBestStartRegion(
@@ -51,7 +51,7 @@ public class Values {
 			}
 		}
 		else if(r.getWasteland()){
-			return costMultiplierNeutral * 10;
+			return costMultiplierNeutral * 10;	
 		}
 		else if (r.getPlayerName().equals("neutral")) {
 			return r.getArmies() * costMultiplierNeutral;
