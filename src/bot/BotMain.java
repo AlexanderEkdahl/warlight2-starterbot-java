@@ -84,7 +84,7 @@ public class BotMain implements Bot {
 				state.getMyPlayerName());
 		// HashMap<Region, Integer> regionSatisfied =
 		// calculateRegionSatisfaction();
-		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
+//		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -95,15 +95,14 @@ public class BotMain implements Bot {
 			ActionProposal currentProposal = proposals.get(currentProposalnr);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
-			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
-					.getSuperRegion();
+//			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
+//					.getSuperRegion();
 			int required = currentProposal.getForces();
 
-			if (available.contains(currentOriginRegion)
-					&& superRegionSatisfied.get(currentTargetSuperRegion) > 0) {
-				int roomLeft = superRegionSatisfied
-						.get(currentTargetSuperRegion);
-				int disposed = Math.min(roomLeft, required);
+			if (available.contains(currentOriginRegion)) {
+//				int roomLeft = superRegionSatisfied
+//						.get(currentTargetSuperRegion);
+				int disposed = Math.min(currentOriginRegion.getArmies() -1, required);
 
 				if (Values.calculateRequiredForcesAttack(
 						state.getMyPlayerName(), currentTargetRegion) < disposed) {
@@ -111,9 +110,9 @@ public class BotMain implements Bot {
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
 							currentOriginRegion, currentTargetRegion, disposed));
 					available.remove(currentOriginRegion);
-					superRegionSatisfied.put(currentTargetSuperRegion,
-							superRegionSatisfied.get(currentTargetSuperRegion)
-									- disposed);
+//					superRegionSatisfied.put(currentTargetSuperRegion,
+//							superRegionSatisfied.get(currentTargetSuperRegion)
+//									- disposed);
 					System.err.println(currentProposal.toString());
 				}
 

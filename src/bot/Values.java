@@ -49,7 +49,11 @@ public class Values {
 			else{
 				return staticCostUnknownEnemy;
 			}
-		} else if (r.getPlayerName().equals("neutral")) {
+		}
+		else if(r.getWasteland()){
+			return costMultiplierNeutral * 10;
+		}
+		else if (r.getPlayerName().equals("neutral")) {
 			return r.getArmies() * costMultiplierNeutral;
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
