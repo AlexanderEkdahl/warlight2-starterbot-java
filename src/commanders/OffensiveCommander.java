@@ -156,10 +156,11 @@ public class OffensiveCommander extends TemplateCommander {
 					totalRequired += Values.calculateRequiredForcesAttack(
 							mName, path.getPath().get(i));
 				}
+				totalRequired += Values.calculateRequiredForcesAttack(mName, targetSuperRegion);
 				proposals.add(new ActionProposal(currentWeight, r, path
 						.getPath().get(1), totalRequired, targetSuperRegion,
 						"OffensiveCommander"));
-
+				
 			}
 
 		}
