@@ -16,11 +16,13 @@ public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
+	private RandomCommander rc;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
 		gc = new GriefCommander();
+		rc = new RandomCommander();
 	}
 
 	public Region getStartingRegion(BotState state, Long timeOut) {
@@ -41,6 +43,7 @@ public class BotMain implements Bot {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
 		proposals.addAll(gc.getPlacementProposals(state));
+		proposals.addAll(rc.getPlacementProposals(state));
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
@@ -92,7 +95,7 @@ public class BotMain implements Bot {
 
 		int currentProposalnr = 0;
 		while (currentProposalnr < proposals.size()) {
-			
+
 			ActionProposal currentProposal = proposals.get(currentProposalnr);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
@@ -100,11 +103,11 @@ public class BotMain implements Bot {
 					.getSuperRegion();
 			int required = currentProposal.getForces();
 
-			
+
 //			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1){
 //				continue;
 //			}
-			
+
 			if (available.contains(currentOriginRegion)) {
 				int roomLeft = superRegionSatisfied
 						.get(currentTargetSuperRegion);
