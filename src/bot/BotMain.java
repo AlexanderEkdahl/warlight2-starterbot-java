@@ -84,8 +84,7 @@ public class BotMain implements Bot {
 				state.getMyPlayerName());
 		// HashMap<Region, Integer> regionSatisfied =
 		// calculateRegionSatisfaction();
-		// HashMap<SuperRegion, Integer> superRegionSatisfied =
-		// calculateSuperRegionSatisfaction(state);
+		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -93,17 +92,22 @@ public class BotMain implements Bot {
 
 		int currentProposalnr = 0;
 		while (currentProposalnr < proposals.size()) {
+			
 			ActionProposal currentProposal = proposals.get(currentProposalnr);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
-			// SuperRegion currentTargetSuperRegion =
-			// currentProposal.getTarget()
-			// .getSuperRegion();
+			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
+					.getSuperRegion();
 			int required = currentProposal.getForces();
 
+			
+//			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1){
+//				continue;
+//			}
+			
 			if (available.contains(currentOriginRegion)) {
-				// int roomLeft = superRegionSatisfied
-				// .get(currentTargetSuperRegion);
+				int roomLeft = superRegionSatisfied
+						.get(currentTargetSuperRegion);
 				int disposed = Math.min(currentOriginRegion.getArmies() - 1,
 						required);
 
@@ -113,9 +117,9 @@ public class BotMain implements Bot {
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
 							currentOriginRegion, currentTargetRegion, disposed));
 
-					// superRegionSatisfied.put(currentTargetSuperRegion,
-					// superRegionSatisfied.get(currentTargetSuperRegion)
-					// - disposed);
+					superRegionSatisfied.put(currentTargetSuperRegion,
+							superRegionSatisfied.get(currentTargetSuperRegion)
+									- disposed);
 					System.err.println(currentProposal.toString());
 				}
 				available.remove(currentOriginRegion);

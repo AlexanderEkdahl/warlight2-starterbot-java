@@ -10,7 +10,7 @@ public class Values {
 	public static final int costMultiplierEnemy = 1;
 	public static final int costMultiplierNeutral = 3;
 	public static final int staticCostUnknown = 10;
-	public static final int staticCostOwned = 8;
+	public static final int staticCostOwned = 10;
 	public static final int staticCostUnknownEnemy = 3;
 
 	private static float startingRegion(int neutrals, int reward) {
@@ -60,12 +60,31 @@ public class Values {
 		}
 		return staticCostOwned;
 	}
-
+	
+	public static int calculateRegionInSuperRegionWeighedCost(String enemyName, Region r) {
+		if (r.getPlayerName().equals(enemyName)) {
+			if(r.getVisible()){
+				return r.getArmies() * costMultiplierEnemy;
+			}
+			else{
+				return staticCostUnknownEnemy;
+			}
+		}
+		else if (r.getPlayerName().equals("neutral")) {
+			return r.getArmies() * costMultiplierNeutral;
+		} else if (r.getPlayerName().equals("unknown")) {
+			return staticCostUnknown;
+		}
+		else if(r.getWasteland() && !r.getPlayerName().equals(enemyName)){
+			return costMultiplierNeutral * 10;	
+		}
+		return 0;
+	}
 	public static int calculateSuperRegionWeighedCost(String enemyName,
 			SuperRegion sr) {
 		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionWeighedCost(enemyName, r);
+			totalCost += calculateRegionInSuperRegionWeighedCost(enemyName, r);
 		}
 		return totalCost;
 	}
@@ -80,13 +99,10 @@ public class Values {
 		} else if (r.getPlayerName().equals(myName)) {
 			return 1;
 		}
-
-		else if (armySize <= 2) {
-			return armySize + 3;
-		} else if (armySize <= 3) {
-			return armySize + 4;
+		 if (armySize <= 3) {
+			return armySize + 1;
 		} else if (armySize <= 5) {
-			return armySize + 6;
+			return armySize + 3;
 		} else {
 			return (int) (armySize * 1.5);
 		}
