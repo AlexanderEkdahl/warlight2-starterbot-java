@@ -89,7 +89,7 @@ public class Values {
 		}
 		return totalCost;
 	}
-
+	
 	public static int calculateRequiredForcesAttack(String myName, Region r) {
 
 		// these numbers will be prone to change
@@ -106,6 +106,26 @@ public class Values {
 			return armySize + 3;
 		} else {
 			return (int) (armySize * 1.5);
+		}
+
+	}
+	
+	public static int calculateRequiredForcesAttackTotalVictory(String myName, Region r) {
+
+		// these numbers will be prone to change
+
+		int armySize = r.getArmies();
+		if (r.getPlayerName().equals("unknown")) {
+			return 5;
+		} else if (r.getPlayerName().equals(myName)) {
+			return 1;
+		}
+		 if (armySize <= 3) {
+			return armySize + 5;
+		} else if (armySize <= 5) {
+			return armySize + 7;
+		} else {
+			return (int) (armySize * 2.5);
 		}
 
 	}

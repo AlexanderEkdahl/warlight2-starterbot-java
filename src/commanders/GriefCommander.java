@@ -65,7 +65,8 @@ public class GriefCommander extends TemplateCommander {
 				// Super region is already controlled
 				continue;
 			}
-			int required = path.getDistance();
+			int required = Values.calculateRegionInSuperRegionWeighedCost(
+					state.getOpponentPlayerName(), path.getPath().get(1));
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(oName, path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(oName,
@@ -158,11 +159,12 @@ public class GriefCommander extends TemplateCommander {
 					totalRequired += Values.calculateRequiredForcesAttack(
 							mName, path.getPath().get(i));
 				}
-				totalRequired += Values.calculateRequiredForcesAttack(mName, targetSuperRegion);
-				
-				int disposed = r.getArmies()-1;
+				totalRequired += Values.calculateRequiredForcesAttack(mName,
+						targetSuperRegion);
+
+				int disposed = r.getArmies() - 1;
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, targetSuperRegion,
+						.getPath().get(1), totalRequired, targetSuperRegion,
 						"GriefCommander"));
 
 			}

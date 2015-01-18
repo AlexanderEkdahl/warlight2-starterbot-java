@@ -56,12 +56,12 @@ public class OffensiveCommander extends TemplateCommander {
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(
 					map.getSuperRegion(s), state.getMyPlayerName());
 
-			int required = Values.calculateRequiredForcesAttack(mName,
-					map.getSuperRegion(s));
 			if (path == null) {
 				// Super region is already controlled
 				continue;
 			}
+			int required = Values.calculateRequiredForcesAttack(mName,path.getPath().get(1)) - path.getOrigin().getArmies() + 1;
+			
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(oName, path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(oName,
@@ -156,7 +156,7 @@ public class OffensiveCommander extends TemplateCommander {
 				
 				int disposed = r.getArmies()-1;
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, targetSuperRegion,
+						.getPath().get(1), totalRequired, targetSuperRegion,
 						"OffensiveCommander"));
 				
 			}
