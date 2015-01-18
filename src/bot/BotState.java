@@ -169,10 +169,9 @@ public class BotState {
 		for (Region region : invisibleRegions) {
 			region.setVisible(false);
 			if (region.getPlayerName().equals(myName)) {
-				System.err.println("Region: " + region.getId() + "was lost out of sight. Should not pose a problem any longer.");
+				System.err.println("Region: " + region.getId() + " was lost out of sight. It must have been taken by the enemy.");
 				region.setPlayerName(opponentName);
 			}
-			System.err.println(region);
 		}
 	}
 
