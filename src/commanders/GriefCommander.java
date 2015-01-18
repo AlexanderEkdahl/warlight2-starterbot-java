@@ -159,8 +159,10 @@ public class GriefCommander extends TemplateCommander {
 							mName, path.getPath().get(i));
 				}
 				totalRequired += Values.calculateRequiredForcesAttack(mName, targetSuperRegion);
+				
+				int disposed = r.getArmies()-1;
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), totalRequired, targetSuperRegion,
+						.getPath().get(1), disposed, targetSuperRegion,
 						"GriefCommander"));
 
 			}

@@ -87,7 +87,6 @@ public class BotMain implements Bot {
 				state.getMyPlayerName());
 		// HashMap<Region, Integer> regionSatisfied =
 		// calculateRegionSatisfaction();
-		HashMap<SuperRegion, Integer> superRegionSatisfied = calculateSuperRegionSatisfaction(state);
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -99,30 +98,20 @@ public class BotMain implements Bot {
 			ActionProposal currentProposal = proposals.get(currentProposalnr);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
-			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
-					.getSuperRegion();
 			int required = currentProposal.getForces();
 
-
-//			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1){
-//				continue;
-//			}
+			// if (superRegionSatisfied.get(currentTargetSuperRegion) < 1){
+			// continue;
+			// }
 
 			if (available.contains(currentOriginRegion)) {
-				int roomLeft = superRegionSatisfied
-						.get(currentTargetSuperRegion);
-				int disposed = Math.min(currentOriginRegion.getArmies() - 1,
-						required);
 
 				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), currentTargetRegion) < disposed) {
+						state.getMyPlayerName(), currentTargetRegion) < required) {
 					// doublecheck that it isn't a stupid attack
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
-							currentOriginRegion, currentTargetRegion, disposed));
+							currentOriginRegion, currentTargetRegion, required));
 
-					superRegionSatisfied.put(currentTargetSuperRegion,
-							superRegionSatisfied.get(currentTargetSuperRegion)
-									- disposed);
 					System.err.println(currentProposal.toString());
 				}
 				available.remove(currentOriginRegion);
@@ -135,26 +124,4 @@ public class BotMain implements Bot {
 		return orders;
 	}
 
-	private HashMap<Region, Integer> calculateAvailable(BotState state) {
-		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
-
-		for (Region r : state.getFullMap().getOwnedRegions(
-				state.getMyPlayerName())) {
-			available.put(r, r.getArmies() - 1);
-
-		}
-		return available;
-	}
-
-	private HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
-			BotState state) {
-		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
-		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
-			roomLeft.put(
-					s,
-					(int) (Values.calculateRequiredForcesAttack(
-							state.getMyPlayerName(), s) * 2));
-		}
-		return roomLeft;
-	}
 }

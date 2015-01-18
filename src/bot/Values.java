@@ -1,6 +1,7 @@
 package bot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import map.Region;
@@ -121,5 +122,19 @@ public class Values {
 		// + s.getId() + " is " + totalRequired);
 		return totalRequired;
 
+	}
+	
+
+	
+	private HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
+			BotState state) {
+		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
+		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
+			roomLeft.put(
+					s,
+					(int) (Values.calculateRequiredForcesAttack(
+							state.getMyPlayerName(), s)));
+		}
+		return roomLeft;
 	}
 }

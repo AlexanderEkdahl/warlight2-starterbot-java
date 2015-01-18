@@ -13,7 +13,7 @@ import map.Pathfinder2.Path;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
-	private static final int staticRegionBonus = 30;
+	private static final int staticRegionBonus = 0;
 	private static final int offencePenaltyOfMovingThroughOwnRegion = 8;
 
 	@Override
@@ -80,10 +80,6 @@ public class OffensiveCommander extends TemplateCommander {
 		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
 		ArrayList<SuperRegion> possibleTargets = state.getFullMap()
 				.getSuperRegions();
-
-		// exclude owned superregions
-		// possibleTargets.removeAll((state.getFullMap()
-		// .getOwnedSuperRegions(state.getMyPlayerName())));
 
 		for (SuperRegion s : possibleTargets) {
 			worth.put(s.getId(), calculateWorth(s, state) + selfImportance);
@@ -157,8 +153,10 @@ public class OffensiveCommander extends TemplateCommander {
 							mName, path.getPath().get(i));
 				}
 				totalRequired += Values.calculateRequiredForcesAttack(mName, targetSuperRegion);
+				
+				int disposed = r.getArmies()-1;
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), totalRequired, targetSuperRegion,
+						.getPath().get(1), disposed, targetSuperRegion,
 						"OffensiveCommander"));
 				
 			}
