@@ -91,10 +91,8 @@ public class BotMain implements Bot {
 
 		Collections.sort(proposals);
 
-		int currentProposalnr = 0;
-		while (currentProposalnr < proposals.size()) {
-
-			ActionProposal currentProposal = proposals.get(currentProposalnr);
+		for (int i = 0; i < proposals.size(); i++) {
+			ActionProposal currentProposal = proposals.get(i);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
 			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
@@ -102,11 +100,15 @@ public class BotMain implements Bot {
 			int required = currentProposal.getForces();
 
 			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1) {
+				System.err.println("Won't attack SuperRegion: "
+						+ currentTargetSuperRegion.getId()
+						+ " satisfaction is: "
+						+ superRegionSatisfied.get(currentTargetSuperRegion));
 				continue;
 			}
-			if (regionSatisfied.get(currentProposal.getTarget()) < 1) {
-				continue;
-			}
+			// if (regionSatisfied.get(currentProposal.getTarget()) < 1) {
+			// continue;
+			// }
 
 			if (available.contains(currentOriginRegion)) {
 
@@ -118,14 +120,16 @@ public class BotMain implements Bot {
 					superRegionSatisfied.put(currentTargetSuperRegion,
 							superRegionSatisfied.get(currentTargetSuperRegion)
 									- required);
-
+					regionSatisfied
+							.put(currentTargetRegion,
+									regionSatisfied.get(currentTargetRegion)
+											- required);
 					System.err.println(currentProposal.toString());
 				}
 				available.remove(currentOriginRegion);
 
 			}
 
-			currentProposalnr++;
 		}
 
 		return orders;

@@ -76,7 +76,7 @@ public class Values {
 		} else if (r.getWasteland() && !r.getPlayerName().equals(enemyName)) {
 			return costMultiplierNeutral * 10;
 		}
-		return 0;
+		return 1;
 	}
 
 	public static int calculateSuperRegionWeighedCost(String enemyName,
@@ -149,7 +149,7 @@ public class Values {
 		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
 			roomLeft.put(
 					s,
-					(int) ((Values.calculateRequiredForcesAttack(
+					((Values.calculateRequiredForcesAttack(
 							state.getMyPlayerName(), s)) * maxSuperRegionSatisfactionMultiplier));
 		}
 		return roomLeft;
