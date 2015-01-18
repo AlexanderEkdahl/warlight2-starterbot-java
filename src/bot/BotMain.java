@@ -82,6 +82,7 @@ public class BotMain implements Bot {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
+		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Integer> superRegionSatisfied = Values
 				.calculateSuperRegionSatisfaction(state);
 		HashMap<Region, Integer> regionSatisfied = Values
@@ -95,15 +96,11 @@ public class BotMain implements Bot {
 			ActionProposal currentProposal = proposals.get(i);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
-			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
-					.getSuperRegion();
+			SuperRegion currentTargetSuperRegion = currentProposal.getPlan();
 			int required = currentProposal.getForces();
 
 			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1) {
-				System.err.println("Won't attack SuperRegion: "
-						+ currentTargetSuperRegion.getId()
-						+ " satisfaction is: "
-						+ superRegionSatisfied.get(currentTargetSuperRegion));
+				backUpProposals.add(currentProposal);
 				continue;
 			}
 			// if (regionSatisfied.get(currentProposal.getTarget()) < 1) {
@@ -130,6 +127,18 @@ public class BotMain implements Bot {
 
 			}
 
+		}
+		for (int i = 0; i < backUpProposals.size(); i++) {
+
+			ActionProposal currentProposal = backUpProposals.get(i);
+			Region currentOriginRegion = currentProposal.getOrigin();
+			Region currentTargetRegion = currentProposal.getTarget();
+			int required = currentProposal.getForces();
+			if (available.contains(currentOriginRegion)) {
+				orders.add(new AttackTransferMove(state.getMyPlayerName(),
+						currentOriginRegion, currentTargetRegion, required));
+				available.remove(currentOriginRegion);
+			}
 		}
 
 		return orders;

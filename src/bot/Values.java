@@ -13,7 +13,7 @@ public class Values {
 	private static final int staticCostUnknown = 10;
 	private static final int staticCostOwned = 10;
 	private static final int staticCostUnknownEnemy = 3;
-	private static final int maxSuperRegionSatisfactionMultiplier = 2;
+	private static final int maxSuperRegionSatisfactionMultiplier = 1;
 	private static final int maxRegionSatisfactionMultiplier = 2;
 
 	private static float startingRegion(int neutrals, int reward) {
