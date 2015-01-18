@@ -80,13 +80,12 @@ public class BotMain implements Bot {
 			Long timeOut) {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-
-		// HashMap<Region, Integer> available = calculateAvailable(state);
-
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
-		// HashMap<Region, Integer> regionSatisfied =
-		// calculateRegionSatisfaction();
+		HashMap<SuperRegion, Integer> superRegionSatisfied = Values
+				.calculateSuperRegionSatisfaction(state);
+		HashMap<Region, Integer> regionSatisfied = Values
+				.calculateRegionSatisfaction(state);
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -98,11 +97,16 @@ public class BotMain implements Bot {
 			ActionProposal currentProposal = proposals.get(currentProposalnr);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
+			SuperRegion currentTargetSuperRegion = currentProposal.getTarget()
+					.getSuperRegion();
 			int required = currentProposal.getForces();
 
-			// if (superRegionSatisfied.get(currentTargetSuperRegion) < 1){
-			// continue;
-			// }
+			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1) {
+				continue;
+			}
+			if (regionSatisfied.get(currentProposal.getTarget()) < 1) {
+				continue;
+			}
 
 			if (available.contains(currentOriginRegion)) {
 
@@ -111,6 +115,9 @@ public class BotMain implements Bot {
 					// doublecheck that it isn't a stupid attack
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
 							currentOriginRegion, currentTargetRegion, required));
+					superRegionSatisfied.put(currentTargetSuperRegion,
+							superRegionSatisfied.get(currentTargetSuperRegion)
+									- required);
 
 					System.err.println(currentProposal.toString());
 				}
