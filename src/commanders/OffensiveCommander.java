@@ -13,21 +13,14 @@ import map.*;
 import map.Pathfinder2.Path;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 40;
+	private static final int rewardMultiplier = 60;
 	private static final int staticRegionBonus = 0;
-	private static final int offencePenaltyOfMovingThroughOwnRegion = 8;
+	private static final int offencePenaltyOfMovingThroughOwnRegion = 5;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
 		Map currentMap = state.getFullMap();
 		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
-
-		// if we don't have any super regions, prioritize expansion greatly
-		if (currentMap.getOwnedSuperRegions(state.getMyPlayerName()).size() < 1) {
-			selfImportance = 1000;
-		} else {
-			selfImportance = 1;
-		}
 
 		worth = calculatePlans(state);
 		ArrayList<PlacementProposal> attackPlans;

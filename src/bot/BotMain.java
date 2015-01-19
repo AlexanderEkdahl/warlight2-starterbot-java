@@ -61,7 +61,7 @@ public class BotMain implements Bot {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
 						currentProposal.getTarget(), currentProposal
 								.getForces()));
-
+				System.err.println(currentProposal.toString());
 				armiesLeft -= currentProposal.getForces();
 			}
 			currentProposalnr++;
@@ -86,13 +86,19 @@ public class BotMain implements Bot {
 			Long timeOut) {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
-				state.getMyPlayerName());
+//		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
+//				state.getMyPlayerName());
+		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
+		for (Region r : state.getFullMap().getOwnedRegions(state.getMyPlayerName())){
+			available.put(r, r.getArmies()-1);
+		}
+		
 		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Integer> superRegionSatisfied = Values
 				.calculateSuperRegionSatisfaction(state);
 		HashMap<Region, Integer> regionSatisfied = Values
 				.calculateRegionSatisfaction(state);
+		HashMap<Region, Integer> awaitingBackup = new HashMap<Region, Integer>();
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -116,24 +122,26 @@ public class BotMain implements Bot {
 				continue;
 			}
 
-			if (available.contains(currentOriginRegion)) {
+			if (available.get(currentOriginRegion) > 0) {
 
+				int disposed = Math.min(required, available.get(currentOriginRegion));
+				
 				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), currentTargetRegion) < required) {
+						state.getMyPlayerName(), currentTargetRegion) < disposed) {
 					// doublecheck that it isn't a stupid attack
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
-							currentOriginRegion, currentTargetRegion, required));
+							currentOriginRegion, currentTargetRegion, disposed));
 					superRegionSatisfied.put(currentTargetSuperRegion,
 							superRegionSatisfied.get(currentTargetSuperRegion)
-									- required);
+									- disposed);
 					regionSatisfied
-							.put(currentTargetRegion,
-									regionSatisfied.get(currentTargetRegion)
-											- required);
-
+							.put(currentFinalTargetRegion,
+									regionSatisfied.get(currentFinalTargetRegion)
+											- disposed);					
 					System.err.println(currentProposal.toString());
-				}
-				available.remove(currentOriginRegion);
+				}	
+				available.put(currentOriginRegion, available.get(currentOriginRegion) - disposed);
+				
 
 			}
 
@@ -144,12 +152,13 @@ public class BotMain implements Bot {
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
 			int required = currentProposal.getForces();
-			if (available.contains(currentOriginRegion)) {
+			if (available.get(currentOriginRegion) > 0) {
+				int disposed = Math.min(required, available.get(currentOriginRegion));
 				if (Values.calculateRequiredForcesAttack(
 						state.getMyPlayerName(), currentTargetRegion) < required) {
 					orders.add(new AttackTransferMove(state.getMyPlayerName(),
 							currentOriginRegion, currentTargetRegion, required));
-					available.remove(currentOriginRegion);
+					available.put(currentOriginRegion, available.get(currentOriginRegion) - disposed);
 				}
 			}
 		}

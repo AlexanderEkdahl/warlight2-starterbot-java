@@ -121,6 +121,10 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
 		
+		ArrayList<SuperRegion> vulnerable = state.getFullMap().getOwnedFrontSuperRegions(state);
+		
+
+		
 		return proposals;
 	}
 
