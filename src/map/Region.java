@@ -131,7 +131,7 @@ public class Region {
     	int totalForce = 0;
     	for (Region n : neighbors){
     		if (n.getPlayerName().equals(oName)){
-    			totalForce += n.getArmies();
+    			totalForce += n.getArmies()-1;
     		}
     		
     	}

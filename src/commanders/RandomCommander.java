@@ -16,7 +16,7 @@ public class RandomCommander extends TemplateCommander {
 
     for (int i = 0; i < state.getStartingArmies(); i++) {
       Region region = regions.get(random.nextInt(regions.size()));
-      PlacementProposal proposal = new PlacementProposal(Integer.MIN_VALUE, region, region.getSuperRegion(), 1, "RandomCommander");
+      PlacementProposal proposal = new PlacementProposal(Integer.MIN_VALUE, region, new Plan(region, region.getSuperRegion()), 1, "RandomCommander");
       proposals.add(proposal);
     }
 

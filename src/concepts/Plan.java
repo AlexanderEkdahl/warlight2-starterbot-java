@@ -1,38 +1,51 @@
 package concepts;
 
+import map.Region;
 import map.SuperRegion;
 
-public class Plan implements Comparable<Plan>{
+public class Plan implements Comparable<Plan> {
 	SuperRegion sr;
+	Region r;
 	float weight;
-	
-	public Plan(SuperRegion sr){
+
+	public Plan(Region r, SuperRegion sr) {
 		this.sr = sr;
+		this.r = r;
 		weight = 0;
 	}
-	public Plan(SuperRegion sr, int weight){
+
+	public Plan(SuperRegion sr, int weight) {
 		this.sr = sr;
 		this.weight = weight;
 	}
-	
+
 	public float getWeight() {
 		return weight;
 	}
+
 	public void setWeight(float f) {
 		this.weight = f;
 	}
+
 	public void setSr(SuperRegion sr) {
 		this.sr = sr;
 	}
-	public SuperRegion getSr(){
+
+	public SuperRegion getSr() {
 		return sr;
 	}
+	
+	public Region getR(){
+		return r;
+	}
+
 	@Override
 	public int compareTo(Plan otherPlan) {
-		if (otherPlan.getWeight() > weight){
+		if (otherPlan.getWeight() > weight) {
 			return 1;
-		}
-		else{
+		} else if (otherPlan.getWeight() == weight) {
+			return 0;
+		} else {
 			return -1;
 		}
 	}

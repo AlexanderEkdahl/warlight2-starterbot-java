@@ -100,7 +100,7 @@ public class SuperRegion {
 			for (Region n : r.getNeighbors()){
 				if (n.getPlayerName().equals(oName) && !checked.contains(n)){
 					checked.add(n);
-					totalForce += n.getArmies();
+					totalForce += n.getArmies()-1;
 				}
 			}
 			

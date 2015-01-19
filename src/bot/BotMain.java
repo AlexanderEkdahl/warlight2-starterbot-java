@@ -7,6 +7,7 @@ import java.util.HashMap;
 import commanders.*;
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
+import concepts.Plan;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
@@ -73,6 +74,11 @@ public class BotMain implements Bot {
 
 		}
 
+		for (PlaceArmiesMove p : orders) {
+			Region r = p.getRegion();
+			r.setArmies(r.getArmies() + p.getArmies());
+		}
+
 		return orders;
 	}
 
@@ -96,16 +102,19 @@ public class BotMain implements Bot {
 			ActionProposal currentProposal = proposals.get(i);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
-			SuperRegion currentTargetSuperRegion = currentProposal.getPlan();
+			Plan currentPlan = currentProposal.getPlan();
+			SuperRegion currentTargetSuperRegion = currentPlan.getSr();
+			Region currentFinalTargetRegion = currentPlan.getR();
 			int required = currentProposal.getForces();
 
 			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1) {
 				backUpProposals.add(currentProposal);
 				continue;
 			}
-			// if (regionSatisfied.get(currentProposal.getTarget()) < 1) {
-			// continue;
-			// }
+			if (regionSatisfied.get(currentFinalTargetRegion) < 1) {
+				backUpProposals.add(currentProposal);
+				continue;
+			}
 
 			if (available.contains(currentOriginRegion)) {
 
@@ -121,6 +130,7 @@ public class BotMain implements Bot {
 							.put(currentTargetRegion,
 									regionSatisfied.get(currentTargetRegion)
 											- required);
+
 					System.err.println(currentProposal.toString());
 				}
 				available.remove(currentOriginRegion);
@@ -135,9 +145,12 @@ public class BotMain implements Bot {
 			Region currentTargetRegion = currentProposal.getTarget();
 			int required = currentProposal.getForces();
 			if (available.contains(currentOriginRegion)) {
-				orders.add(new AttackTransferMove(state.getMyPlayerName(),
-						currentOriginRegion, currentTargetRegion, required));
-				available.remove(currentOriginRegion);
+				if (Values.calculateRequiredForcesAttack(
+						state.getMyPlayerName(), currentTargetRegion) < required) {
+					orders.add(new AttackTransferMove(state.getMyPlayerName(),
+							currentOriginRegion, currentTargetRegion, required));
+					available.remove(currentOriginRegion);
+				}
 			}
 		}
 

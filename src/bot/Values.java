@@ -44,8 +44,8 @@ public class Values {
 
 	}
 
-	public static int calculateRegionWeighedCost(String enemyName, Region r) {
-		if (r.getPlayerName().equals(enemyName)) {
+	public static int calculateRegionWeighedCost(String mName, String eName, Region r) {
+		if (r.getPlayerName().equals(eName)) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
 			} else {
@@ -55,7 +55,7 @@ public class Values {
 			return r.getArmies() * costMultiplierNeutral;
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
-		} else if (r.getWasteland() && !r.getPlayerName().equals(enemyName)) {
+		} else if (r.getWasteland() && !r.getPlayerName().equals(mName)) {
 			return costMultiplierNeutral * 10;
 		}
 		return staticCostOwned;
@@ -115,9 +115,12 @@ public class Values {
 
 		int armySize = r.getArmies();
 		if (r.getPlayerName().equals("unknown")) {
-			return 5;
+			return 100;
 		} else if (r.getPlayerName().equals(myName)) {
 			return 0;
+		}
+		else if (r.getPlayerName().equals("neutral")){
+			return (int) (armySize *2.5);
 		}
 		if (armySize <= 3) {
 			return armySize + 5;
@@ -126,6 +129,8 @@ public class Values {
 		} else {
 			return (int) (armySize * 2.5);
 		}
+		
+		
 
 	}
 

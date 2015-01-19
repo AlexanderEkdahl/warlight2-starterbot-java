@@ -16,6 +16,7 @@ import bot.BotState;
 import bot.Values;
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
+import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
 	public static final int valueDenialMultiplier = 10;
@@ -52,7 +53,8 @@ public class GriefCommander extends TemplateCommander {
 		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
-						return Values.calculateRegionWeighedCost(oName, nodeB);
+						return Values.calculateRegionWeighedCost(mName, oName,
+								nodeB);
 
 					}
 				});
@@ -74,13 +76,15 @@ public class GriefCommander extends TemplateCommander {
 				break;
 			}
 			float cost = path.getDistance()
-					- Values.calculateRegionWeighedCost(oName, path.getTarget())
+					- Values.calculateRegionWeighedCost(mName, oName,
+							path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(oName,
 							map.getSuperRegion(s));
 
 			float value = worth.get(s) / cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), map
-					.getSuperRegion(s), required, "GriefCommander"));
+			proposals.add(new PlacementProposal(value, path.getOrigin(),
+					new Plan(path.getOrigin(), path.getOrigin()
+							.getSuperRegion()), required, "GriefCommander"));
 
 		}
 
@@ -126,8 +130,8 @@ public class GriefCommander extends TemplateCommander {
 						if (nodeB.getPlayerName().equals(mName)) {
 							return 5;
 						} else {
-							return Values.calculateRegionWeighedCost(eName,
-									nodeB);
+							return Values.calculateRegionWeighedCost(mName,
+									eName, nodeB);
 						}
 
 					}
@@ -151,7 +155,7 @@ public class GriefCommander extends TemplateCommander {
 				SuperRegion targetSuperRegion = path.getTarget()
 						.getSuperRegion();
 				float currentPathCost = path.getDistance()
-						- Values.calculateRegionWeighedCost(eName,
+						- Values.calculateRegionWeighedCost(mName, eName,
 								path.getTarget());
 				float currentSuperRegionCost = Values
 						.calculateSuperRegionWeighedCost(eName,
@@ -172,8 +176,8 @@ public class GriefCommander extends TemplateCommander {
 				disposed = Math.max(r.getArmies() / 2, disposed);
 
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, targetSuperRegion,
-						"GriefCommander"));
+						.getPath().get(1), disposed, new Plan(path.getTarget(),
+						targetSuperRegion), "GriefCommander"));
 
 			}
 

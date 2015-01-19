@@ -1,16 +1,15 @@
 package concepts;
 
 import map.Region;
-import map.SuperRegion;
 
 public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 	protected float weight;
 	protected Region target;
 	protected int forces;
-	protected SuperRegion plan;
+	protected Plan plan;
 	protected String issuedBy;
 
-	public TemplateProposal(float weight, Region target, SuperRegion plan, int forces,
+	public TemplateProposal(float weight, Region target, Plan plan, int forces,
 			String issuedBy) {
 		this.weight = weight;
 		this.target = target;
@@ -19,11 +18,11 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 		this.plan = plan;
 	}
 
-	public SuperRegion getPlan() {
+	public Plan getPlan() {
 		return plan;
 	}
 
-	public void SuperRegion(SuperRegion plan) {
+	public void SuperRegion(Plan plan) {
 		this.plan = plan;
 	}
 

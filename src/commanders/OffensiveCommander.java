@@ -6,6 +6,7 @@ import java.util.Set;
 
 import concepts.ActionProposal;
 import concepts.PlacementProposal;
+import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
@@ -40,13 +41,13 @@ public class OffensiveCommander extends TemplateCommander {
 
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		final String oName = state.getOpponentPlayerName();
-		String mName = state.getMyPlayerName();
+		final String mName = state.getMyPlayerName();
 		Map map = state.getFullMap();
 
 		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
-						return Values.calculateRegionWeighedCost(oName, nodeB);
+						return Values.calculateRegionWeighedCost(mName, oName, nodeB);
 
 					}
 				});
@@ -68,13 +69,16 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 
 			float cost = path.getDistance()
-					- Values.calculateRegionWeighedCost(oName, path.getTarget())
+					- Values.calculateRegionWeighedCost(mName,oName, path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(oName,
 							map.getSuperRegion(s));
 
 			float value = worth.get(s) / cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), map
-					.getSuperRegion(s), required, "OffensiveCommander"));
+			proposals
+					.add(new PlacementProposal(value, path.getOrigin(),
+							new Plan(path.getOrigin(), path.getOrigin()
+									.getSuperRegion()), required,
+							"OffensiveCommander"));
 
 		}
 
@@ -117,7 +121,7 @@ public class OffensiveCommander extends TemplateCommander {
 						if (nodeB.getPlayerName().equals(mName)) {
 							return offencePenaltyOfMovingThroughOwnRegion;
 						} else {
-							return Values.calculateRegionWeighedCost(eName,
+							return Values.calculateRegionWeighedCost(mName,eName,
 									nodeB);
 						}
 
@@ -143,7 +147,7 @@ public class OffensiveCommander extends TemplateCommander {
 				SuperRegion targetSuperRegion = path.getTarget()
 						.getSuperRegion();
 				float currentPathCost = path.getDistance()
-						- Values.calculateRegionWeighedCost(eName,
+						- Values.calculateRegionWeighedCost(mName,eName,
 								path.getTarget());
 				float currentSuperRegionCost = Values
 						.calculateSuperRegionWeighedCost(eName,
@@ -161,11 +165,11 @@ public class OffensiveCommander extends TemplateCommander {
 						targetSuperRegion);
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
-				disposed = Math.max(r.getArmies() / 2, disposed);
+				disposed = Math.max((r.getArmies() / 2), disposed);
 
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, targetSuperRegion,
-						"OffensiveCommander"));
+						.getPath().get(1), disposed, new Plan(r,
+						targetSuperRegion), "OffensiveCommander"));
 
 			}
 
