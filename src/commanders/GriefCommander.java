@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import map.Map;
-import map.Pathfinder;
 import map.Pathfinder2;
 import map.PathfinderWeighter;
 import map.Region;
@@ -78,7 +77,7 @@ public class GriefCommander extends TemplateCommander {
 			float cost = path.getDistance()
 					- Values.calculateRegionWeighedCost(mName, oName,
 							path.getTarget())
-					+ Values.calculateSuperRegionWeighedCost(oName,
+					+ Values.calculateSuperRegionWeighedCost(mName,oName,
 							map.getSuperRegion(s));
 
 			float value = worth.get(s) / cost;
@@ -158,26 +157,24 @@ public class GriefCommander extends TemplateCommander {
 						- Values.calculateRegionWeighedCost(mName, eName,
 								path.getTarget());
 				float currentSuperRegionCost = Values
-						.calculateSuperRegionWeighedCost(eName,
+						.calculateSuperRegionWeighedCost(mName,eName,
 								targetSuperRegion);
 				float currentWorth = ranking.get(path.getTarget()
 						.getSuperRegion().getId());
 				currentWeight = currentWorth
 						/ (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size() - 1; i++) {
-					totalRequired += Values.calculateRequiredForcesAttack(
-							mName, path.getPath().get(i));
+				for (int i = 1; i < path.getPath().size(); i++) {
+					totalRequired += Values
+							.calculateRequiredForcesAttackTotalVictory(mName,
+									path.getPath().get(i));
 				}
-				totalRequired += Values.calculateRequiredForcesAttack(mName,
-						targetSuperRegion);
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
-				disposed = Math.max(r.getArmies() / 2, disposed);
 
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, new Plan(path.getTarget(),
-						targetSuperRegion), "GriefCommander"));
+						.getPath().get(1), disposed, new Plan(r,
+						targetSuperRegion), "OffensiveCommander"));
 
 			}
 

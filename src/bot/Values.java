@@ -15,6 +15,7 @@ public class Values {
 	private static final int staticCostUnknownEnemy = 8;
 	private static final int maxSuperRegionSatisfactionMultiplier = 1;
 	private static final int maxRegionSatisfactionMultiplier = 2;
+	private static final int staticRegionCost = 3;
 
 	private static float startingRegion(int neutrals, int reward) {
 		if (reward == 0) {
@@ -44,7 +45,8 @@ public class Values {
 
 	}
 
-	public static int calculateRegionWeighedCost(String mName, String eName, Region r) {
+	public static int calculateRegionWeighedCost(String mName, String eName,
+			Region r) {
 		if (r.getPlayerName().equals(eName)) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
@@ -61,9 +63,9 @@ public class Values {
 		return staticCostOwned;
 	}
 
-	public static int calculateRegionInSuperRegionWeighedCost(String enemyName,
+	public static int calculateRegionInSuperRegionWeighedCost(String mName, String eName,
 			Region r) {
-		if (r.getPlayerName().equals(enemyName)) {
+		if (r.getPlayerName().equals(eName)) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
 			} else {
@@ -73,37 +75,38 @@ public class Values {
 			return r.getArmies() * costMultiplierNeutral;
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
-		} else if (r.getWasteland() && !r.getPlayerName().equals(enemyName)) {
+		} else if (r.getWasteland() && !r.getPlayerName().equals(mName)) {
 			return costMultiplierNeutral * 10;
 		}
-		return 1;
+		return 0;
 	}
 
-	public static int calculateSuperRegionWeighedCost(String enemyName,
+	public static int calculateSuperRegionWeighedCost(String mName, String eName,
 			SuperRegion sr) {
 		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInSuperRegionWeighedCost(enemyName, r);
+			totalCost += calculateRegionInSuperRegionWeighedCost(mName, eName, r) + staticRegionCost;
 		}
 		return totalCost;
 	}
 
-	public static int calculateRequiredForcesAttack(String myName, Region r) {
+	public static int calculateRequiredForcesAttack(String mName, Region r) {
 
 		// these numbers will be prone to change
 
 		int armySize = r.getArmies();
 		if (r.getPlayerName().equals("unknown")) {
-			return 5;
-		} else if (r.getPlayerName().equals(myName)) {
-			return 1;
+			return 6;
+		} else if (r.getPlayerName().equals(mName)) {
+			return 0;
 		}
-		if (armySize <= 3) {
+
+		else if (armySize <= 3) {
 			return armySize + 2;
 		} else if (armySize <= 5) {
-			return armySize + 3;
+			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.5);
+			return (int) (armySize * 1.8);
 		}
 
 	}
@@ -118,19 +121,21 @@ public class Values {
 			return 100;
 		} else if (r.getPlayerName().equals(myName)) {
 			return 0;
+		} else if (r.getPlayerName().equals("neutral")) {
+			if (armySize <= 2){
+				return armySize +2;
+			}
+			else {
+				return (int) (armySize * 1.7);
+			}
 		}
-		else if (r.getPlayerName().equals("neutral")){
-			return (int) (armySize *2.5);
-		}
-		if (armySize <= 3) {
-			return armySize + 5;
+		else if (armySize <= 3) {
+			return armySize + 8;
 		} else if (armySize <= 5) {
-			return armySize + 7;
+			return armySize + 11;
 		} else {
 			return (int) (armySize * 2.5);
 		}
-		
-		
 
 	}
 

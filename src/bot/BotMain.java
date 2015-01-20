@@ -3,9 +3,11 @@ package bot;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 import commanders.*;
 import concepts.ActionProposal;
+import concepts.FromTo;
 import concepts.PlacementProposal;
 import concepts.Plan;
 import map.Region;
@@ -86,19 +88,20 @@ public class BotMain implements Bot {
 			Long timeOut) {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-//		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
-//				state.getMyPlayerName());
+		// ArrayList<Region> available = state.getFullMap().getOwnedRegions(
+		// state.getMyPlayerName());
 		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
-		for (Region r : state.getFullMap().getOwnedRegions(state.getMyPlayerName())){
-			available.put(r, r.getArmies()-1);
+		for (Region r : state.getFullMap().getOwnedRegions(
+				state.getMyPlayerName())) {
+			available.put(r, r.getArmies() - 1);
 		}
-		
 		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Integer> superRegionSatisfied = Values
 				.calculateSuperRegionSatisfaction(state);
 		HashMap<Region, Integer> regionSatisfied = Values
 				.calculateRegionSatisfaction(state);
 		HashMap<Region, Integer> awaitingBackup = new HashMap<Region, Integer>();
+		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
 
@@ -122,26 +125,32 @@ public class BotMain implements Bot {
 				continue;
 			}
 
-			if (available.get(currentOriginRegion) > 0) {
+			if (available.get(currentOriginRegion) > 0 && required > 0) {
 
-				int disposed = Math.min(required, available.get(currentOriginRegion));
-				
-				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), currentTargetRegion) < disposed) {
-					// doublecheck that it isn't a stupid attack
-					orders.add(new AttackTransferMove(state.getMyPlayerName(),
-							currentOriginRegion, currentTargetRegion, disposed));
-					superRegionSatisfied.put(currentTargetSuperRegion,
-							superRegionSatisfied.get(currentTargetSuperRegion)
-									- disposed);
-					regionSatisfied
-							.put(currentFinalTargetRegion,
-									regionSatisfied.get(currentFinalTargetRegion)
-											- disposed);					
-					System.err.println(currentProposal.toString());
-				}	
-				available.put(currentOriginRegion, available.get(currentOriginRegion) - disposed);
-				
+				int disposed = Math.min(required,
+						available.get(currentOriginRegion));
+
+				// if (Values.calculateRequiredForcesAttack(
+				// state.getMyPlayerName(), currentTargetRegion) <= disposed) {
+				// doublecheck that it isn't a stupid attack
+				FromTo currentMove = new FromTo(currentOriginRegion,
+						currentTargetRegion);
+				if (decisions.get(currentMove) == null) {
+					decisions.put(currentMove, disposed);
+				} else {
+					decisions.put(currentMove, decisions.get(currentMove)
+							+ disposed);
+				}
+				superRegionSatisfied.put(currentTargetSuperRegion,
+						superRegionSatisfied.get(currentTargetSuperRegion)
+								- disposed);
+				regionSatisfied.put(currentFinalTargetRegion,
+						regionSatisfied.get(currentFinalTargetRegion)
+								- disposed);
+				System.err.println(currentProposal.toString());
+				available.put(currentOriginRegion,
+						available.get(currentOriginRegion) - disposed);
+				// }
 
 			}
 
@@ -152,15 +161,30 @@ public class BotMain implements Bot {
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
 			int required = currentProposal.getForces();
-			if (available.get(currentOriginRegion) > 0) {
-				int disposed = Math.min(required, available.get(currentOriginRegion));
-				if (Values.calculateRequiredForcesAttack(
-						state.getMyPlayerName(), currentTargetRegion) < required) {
-					orders.add(new AttackTransferMove(state.getMyPlayerName(),
-							currentOriginRegion, currentTargetRegion, required));
-					available.put(currentOriginRegion, available.get(currentOriginRegion) - disposed);
+			if (available.get(currentOriginRegion) > 0 && required > 0) {
+				int disposed = Math.min(required,
+						available.get(currentOriginRegion));
+				// if
+				// (Values.calculateRequiredForcesAttack(state.getMyPlayerName(),
+				// currentTargetRegion) <= required) {
+				FromTo currentMove = new FromTo(currentOriginRegion,
+						currentTargetRegion);
+				if (decisions.get(currentMove) == null) {
+					decisions.put(currentMove, disposed);
+				} else {
+					decisions.put(currentMove, decisions.get(currentMove)
+							+ disposed);
 				}
+				available.put(currentOriginRegion,
+						available.get(currentOriginRegion) - disposed);
+				// }
 			}
+		}
+
+		Set<FromTo> keys = decisions.keySet();
+		for (FromTo f : keys) {
+			orders.add(new AttackTransferMove(state.getMyPlayerName(), f
+					.getR1(), f.getR2(), decisions.get(f)));
 		}
 
 		return orders;
