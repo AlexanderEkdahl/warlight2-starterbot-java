@@ -19,13 +19,11 @@ public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
-	private RandomCommander rc;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
 		gc = new GriefCommander();
-		rc = new RandomCommander();
 	}
 
 	public Region getStartingRegion(BotState state, Long timeOut) {
@@ -46,7 +44,6 @@ public class BotMain implements Bot {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
 		proposals.addAll(gc.getPlacementProposals(state));
-		proposals.addAll(rc.getPlacementProposals(state));
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
