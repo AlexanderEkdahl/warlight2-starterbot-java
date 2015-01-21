@@ -102,6 +102,9 @@ public class BotMain implements Bot {
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
+		
+		String mName = state.getMyPlayerName();
+		String eName = state.getOpponentPlayerName();
 
 		Collections.sort(proposals);
 
@@ -136,7 +139,7 @@ public class BotMain implements Bot {
 						decisions.put(currentMove, decisions.get(currentMove)
 								+ disposed);
 					}
-					if (!currentTargetRegion.getPlayerName().equals(state.getMyPlayerName())){
+					if (!currentTargetRegion.getPlayerName().equals(mName)){
 						if (attacking.get(currentTargetRegion) == null){
 							attacking.put(currentTargetRegion, disposed);
 						}
@@ -179,7 +182,7 @@ public class BotMain implements Bot {
 						decisions.put(currentMove, decisions.get(currentMove)
 								+ disposed);
 					}
-					if (!currentTargetRegion.getPlayerName().equals(state.getMyPlayerName())){
+					if (!currentTargetRegion.getPlayerName().equals(mName)){
 						if (attacking.get(currentTargetRegion) == null){
 							attacking.put(currentTargetRegion, disposed);
 						}
@@ -193,16 +196,24 @@ public class BotMain implements Bot {
 			}
 		}
 		
-		Set<Region> aKeys = atta
+		Set<Region> aKeys = attacking.keySet();
+		ArrayList<Region> badAttacks = new ArrayList<Region>();
+		for (Region r : aKeys){
+			if (Values.calculateRequiredForcesAttack(mName, r) > attacking.get(r)){
+				badAttacks.add(r);
+			}
+		}
 
 		Set<FromTo> keys = decisions.keySet();
 		
 		for (FromTo f : keys) {
-			orders.add(new AttackTransferMove(state.getMyPlayerName(), f
-					.getR1(), f.getR2(), decisions.get(f)));
+			if (!badAttacks.contains(f.getR2())){
+				orders.add(new AttackTransferMove(state.getMyPlayerName(), f
+						.getR1(), f.getR2(), decisions.get(f)));
+			}
+			
 		}
 
 		return orders;
 	}
-
 }

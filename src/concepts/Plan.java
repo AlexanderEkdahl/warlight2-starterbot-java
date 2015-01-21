@@ -39,9 +39,9 @@ public class Plan implements Comparable<Plan> {
 		return r;
 	}
 	
-	public String toString(){
-		return ("Region: " + r + " SuperRegion: " + sr);
-	}
+//	public String toString(){
+//		return ("Region: " + r + " SuperRegion: " + sr);
+//	}
  
 	@Override
 	public int compareTo(Plan otherPlan) {

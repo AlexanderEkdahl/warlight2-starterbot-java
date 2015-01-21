@@ -103,11 +103,11 @@ public class Values {
 		}
 
 		else if (armySize <= 3) {
-			return armySize + 2;
+			return armySize + 1;
 		} else if (armySize <= 5) {
-			return armySize + 4;
+			return armySize + 3;
 		} else {
-			return (int) (armySize * 1.8);
+			return (int) (armySize * 1.5);
 		}
 
 	}
