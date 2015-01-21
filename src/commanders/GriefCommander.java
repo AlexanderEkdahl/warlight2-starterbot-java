@@ -173,8 +173,8 @@ public class GriefCommander extends TemplateCommander {
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, new Plan(r,
-						targetSuperRegion), "OffensiveCommander"));
+						.getPath().get(1), disposed, new Plan(path.getTarget(),
+						targetSuperRegion), "GriefCommander"));
 
 			}
 

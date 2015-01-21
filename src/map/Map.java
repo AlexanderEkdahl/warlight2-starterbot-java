@@ -104,6 +104,7 @@ public class Map {
 
 		return owned;
 	}
+	
 
 	public ArrayList<SuperRegion> getOwnedSuperRegions(String name) {
 		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();

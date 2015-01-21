@@ -3,6 +3,7 @@ package bot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import map.Region;
 import map.SuperRegion;
@@ -126,7 +127,7 @@ public class Values {
 				return armySize +2;
 			}
 			else {
-				return (int) (armySize * 1.7);
+				return (int) (armySize * 2);
 			}
 		}
 		else if (armySize <= 3) {
@@ -147,8 +148,6 @@ public class Values {
 			totalRequired += calculateRequiredForcesAttack(myName, r);
 		}
 
-		// System.err.println("The calculated cost of attacking the SuperRegion "
-		// + s.getId() + " is " + totalRequired);
 		return totalRequired;
 
 	}
@@ -157,10 +156,16 @@ public class Values {
 			BotState state) {
 		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
 		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
-			roomLeft.put(
-					s,
-					((Values.calculateRequiredForcesAttack(
-							state.getMyPlayerName(), s)) * maxSuperRegionSatisfactionMultiplier));
+			if (s.ownedByPlayer(state.getMyPlayerName())){
+				roomLeft.put(s, arg1)
+			}
+			else{
+				roomLeft.put(
+						s,
+						((Values.calculateRequiredForcesAttack(
+								state.getMyPlayerName(), s)) * maxSuperRegionSatisfactionMultiplier));
+			}
+			
 		}
 		return roomLeft;
 	}
@@ -168,6 +173,7 @@ public class Values {
 	public static HashMap<Region, Integer> calculateRegionSatisfaction(
 			BotState state) {
 		HashMap<Region, Integer> roomLeft = new HashMap<Region, Integer>();
+	
 		for (Region r : state.getFullMap().getRegionList()) {
 			roomLeft.put(
 					r,
@@ -176,5 +182,14 @@ public class Values {
 		}
 
 		return roomLeft;
+	}
+
+	public static boolean retardedMove(String myPlayerName, int disposed, Region currentTargetRegion) {
+		if (!currentTargetRegion.getPlayerName().equals(myPlayerName)){
+			if (disposed < 2){
+				return true;
+			}
+		}
+		return false;
 	}
 }

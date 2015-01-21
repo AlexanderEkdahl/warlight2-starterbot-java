@@ -1,7 +1,6 @@
 package commanders;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -14,13 +13,12 @@ import map.*;
 import map.Pathfinder2.Path;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 60;
+	private static final int rewardMultiplier = 40;
 	private static final int staticRegionBonus = 0;
 	private static final int offencePenaltyOfMovingThroughOwnRegion = 5;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-		Map currentMap = state.getFullMap();
 		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
 
 		worth = calculatePlans(state);
@@ -115,12 +113,9 @@ public class OffensiveCommander extends TemplateCommander {
 		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
-						if (nodeB.getPlayerName().equals(mName)) {
-							return offencePenaltyOfMovingThroughOwnRegion;
-						} else {
-							return Values.calculateRegionWeighedCost(mName,
-									eName, nodeB);
-						}
+
+						return Values.calculateRegionWeighedCost(mName, eName,
+								nodeB);
 
 					}
 				});
@@ -163,7 +158,7 @@ public class OffensiveCommander extends TemplateCommander {
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
 				proposals.add(new ActionProposal(currentWeight, r, path
-						.getPath().get(1), disposed, new Plan(r,
+						.getPath().get(1), disposed, new Plan(path.getTarget(),
 						targetSuperRegion), "OffensiveCommander"));
 
 			}

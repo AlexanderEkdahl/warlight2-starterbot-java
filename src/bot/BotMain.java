@@ -130,54 +130,53 @@ public class BotMain implements Bot {
 				int disposed = Math.min(required,
 						available.get(currentOriginRegion));
 
-				// if (Values.calculateRequiredForcesAttack(
-				// state.getMyPlayerName(), currentTargetRegion) <= disposed) {
-				// doublecheck that it isn't a stupid attack
-				FromTo currentMove = new FromTo(currentOriginRegion,
-						currentTargetRegion);
-				if (decisions.get(currentMove) == null) {
-					decisions.put(currentMove, disposed);
-				} else {
-					decisions.put(currentMove, decisions.get(currentMove)
-							+ disposed);
-				}
-				superRegionSatisfied.put(currentTargetSuperRegion,
-						superRegionSatisfied.get(currentTargetSuperRegion)
-								- disposed);
-				regionSatisfied.put(currentFinalTargetRegion,
-						regionSatisfied.get(currentFinalTargetRegion)
-								- disposed);
-				System.err.println(currentProposal.toString());
-				available.put(currentOriginRegion,
-						available.get(currentOriginRegion) - disposed);
-				// }
 
-			}
+					FromTo currentMove = new FromTo(currentOriginRegion,
+							currentTargetRegion);
+					if (decisions.get(currentMove) == null) {
+						decisions.put(currentMove, disposed);
+					} else {
+						decisions.put(currentMove, decisions.get(currentMove)
+								+ disposed);
+					}
+
+					superRegionSatisfied.put(currentTargetSuperRegion,
+							superRegionSatisfied.get(currentTargetSuperRegion)
+									- disposed);
+					regionSatisfied.put(currentFinalTargetRegion,
+							regionSatisfied.get(currentFinalTargetRegion)
+									- disposed);
+					System.err.println(currentProposal.toString());
+					available.put(currentOriginRegion,
+							available.get(currentOriginRegion) - disposed);
+				}
+
+			
 
 		}
 		for (int i = 0; i < backUpProposals.size(); i++) {
-
+			
 			ActionProposal currentProposal = backUpProposals.get(i);
+			
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
 			int required = currentProposal.getForces();
 			if (available.get(currentOriginRegion) > 0 && required > 0) {
 				int disposed = Math.min(required,
 						available.get(currentOriginRegion));
-				// if
-				// (Values.calculateRequiredForcesAttack(state.getMyPlayerName(),
-				// currentTargetRegion) <= required) {
-				FromTo currentMove = new FromTo(currentOriginRegion,
-						currentTargetRegion);
-				if (decisions.get(currentMove) == null) {
-					decisions.put(currentMove, disposed);
-				} else {
-					decisions.put(currentMove, decisions.get(currentMove)
-							+ disposed);
-				}
-				available.put(currentOriginRegion,
-						available.get(currentOriginRegion) - disposed);
-				// }
+
+					FromTo currentMove = new FromTo(currentOriginRegion,
+							currentTargetRegion);
+					System.err.println("Backup Proposal: "+ currentProposal.toString());
+					if (decisions.get(currentMove) == null) {
+						decisions.put(currentMove, disposed);
+					} else {
+						decisions.put(currentMove, decisions.get(currentMove)
+								+ disposed);
+					}
+					available.put(currentOriginRegion,
+							available.get(currentOriginRegion) - disposed);
+				
 			}
 		}
 
