@@ -15,7 +15,7 @@ public class Values {
 	private static final int staticCostOwned = 10;
 	private static final int staticCostUnknownEnemy = 8;
 	private static final int maxSuperRegionSatisfactionMultiplier = 1;
-	private static final int maxRegionSatisfactionMultiplier = 2;
+	private static final int maxRegionSatisfactionMultiplier = 1;
 	private static final int staticRegionCost = 3;
 
 	private static float startingRegion(int neutrals, int reward) {
@@ -124,7 +124,7 @@ public class Values {
 			return 0;
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (armySize <= 2){
-				return armySize +2;
+				return armySize + 1;
 			}
 			else {
 				return (int) (armySize * 2);
@@ -151,19 +151,25 @@ public class Values {
 		return totalRequired;
 
 	}
+	
+	public static int calculateRequiredForcesDefend(String myName, String eName, SuperRegion s){
+		return s.getTotalThreateningForce(eName) - s.getTotalFriendlyForce(myName);
+	}
 
 	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
 			BotState state) {
+		String mName = state.getMyPlayerName();
+		String eName = state.getOpponentPlayerName();
 		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
 		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
 			if (s.ownedByPlayer(state.getMyPlayerName())){
-				roomLeft.put(s, arg1)
+				roomLeft.put(s, Values.calculateRequiredForcesDefend(mName, eName, s));
 			}
 			else{
 				roomLeft.put(
 						s,
 						((Values.calculateRequiredForcesAttack(
-								state.getMyPlayerName(), s)) * maxSuperRegionSatisfactionMultiplier));
+								mName, s)) * maxSuperRegionSatisfactionMultiplier));
 			}
 			
 		}

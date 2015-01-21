@@ -38,7 +38,11 @@ public class Plan implements Comparable<Plan> {
 	public Region getR(){
 		return r;
 	}
-
+	
+	public String toString(){
+		return ("Region: " + r + " SuperRegion: " + sr);
+	}
+ 
 	@Override
 	public int compareTo(Plan otherPlan) {
 		if (otherPlan.getWeight() > weight) {

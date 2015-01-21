@@ -109,5 +109,15 @@ public class SuperRegion {
 		return totalForce;
 		
 	}
+
+	public int getTotalFriendlyForce(String myName) {
+		int totalForce = 0;
+		for (Region r : getSubRegions()){
+			if (r.getPlayerName().equals(myName)){
+				totalForce += r.getArmies()-1;
+			}
+		}
+		return totalForce;
+	}
 	
 }

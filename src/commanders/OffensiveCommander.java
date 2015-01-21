@@ -15,7 +15,6 @@ import map.Pathfinder2.Path;
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
 	private static final int staticRegionBonus = 0;
-	private static final int offencePenaltyOfMovingThroughOwnRegion = 5;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {

@@ -18,12 +18,11 @@ import bot.BotState;
 import bot.Values;
 
 public class DefensiveCommander extends TemplateCommander {
-	private static final int staticPocketDefence = 40;
+	private static final int staticPocketDefence = 30;
 	private static final int staticSuperRegionDefence = 10;
 	private static final int rewardDefenseImportanceMultiplier = 15;
-	private static final int MultipleFrontPenalty = 10;
-	private static final int enemyTroopMatching = 1;
-	private static final int costOfMovingThroughFriendlyTerritory = 5;
+	private static final int multipleFrontPenalty = 10;
+	private static final int costOfMovingThroughFriendlyTerritory = 4;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -72,10 +71,8 @@ public class DefensiveCommander extends TemplateCommander {
 			// determine if more dudes are needed
 
 			if (enemyArmies > ownedArmies) {
-				float worth = staticSuperRegionDefence
-						+ rewardDefenseImportanceMultiplier
-						* s.getArmiesReward();
-				float cost = MultipleFrontPenalty * front.size();
+				float worth = calculateWorth(s);
+				float cost = multipleFrontPenalty * front.size();
 				float weight = worth / cost;
 				for (Region r : front) {
 					int needed = r.getArmies()
@@ -91,6 +88,12 @@ public class DefensiveCommander extends TemplateCommander {
 
 		}
 		return placementProposals;
+	}
+
+	private float calculateWorth(SuperRegion s) {
+		return staticSuperRegionDefence
+		+ rewardDefenseImportanceMultiplier
+		* s.getArmiesReward();
 	}
 
 	private ArrayList<PlacementProposal> organizePocketDefence(BotState state) {
@@ -127,20 +130,20 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<Region> fronts = state.getFullMap().getOwnedFrontRegions(
 				state);
 		HashMap<Region, Integer> needHelp = new HashMap<Region, Integer>();
+		ArrayList<Region> needHelpRegions = new ArrayList<Region>();
 		HashMap<SuperRegion, Integer> neededSuperRegion = new HashMap<SuperRegion, Integer>();
 
 		final String eName = state.getOpponentPlayerName();
 		final String mName = state.getMyPlayerName();
 		for (Region r : fronts) {
-			if (r.getTotalThreateningForce(eName) > r.getArmies()) {
-				needHelp.put(r,
-						r.getTotalThreateningForce(eName) - r.getArmies());
-			}
+			needHelp.put(r, r.getTotalThreateningForce(eName) - r.getArmies());
+			needHelpRegions.add(r);
+
 		}
 
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
-		
+
 		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
@@ -154,15 +157,26 @@ public class DefensiveCommander extends TemplateCommander {
 					}
 				});
 
-		
-		for (Region r : available){
+		for (Region r : available) {
+			if (needHelp.get(r) > 0) {
+				proposals.add(new ActionProposal(calculateImportance(r), r, r,
+						r.getArmies(), new Plan(r, r.getSuperRegion()),
+						"DefensiveCommander"));
+			}
 			
+			
+			pathfinder.getPathToRegionsFromRegion(r, needHelpRegions, mName);
 		}
 
 		ArrayList<SuperRegion> vulnerable = state.getFullMap()
 				.getOwnedFrontSuperRegions(state);
 
 		return proposals;
+	}
+
+	private float calculateImportance(Region r) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	private ArrayList<Region> determineBestDefensivePositions() {

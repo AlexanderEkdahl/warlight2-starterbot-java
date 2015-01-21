@@ -88,6 +88,7 @@ public class BotMain implements Bot {
 			Long timeOut) {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
+		HashMap<Region, Integer> attacking = new HashMap<Region, Integer>();
 		// ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 		// state.getMyPlayerName());
 		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
@@ -130,7 +131,6 @@ public class BotMain implements Bot {
 				int disposed = Math.min(required,
 						available.get(currentOriginRegion));
 
-
 					FromTo currentMove = new FromTo(currentOriginRegion,
 							currentTargetRegion);
 					if (decisions.get(currentMove) == null) {
@@ -138,6 +138,14 @@ public class BotMain implements Bot {
 					} else {
 						decisions.put(currentMove, decisions.get(currentMove)
 								+ disposed);
+					}
+					if (!currentTargetRegion.getPlayerName().equals(state.getMyPlayerName())){
+						if (attacking.get(currentTargetRegion) == null){
+							attacking.put(currentTargetRegion, disposed);
+						}
+						else{
+							attacking.put(currentTargetRegion, attacking.get(currentTargetRegion) + disposed);
+						}
 					}
 
 					superRegionSatisfied.put(currentTargetSuperRegion,
@@ -174,13 +182,24 @@ public class BotMain implements Bot {
 						decisions.put(currentMove, decisions.get(currentMove)
 								+ disposed);
 					}
+					if (!currentTargetRegion.getPlayerName().equals(state.getMyPlayerName())){
+						if (attacking.get(currentTargetRegion) == null){
+							attacking.put(currentTargetRegion, disposed);
+						}
+						else{
+							attacking.put(currentTargetRegion, attacking.get(currentTargetRegion) + disposed);
+						}
+					}
 					available.put(currentOriginRegion,
 							available.get(currentOriginRegion) - disposed);
 				
 			}
 		}
+		
+		Set<Region> aKeys = atta
 
 		Set<FromTo> keys = decisions.keySet();
+		
 		for (FromTo f : keys) {
 			orders.add(new AttackTransferMove(state.getMyPlayerName(), f
 					.getR1(), f.getR2(), decisions.get(f)));
