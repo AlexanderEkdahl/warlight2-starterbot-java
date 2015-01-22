@@ -113,8 +113,8 @@ public class BotMain implements Bot {
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
 			Plan currentPlan = currentProposal.getPlan();
-			SuperRegion currentTargetSuperRegion = currentPlan.getSr();
-			Region currentFinalTargetRegion = currentPlan.getR();
+			SuperRegion currentTargetSuperRegion = currentPlan.getSuperRegion();
+			Region currentFinalTargetRegion = currentPlan.getRegion();
 			int required = currentProposal.getForces();
 
 			if (superRegionSatisfied.get(currentTargetSuperRegion) < 1) {
