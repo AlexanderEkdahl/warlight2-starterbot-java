@@ -51,12 +51,12 @@
   </target>
 
   <target name="test" depends="compile">
-    <junit printsummary="on" fork="true" haltonfailure="yes">
+    <junit fork="true" haltonfailure="yes">
       <classpath refid="junit.class.path" />
       <classpath>
         <pathelement location="${build.test.dir}"/>
       </classpath>
-      <formatter type="plain" />
+      <formatter type="plain" usefile="false"/>
       <batchtest>
         <fileset dir="${test.dir}">
           <include name="**/*Test*.java" />
