@@ -152,8 +152,8 @@ public class Values {
 
 	}
 	
-	public static int calculateRequiredForcesDefend(String myName, String eName, SuperRegion s){
-		return s.getTotalThreateningForce(eName) - s.getTotalFriendlyForce(myName);
+	public static int calculateRequiredForcesDefend(String mName, String eName, SuperRegion s){
+		return s.getTotalThreateningForce(eName) - s.getTotalFriendlyForce(mName);
 	}
 
 	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
@@ -179,23 +179,29 @@ public class Values {
 	public static HashMap<Region, Integer> calculateRegionSatisfaction(
 			BotState state) {
 		HashMap<Region, Integer> roomLeft = new HashMap<Region, Integer>();
+		String mName = state.getMyPlayerName();
+		String eName = state.getOpponentPlayerName();
 	
 		for (Region r : state.getFullMap().getRegionList()) {
+			if (!r.getPlayerName().equals(mName))
 			roomLeft.put(
 					r,
 					calculateRequiredForcesAttackTotalVictory(
 							state.getMyPlayerName(), r));
-		}
+			else{
+				roomLeft.put(r, Values.calculateRequiredForcesDefend(mName, eName, r));
+			}
 
+		}
+		
 		return roomLeft;
 	}
 
-	public static boolean retardedMove(String myPlayerName, int disposed, Region currentTargetRegion) {
-		if (!currentTargetRegion.getPlayerName().equals(myPlayerName)){
-			if (disposed < 2){
-				return true;
-			}
-		}
-		return false;
+	public static Integer calculateRequiredForcesDefend(String mName,
+			String eName, Region r) {
+		// TODO Auto-generated method stub
+		return r.getHighestThreateningForce(eName) - r.getArmies();
 	}
+
+
 }

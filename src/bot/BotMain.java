@@ -44,6 +44,7 @@ public class BotMain implements Bot {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 		proposals.addAll(oc.getPlacementProposals(state));
 		proposals.addAll(gc.getPlacementProposals(state));
+		proposals.addAll(dc.getPlacementProposals(state));
 		Collections.sort(proposals);
 		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
@@ -55,7 +56,6 @@ public class BotMain implements Bot {
 						currentProposal.getTarget(), armiesLeft));
 				armiesLeft = 0;
 			}
-
 			else {
 				orders.add(new PlaceArmiesMove(state.getMyPlayerName(),
 						currentProposal.getTarget(), currentProposal
@@ -102,6 +102,7 @@ public class BotMain implements Bot {
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		proposals.addAll(oc.getActionProposals(state));
 		proposals.addAll(gc.getActionProposals(state));
+		proposals.addAll(dc.getActionProposals(state));
 		
 		String mName = state.getMyPlayerName();
 		String eName = state.getOpponentPlayerName();

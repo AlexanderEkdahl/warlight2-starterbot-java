@@ -18,7 +18,7 @@ import concepts.PlacementProposal;
 import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
-	public static final int valueDenialMultiplier = 10;
+	public static final int valueDenialMultiplier = 12;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -74,11 +74,7 @@ public class GriefCommander extends TemplateCommander {
 			if (required < 1) {
 				break;
 			}
-			float cost = path.getDistance()
-					- Values.calculateRegionWeighedCost(mName, oName,
-							path.getTarget())
-					+ Values.calculateSuperRegionWeighedCost(mName,oName,
-							map.getSuperRegion(s));
+			float cost = path.getDistance();
 
 			float value = worth.get(s) / cost;
 			proposals.add(new PlacementProposal(value, path.getOrigin(),

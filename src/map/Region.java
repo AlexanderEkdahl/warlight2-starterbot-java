@@ -137,4 +137,17 @@ public class Region {
     	}
 		return totalForce;
     }
+    
+    public int getHighestThreateningForce(String oName){
+    	int maxForce = 0;
+    	for (Region n : neighbors){
+    		if (n.getPlayerName().equals(oName)){
+    			if (n.getArmies() - 1 > maxForce){
+    				maxForce = n.getArmies() - 1;
+    			}
+    		}
+    		
+    	}
+		return maxForce;
+    }
 }
