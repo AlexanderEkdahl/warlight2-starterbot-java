@@ -55,17 +55,20 @@ public class Values {
 				return staticCostUnknownEnemy;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
-			return r.getArmies() * costMultiplierNeutral;
+			if (r.getVisible() == false && r.getWasteland()) {
+				return costMultiplierNeutral * 10;
+			} else {
+				return r.getArmies() * costMultiplierNeutral;
+			}
+
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
-		} else if (r.getWasteland() && !r.getPlayerName().equals(mName)) {
-			return costMultiplierNeutral * 10;
 		}
 		return staticCostOwned;
 	}
 
-	public static int calculateRegionInSuperRegionWeighedCost(String mName, String eName,
-			Region r) {
+	public static int calculateRegionInSuperRegionWeighedCost(String mName,
+			String eName, Region r) {
 		if (r.getPlayerName().equals(eName)) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
@@ -73,20 +76,24 @@ public class Values {
 				return staticCostUnknownEnemy;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
-			return r.getArmies() * costMultiplierNeutral;
+			if (r.getVisible() == false && r.getWasteland()) {
+				return costMultiplierNeutral * 10;
+			} else {
+				return r.getArmies() * costMultiplierNeutral;
+			}
+
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
-		} else if (r.getWasteland() && !r.getPlayerName().equals(mName)) {
-			return costMultiplierNeutral * 10;
 		}
 		return 0;
 	}
 
-	public static int calculateSuperRegionWeighedCost(String mName, String eName,
-			SuperRegion sr) {
+	public static int calculateSuperRegionWeighedCost(String mName,
+			String eName, SuperRegion sr) {
 		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInSuperRegionWeighedCost(mName, eName, r) + staticRegionCost;
+			totalCost += calculateRegionInSuperRegionWeighedCost(mName, eName,
+					r) + staticRegionCost;
 		}
 		return totalCost;
 	}
@@ -123,14 +130,12 @@ public class Values {
 		} else if (r.getPlayerName().equals(myName)) {
 			return 0;
 		} else if (r.getPlayerName().equals("neutral")) {
-			if (armySize <= 2){
+			if (armySize <= 2) {
 				return armySize + 1;
-			}
-			else {
+			} else {
 				return (int) (armySize * 2);
 			}
-		}
-		else if (armySize <= 3) {
+		} else if (armySize <= 3) {
 			return armySize + 8;
 		} else if (armySize <= 5) {
 			return armySize + 11;
@@ -151,9 +156,11 @@ public class Values {
 		return totalRequired;
 
 	}
-	
-	public static int calculateRequiredForcesDefend(String mName, String eName, SuperRegion s){
-		return s.getTotalThreateningForce(eName) - s.getTotalFriendlyForce(mName);
+
+	public static int calculateRequiredForcesDefend(String mName, String eName,
+			SuperRegion s) {
+		return s.getTotalThreateningForce(eName)
+				- s.getTotalFriendlyForce(mName);
 	}
 
 	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(
@@ -162,16 +169,15 @@ public class Values {
 		String eName = state.getOpponentPlayerName();
 		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
 		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
-			if (s.ownedByPlayer(state.getMyPlayerName())){
-				roomLeft.put(s, Values.calculateRequiredForcesDefend(mName, eName, s));
-			}
-			else{
+			if (s.ownedByPlayer(state.getMyPlayerName())) {
+				roomLeft.put(s,
+						Values.calculateRequiredForcesDefend(mName, eName, s));
+			} else {
 				roomLeft.put(
 						s,
-						((Values.calculateRequiredForcesAttack(
-								mName, s)) * maxSuperRegionSatisfactionMultiplier));
+						((Values.calculateRequiredForcesAttack(mName, s)) * maxSuperRegionSatisfactionMultiplier));
 			}
-			
+
 		}
 		return roomLeft;
 	}
@@ -181,19 +187,20 @@ public class Values {
 		HashMap<Region, Integer> roomLeft = new HashMap<Region, Integer>();
 		String mName = state.getMyPlayerName();
 		String eName = state.getOpponentPlayerName();
-	
+
 		for (Region r : state.getFullMap().getRegionList()) {
 			if (!r.getPlayerName().equals(mName))
-			roomLeft.put(
-					r,
-					calculateRequiredForcesAttackTotalVictory(
-							state.getMyPlayerName(), r));
-			else{
-				roomLeft.put(r, Values.calculateRequiredForcesDefend(mName, eName, r));
+				roomLeft.put(
+						r,
+						calculateRequiredForcesAttackTotalVictory(
+								state.getMyPlayerName(), r));
+			else {
+				roomLeft.put(r,
+						Values.calculateRequiredForcesDefend(mName, eName, r));
 			}
 
 		}
-		
+
 		return roomLeft;
 	}
 
@@ -202,6 +209,5 @@ public class Values {
 		// TODO Auto-generated method stub
 		return r.getHighestThreateningForce(eName) - r.getArmies();
 	}
-
 
 }
