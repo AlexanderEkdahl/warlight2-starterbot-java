@@ -2,17 +2,17 @@ package map;
 
 import java.util.*;
 
-public class Pathfinder2 {
+public class Pathfinder {
 	private PathfinderWeighter pathfinderWeighter;
 	private HashMap<Region, Integer> distances;
 	private Map map;
 
-	public Pathfinder2(Map map, PathfinderWeighter pathfinderWeighter) {
+	public Pathfinder(Map map, PathfinderWeighter pathfinderWeighter) {
 		this.map = map;
 		this.pathfinderWeighter = pathfinderWeighter;
 	}
 
-	public Pathfinder2(Map map) {
+	public Pathfinder(Map map) {
 		this(map, new PathfinderWeighter() {
 			public int weight(Region nodeA, Region nodeB) {
 				return 1;
@@ -272,18 +272,18 @@ public class Pathfinder2 {
 		m.add(node4);
 		m.add(node5);
 
-		Pathfinder2 pathfinder2 = new Pathfinder2(m);
+		Pathfinder Pathfinder = new Pathfinder(m);
 
-		// Iterator<Path> it = pathfinder2.distanceIterator(node1);
+		// Iterator<Path> it = Pathfinder.distanceIterator(node1);
 		// while (it.hasNext()){
 		// System.out.println(it.next().getTarget());
 		// }
 
-		// System.out.println(pathfinder2.getDistanceBetweenRegions(node1,
+		// System.out.println(Pathfinder.getDistanceBetweenRegions(node1,
 		// node4));
-		// pathfinder2.getPlayerInnerRegions("player1");
+		// Pathfinder.getPlayerInnerRegions("player1");
 
-		// for (Region region : pathfinder2.getPlayerInnerRegions(m, "player1"))
+		// for (Region region : Pathfinder.getPlayerInnerRegions(m, "player1"))
 		// {
 		// System.out.println(region.getId());
 		// }

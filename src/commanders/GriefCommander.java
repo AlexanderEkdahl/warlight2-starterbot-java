@@ -6,11 +6,11 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import map.Map;
-import map.Pathfinder2;
+import map.Pathfinder;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
-import map.Pathfinder2.Path;
+import map.Pathfinder.Path;
 import bot.BotState;
 import bot.Values;
 import concepts.ActionProposal;
@@ -49,7 +49,7 @@ public class GriefCommander extends TemplateCommander {
 		Map map = state.getFullMap();
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 
-		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						return Values.calculateRegionWeighedCost(mName, oName,
@@ -119,7 +119,7 @@ public class GriefCommander extends TemplateCommander {
 				state.getMyPlayerName());
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
-		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						if (nodeB.getPlayerName().equals(mName)) {

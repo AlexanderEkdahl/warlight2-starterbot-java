@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import map.Pathfinder2;
-import map.Pathfinder2.Path;
+import map.Pathfinder;
+import map.Pathfinder.Path;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
@@ -138,7 +138,7 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(
 				state.getMyPlayerName());
 
-		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						if (nodeB.getPlayerName().equals(mName)) {

@@ -4,14 +4,14 @@ import org.junit.Test;
 import org.junit.Before;
 
 import map.*;
-import map.Pathfinder2.Path;
+import map.Pathfinder.Path;
 import java.util.Iterator;
 
 public class PathfinderTest {
   private Map map;
   private SuperRegion superRegion1, superRegion2;
   private Region node1, node2, node3, node4, node5;
-  private Pathfinder2 pathfinder2;
+  private Pathfinder Pathfinder;
 
   @Before
   public void setup() {
@@ -38,12 +38,12 @@ public class PathfinderTest {
     map.add(node4);
     map.add(node5);
 
-    pathfinder2 = new Pathfinder2(map);
+    Pathfinder = new Pathfinder(map);
   }
 
   @Test
   public void testDistanceIterator() {
-    Iterator<Path> it = pathfinder2.distanceIterator(node1);
+    Iterator<Path> it = Pathfinder.distanceIterator(node1);
     assert(it.hasNext());
     Path path = it.next();
     assertEquals(node3, path.getTarget());

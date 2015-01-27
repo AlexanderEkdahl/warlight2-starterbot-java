@@ -10,7 +10,7 @@ import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
-import map.Pathfinder2.Path;
+import map.Pathfinder.Path;
 
 public class OffensiveCommander extends TemplateCommander {
 	private static final int rewardMultiplier = 40;
@@ -35,7 +35,7 @@ public class OffensiveCommander extends TemplateCommander {
 		final String mName = state.getMyPlayerName();
 		Map map = state.getFullMap();
 
-		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 						return Values.calculateRegionWeighedCost(mName, oName,
@@ -109,7 +109,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
-		Pathfinder2 pathfinder = new Pathfinder2(state.getFullMap(),
+		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
 

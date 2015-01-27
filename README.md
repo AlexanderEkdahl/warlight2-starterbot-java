@@ -20,16 +20,16 @@ Run simple integration test from the commandline
 
 Test Pathfinder
 
-    ant jar -Dmain-class=map.Pathfinder2 && java -jar bin/Warlight.jar
+    ant jar -Dmain-class=map.Pathfinder && java -jar bin/Warlight.jar
 
 # Links
 
 - http://gamedev.stackexchange.com/questions/21519/complex-game-ai-for-turn-based-strategy-games
 
 ``` java
-Pathfinder2 pathfinder2 = new Pathfinder2(m);
+Pathfinder Pathfinder = new Pathfinder(m);
 
-Path path = pathfinder2.getShortestPathToSuperRegionFromRegionOwnedByPlayer(superRegion, "player1");
+Path path = Pathfinder.getShortestPathToSuperRegionFromRegionOwnedByPlayer(superRegion, "player1");
 
 System.err.println("Total distance: " + path.getDistance());
 System.err.println("Origin region: " + path.getOrigin());
