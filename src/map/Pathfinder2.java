@@ -88,21 +88,21 @@ public class Pathfinder2 {
 
 		return paths;
 	}
-	
+
 	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions, String playerName){
 		ArrayList<Path> paths = new ArrayList<Path>();
-		
+
 		for (Iterator<Path> iterator = distanceIterator(origin); iterator
 				.hasNext();) {
 			Path path = iterator.next();
-			
+
 			if (regions.contains(path.getTarget())) {
 				paths.add(path);
 			}
-			
+
 		}
 		return paths;
-		
+
 	}
 
 	public class Path {
@@ -128,6 +128,13 @@ public class Pathfinder2 {
 
 		public Region getTarget() {
 			return path.getLast();
+		}
+
+		public String toString() {
+			return "Path{" +
+							"distance=" + distance +
+							", path=" + path +
+							'}';
 		}
 	}
 
@@ -226,7 +233,7 @@ public class Pathfinder2 {
 		return paths.iterator();
 	}
 
-	private Iterator<Path> distanceIterator(Region origin) {
+	public Iterator<Path> distanceIterator(Region origin) {
 		return distanceIterator(java.util.Collections.singleton(origin));
 	}
 
@@ -271,8 +278,6 @@ public class Pathfinder2 {
 		// while (it.hasNext()){
 		// System.out.println(it.next().getTarget());
 		// }
-
-		// Region nearest = pathfinder2.getNearestOwnedRegion(node3, "player1");
 
 		// System.out.println(pathfinder2.getDistanceBetweenRegions(node1,
 		// node4));

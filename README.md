@@ -38,3 +38,7 @@ for (Region region : path.getPath()) {
   System.out.print(region);
 }
 ```
+
+# Lines of Code
+
+    find . -name '*.java' | xargs wc -l
