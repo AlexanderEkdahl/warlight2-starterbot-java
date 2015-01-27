@@ -20,9 +20,9 @@ import bot.Values;
 
 public class DefensiveCommander extends TemplateCommander {
 	private static final int staticPocketDefence = 30;
-	private static final int staticSuperRegionDefence = 10;
-	private static final int rewardDefenseImportanceMultiplier = 15;
-	private static final int multipleFrontPenalty = 10;
+	private static final int staticSuperRegionDefence = 0;
+	private static final int rewardDefenseImportanceMultiplier = 40;
+	private static final int multipleFrontPenalty = 5;
 	private static final int costOfMovingThroughFriendlyTerritory = 4;
 
 	@Override
@@ -41,7 +41,7 @@ public class DefensiveCommander extends TemplateCommander {
 			ArrayList<SuperRegion> vulnerableSuperRegions) {
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 
-		placementProposals.addAll(organizePocketDefence(state));
+//		placementProposals.addAll(organizePocketDefence(state));
 		placementProposals.addAll(organizeOwnedSuperRegionDefence(state));
 
 		return placementProposals;
