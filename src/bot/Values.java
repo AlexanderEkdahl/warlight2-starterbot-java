@@ -9,21 +9,25 @@ import map.Region;
 import map.SuperRegion;
 
 public class Values {
-	private static final int costMultiplierEnemy = 1;
-	private static final int costMultiplierNeutral = 3;
-	private static final int staticCostUnknown = 10;
-	private static final int staticCostOwned = 10;
-	private static final int staticCostUnknownEnemy = 8;
-	private static final int maxSuperRegionSatisfactionMultiplier = 1;
-	private static final int maxRegionSatisfactionMultiplier = 1;
-	private static final int staticRegionCost = 3;
+	public static final int costMultiplierEnemy = 1;
+	public static final float costMultiplierDefendingAgainstEnemy = 0.5f;
+	
+	public static final int costMultiplierNeutral = 3;
+	public static final int staticCostUnknown = 5;
+	public static final int staticCostOwned = 10;
+	public static final int staticCostUnknownEnemy = 8;
+	public static final int multipleFrontPenalty = 5;
+	public static final float maxSuperRegionSatisfactionMultiplier = 1.5f;
+	public static final int maxRegionSatisfactionMultiplier = 1;
+	public static final int staticRegionCost = 3;
 
-	private static float startingRegion(int neutrals, int reward) {
-		if (reward == 0) {
+	private static float startingRegion(SuperRegion s) {
+		if (s.getArmiesReward() == 0) {
 			return Integer.MIN_VALUE;
 		}
 
-		return (reward * 2) / neutrals;
+		return (s.getArmiesReward() * 2)
+				/ (s.getInitialNeutralCount() + s.getSubRegions().size());
 	}
 
 	public static Region getBestStartRegion(
@@ -33,9 +37,7 @@ public class Values {
 		for (Region currentRegion : pickableStartingRegions) {
 			SuperRegion superRegion = currentRegion.getSuperRegion();
 
-			float value = Values.startingRegion(
-					superRegion.getInitialNeutralCount(),
-					superRegion.getArmiesReward());
+			float value = Values.startingRegion(superRegion);
 			if (value >= maxValue) {
 				maxValue = value;
 				maxRegion = currentRegion;
@@ -175,7 +177,7 @@ public class Values {
 			} else {
 				roomLeft.put(
 						s,
-						((Values.calculateRequiredForcesAttack(mName, s)) * maxSuperRegionSatisfactionMultiplier));
+						(int) ((Values.calculateRequiredForcesAttack(mName, s)) * maxSuperRegionSatisfactionMultiplier));
 			}
 
 		}
@@ -206,7 +208,6 @@ public class Values {
 
 	public static Integer calculateRequiredForcesDefend(String mName,
 			String eName, Region r) {
-		// TODO Auto-generated method stub
 		return r.getHighestThreateningForce(eName) - r.getArmies();
 	}
 

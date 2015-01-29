@@ -21,9 +21,10 @@ import bot.Values;
 public class DefensiveCommander extends TemplateCommander {
 	private static final int staticPocketDefence = 30;
 	private static final int staticSuperRegionDefence = 0;
-	private static final int rewardDefenseImportanceMultiplier = 40;
-	private static final int multipleFrontPenalty = 5;
+	private static final int rewardDefenseImportanceMultiplier = 30;
+
 	private static final int costOfMovingThroughFriendlyTerritory = 4;
+	private static final int extraArmiesDefence = 5;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -41,55 +42,69 @@ public class DefensiveCommander extends TemplateCommander {
 			ArrayList<SuperRegion> vulnerableSuperRegions) {
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 
-//		placementProposals.addAll(organizePocketDefence(state));
-		placementProposals.addAll(organizeOwnedSuperRegionDefence(state));
+		placementProposals.addAll(organizePocketDefence(state));
+		placementProposals.addAll(organizeSuperRegionDefence(state));
 
 		return placementProposals;
 	}
 
-	private ArrayList<PlacementProposal> organizeOwnedSuperRegionDefence(
+	private ArrayList<PlacementProposal> organizeSuperRegionDefence(
 			BotState state) {
+
 		ArrayList<SuperRegion> vulnerable = state.getFullMap()
 				.getOwnedFrontSuperRegions(state);
+		String mName = state.getMyPlayerName();
+		String eName = state.getOpponentPlayerName();
 
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
-
 		for (SuperRegion s : vulnerable) {
-			// it's generally a good thing to focus on superRegions that are
-			// cheaply defended
-			ArrayList<Region> front = s
-					.getFronts(state.getOpponentPlayerName());
-			int ownedArmies = 0;
-			for (Region r : front) {
-				ownedArmies += r.getArmies();
-			}
-			int enemyArmies = s.getTotalThreateningForce(state
-					.getOpponentPlayerName());
-			// determine if more dudes are needed
+			float weight = calculateWeight(s, eName);
+			Region mostVulnerableRegion = null;
+			float currentRequiredQuota;
+			int diff = s.getTotalFriendlyForce(mName)
+					- s.getTotalThreateningForce(eName);
 
-			if (enemyArmies > ownedArmies) {
-				float worth = calculateWorth(s);
-				float cost = multipleFrontPenalty * front.size();
-				float weight = worth / cost;
-				for (Region r : front) {
-					int needed = r.getArmies()
-							- r.getHighestThreateningForce(state
-									.getOpponentPlayerName());
-					if (needed > 0) {
-						placementProposals.add(new PlacementProposal(weight, r,
-								new Plan(r, s), needed, "DefensiveCommander"));
+			// keep on assigning dudes until we have at least 5 more in our
+			// superregion than they have
+			// and add them in the most vulnerable region
+			while (diff < extraArmiesDefence) {
+				float minRequiredQuota = Float.MAX_VALUE;
+				for (Region r : s.getFronts(eName)) {
+					currentRequiredQuota = r.getArmies()
+							/ r.getHighestThreateningForce(eName);
+					if (currentRequiredQuota < minRequiredQuota) {
+						minRequiredQuota = currentRequiredQuota;
+						mostVulnerableRegion = r;
 					}
-				}
 
+				}
+				placementProposals.add(new PlacementProposal(weight,
+						mostVulnerableRegion, new Plan(mostVulnerableRegion,
+								mostVulnerableRegion.getSuperRegion()), 1,
+						"DefensiveCommander"));
+				diff++;
 			}
 
 		}
 		return placementProposals;
 	}
 
-	private float calculateWorth(SuperRegion s) {
-		return staticSuperRegionDefence + rewardDefenseImportanceMultiplier
+	private float calculateWeight(SuperRegion s, String eName) {
+		float worth = calculateWorth(s);
+		float cost = calculateCost(s, eName);
+		float weight = worth / cost;
+		return weight;
+	}
+	
+	private float calculateWorth(SuperRegion s){
+		float worth = staticSuperRegionDefence + rewardDefenseImportanceMultiplier
 				* s.getArmiesReward();
+		return worth;
+	}
+	
+	private float calculateCost(SuperRegion s, String eName){
+		float cost = (s.getFronts(eName).size() * Values.multipleFrontPenalty) + (s.getTotalThreateningForce(eName) * Values.costMultiplierDefendingAgainstEnemy);
+		return cost;
 	}
 
 	private ArrayList<PlacementProposal> organizePocketDefence(BotState state) {
@@ -157,41 +172,36 @@ public class DefensiveCommander extends TemplateCommander {
 			// least that's what I think but hey I'm just the defensivecommander
 			// who cares what I think
 			if (needHelp.get(r) != null && needHelp.get(r) > 0) {
-				proposals.add(new ActionProposal(calculateImportance(r), r, r,
+				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion(), eName), r, r,
 						r.getArmies(), new Plan(r, r.getSuperRegion()),
 						"DefensiveCommander"));
 			} else {
 				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(
 						r, needHelpRegions, mName);
-				for (Path path : paths){
-					float currentCost = path.getDistance();
+				for (Path path : paths) {
+					float currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion(), eName);
 					float currentWorth = calculateWorth(r.getSuperRegion());
 					float currentWeight = currentWorth / currentCost;
-					
-					
+
 					int totalRequired = needHelp.get(path.getTarget());
 					for (int i = 1; i < path.getPath().size(); i++) {
 						totalRequired += Values
-								.calculateRequiredForcesAttackTotalVictory(mName,
-										path.getPath().get(i));
+								.calculateRequiredForcesAttackTotalVictory(
+										mName, path.getPath().get(i));
 					}
 					int disposed = Math.min(totalRequired, r.getArmies() - 1);
-					
+
 					proposals.add(new ActionProposal(currentWeight, r, path
-							.getPath().get(1), disposed, new Plan(path.getTarget(),
-							path.getTarget().getSuperRegion()), "DefensiveCommander"));
-					
+							.getPath().get(1), disposed, new Plan(path
+							.getTarget(), path.getTarget().getSuperRegion()),
+							"DefensiveCommander"));
+
 				}
 			}
 
 		}
 
 		return proposals;
-	}
-
-	private float calculateImportance(Region r) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 

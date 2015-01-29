@@ -130,6 +130,8 @@ public class BotMain implements Bot {
 			Region currentFinalTargetRegion = currentPlan.getR();
 			int required = currentProposal.getForces();
 			
+			
+			// check for satisfaction
 			if (alreadySatisfied(currentFinalTargetRegion, currentTargetSuperRegion, regionSatisfied, superRegionSatisfied)){
 				backUpProposals.add(currentProposal);
 				continue;			
@@ -139,12 +141,18 @@ public class BotMain implements Bot {
 			if (available.get(currentOriginRegion) > 0 && required > 0) {
 				int disposed = Math.min(required,
 						available.get(currentOriginRegion));
+				// check for attack with only one dude which sucks
+				if (disposed < 2 && !currentTargetRegion.getPlayerName().equals(mName)){
+					continue;
+				}
+				
 				FromTo currentMove = new FromTo(currentOriginRegion,
 						currentTargetRegion);
 				addMove(currentMove, decisions, disposed);
 				if (!currentTargetRegion.getPlayerName().equals(mName)) {
 					addAttacking(currentTargetRegion, attacking, disposed);
 				}
+				// add satisfaction
 				addSatisfaction(currentTargetRegion, currentFinalTargetRegion,
 						disposed, regionSatisfied, superRegionSatisfied);
 
@@ -155,7 +163,7 @@ public class BotMain implements Bot {
 
 		}
 		
-		// backup proposals are moves towards already satisfied areas
+		// backup proposals are moves that are ordered towards already satisfied areas
 		for (int i = 0; i < backUpProposals.size(); i++) {
 			ActionProposal currentProposal = backUpProposals.get(i);
 
@@ -189,6 +197,7 @@ public class BotMain implements Bot {
 			if (Values.calculateRequiredForcesAttack(mName, r) > attacking
 					.get(r)) {
 				badAttacks.add(r);
+				continue;
 			}
 		}
 
