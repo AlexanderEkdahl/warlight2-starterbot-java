@@ -9,7 +9,7 @@ import map.Region;
 import map.SuperRegion;
 
 public class Values {
-	private static final int costMultiplierEnemy = 2;
+	private static final int costMultiplierEnemy = 1;
 	private static final int costMultiplierNeutral = 3;
 	private static final int staticCostUnknown = 10;
 	private static final int staticCostOwned = 10;
