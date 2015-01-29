@@ -23,20 +23,19 @@ public class Values {
 
 	private static float startingRegion(SuperRegion s) {
 		if (s.getArmiesReward() == 0) {
-			return Integer.MIN_VALUE;
+			return Float.MIN_VALUE;
 		}
 
-		return (s.getArmiesReward() * 2)
+		return (float)(s.getArmiesReward() * 2)
 				/ (s.getInitialNeutralCount() + s.getSubRegions().size());
 	}
 
 	public static Region getBestStartRegion(
 			ArrayList<Region> pickableStartingRegions) {
 		Region maxRegion = null;
-		float maxValue = Integer.MIN_VALUE;
+		float maxValue = Float.MIN_VALUE;
 		for (Region currentRegion : pickableStartingRegions) {
 			SuperRegion superRegion = currentRegion.getSuperRegion();
-
 			float value = Values.startingRegion(superRegion);
 			if (value >= maxValue) {
 				maxValue = value;
