@@ -64,13 +64,18 @@ public class DefensiveCommander extends TemplateCommander {
 			int diff = s.getTotalFriendlyForce(mName)
 					- s.getTotalThreateningForce(eName);
 
+			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
+
+			for (Region r : s.getFronts(eName)) {
+				ownForces.put(r, r.getArmies());
+			}
 			// keep on assigning dudes until we have at least 5 more in our
 			// superregion than they have
 			// and add them in the most vulnerable region
 			while (diff < extraArmiesDefence) {
 				float minRequiredQuota = Float.MAX_VALUE;
 				for (Region r : s.getFronts(eName)) {
-					currentRequiredQuota = r.getArmies()
+					currentRequiredQuota = ownForces.get(r)
 							/ r.getHighestThreateningForce(eName);
 					if (currentRequiredQuota < minRequiredQuota) {
 						minRequiredQuota = currentRequiredQuota;
@@ -82,6 +87,8 @@ public class DefensiveCommander extends TemplateCommander {
 						mostVulnerableRegion, new Plan(mostVulnerableRegion,
 								mostVulnerableRegion.getSuperRegion()), 1,
 						"DefensiveCommander"));
+				ownForces.put(mostVulnerableRegion,
+						ownForces.get(mostVulnerableRegion) + 1);
 				diff++;
 			}
 
@@ -95,15 +102,16 @@ public class DefensiveCommander extends TemplateCommander {
 		float weight = worth / cost;
 		return weight;
 	}
-	
-	private float calculateWorth(SuperRegion s){
-		float worth = staticSuperRegionDefence + rewardDefenseImportanceMultiplier
-				* s.getArmiesReward();
+
+	private float calculateWorth(SuperRegion s) {
+		float worth = staticSuperRegionDefence
+				+ rewardDefenseImportanceMultiplier * s.getArmiesReward();
 		return worth;
 	}
-	
-	private float calculateCost(SuperRegion s, String eName){
-		float cost = (s.getFronts(eName).size() * Values.multipleFrontPenalty) + (s.getTotalThreateningForce(eName) * Values.costMultiplierDefendingAgainstEnemy);
+
+	private float calculateCost(SuperRegion s, String eName) {
+		float cost = (s.getFronts(eName).size() * Values.multipleFrontPenalty)
+				+ (s.getTotalThreateningForce(eName) * Values.costMultiplierDefendingAgainstEnemy);
 		return cost;
 	}
 
@@ -172,14 +180,16 @@ public class DefensiveCommander extends TemplateCommander {
 			// least that's what I think but hey I'm just the defensivecommander
 			// who cares what I think
 			if (needHelp.get(r) != null && needHelp.get(r) > 0) {
-				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion(), eName), r, r,
-						r.getArmies(), new Plan(r, r.getSuperRegion()),
-						"DefensiveCommander"));
+				proposals.add(new ActionProposal(calculateWeight(
+						r.getSuperRegion(), eName), r, r, r.getArmies(),
+						new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
 			} else {
 				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(
 						r, needHelpRegions, mName);
 				for (Path path : paths) {
-					float currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion(), eName);
+					float currentCost = path.getDistance()
+							+ calculateCost(path.getTarget().getSuperRegion(),
+									eName);
 					float currentWorth = calculateWorth(r.getSuperRegion());
 					float currentWeight = currentWorth / currentCost;
 
@@ -203,6 +213,5 @@ public class DefensiveCommander extends TemplateCommander {
 
 		return proposals;
 	}
-
 
 }
