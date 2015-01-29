@@ -27,7 +27,7 @@ public class Values {
 		}
 
 		return (float)(s.getArmiesReward() * 2)
-				/ (s.getInitialNeutralCount() + s.getSubRegions().size());
+				/ (float) (s.getInitialNeutralCount() + s.getSubRegions().size());
 	}
 
 	public static Region getBestStartRegion(
