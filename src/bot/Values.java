@@ -26,8 +26,8 @@ public class Values {
 			return Float.MIN_VALUE;
 		}
 
-		return (float)(s.getArmiesReward() * 2)
-				/ (float) (s.getInitialNeutralCount() + s.getSubRegions().size());
+		return (float) (s.getArmiesReward())
+				/ (float) ((float) s.getInitialNeutralCount() + (float) s.getSubRegions().size());
 	}
 
 	public static Region getBestStartRegion(
