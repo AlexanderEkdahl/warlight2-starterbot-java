@@ -143,7 +143,7 @@ public class Region {
     	for (Region n : neighbors){
     		if (n.getPlayerName().equals(oName)){
     			if (n.getArmies() - 1 > maxForce){
-    				maxForce = n.getArmies() - 1;
+    				maxForce = n.getArmies();
     			}
     		}
     		

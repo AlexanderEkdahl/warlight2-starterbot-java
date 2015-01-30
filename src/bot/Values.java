@@ -9,12 +9,11 @@ import map.Region;
 import map.SuperRegion;
 
 public class Values {
-	public static final int costMultiplierEnemy = 1;
 	public static final float costMultiplierDefendingAgainstEnemy = 0.5f;
-	
+	public static final int costMultiplierEnemy = 2;
 	public static final int costMultiplierNeutral = 3;
 	public static final int staticCostUnknown = 5;
-	public static final int staticCostOwned = 10;
+	public static final int staticCostOwned = 5;
 	public static final int staticCostUnknownEnemy = 8;
 	public static final int multipleFrontPenalty = 5;
 	public static final float maxSuperRegionSatisfactionMultiplier = 1.5f;

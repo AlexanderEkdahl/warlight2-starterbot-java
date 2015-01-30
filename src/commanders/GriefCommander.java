@@ -18,7 +18,7 @@ import concepts.PlacementProposal;
 import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
-	public static final int valueDenialMultiplier = 12;
+	public static final int valueDenialMultiplier = 15;
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -26,7 +26,7 @@ public class GriefCommander extends TemplateCommander {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 
 		// don't start griefing too early
-		if (state.getRoundNumber() < 3) {
+		if (state.getRoundNumber() < 2) {
 			return proposals;
 		}
 		ArrayList<Region> enemyRegions = state.getFullMap().getOwnedRegions(

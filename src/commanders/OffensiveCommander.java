@@ -13,7 +13,7 @@ import map.*;
 import map.Pathfinder.Path;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 40;
+	private static final int rewardMultiplier = 35;
 	private static final int staticRegionBonus = 0;
 
 	@Override

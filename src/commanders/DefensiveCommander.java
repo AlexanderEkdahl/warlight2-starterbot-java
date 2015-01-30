@@ -22,8 +22,6 @@ public class DefensiveCommander extends TemplateCommander {
 	private static final int staticPocketDefence = 30;
 	private static final int staticSuperRegionDefence = 0;
 	private static final int rewardDefenseImportanceMultiplier = 30;
-
-	private static final int costOfMovingThroughFriendlyTerritory = 4;
 	private static final int extraArmiesDefence = 5;
 
 	@Override
@@ -42,7 +40,7 @@ public class DefensiveCommander extends TemplateCommander {
 			ArrayList<SuperRegion> vulnerableSuperRegions) {
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 
-		placementProposals.addAll(organizePocketDefence(state));
+		// placementProposals.addAll(organizePocketDefence(state));
 		placementProposals.addAll(organizeSuperRegionDefence(state));
 
 		return placementProposals;
@@ -61,24 +59,33 @@ public class DefensiveCommander extends TemplateCommander {
 			float weight = calculateWeight(s, eName);
 			Region mostVulnerableRegion = null;
 			float currentRequiredQuota;
-			int diff = s.getTotalFriendlyForce(mName)
-					- s.getTotalThreateningForce(eName);
 
 			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
 
 			for (Region r : s.getFronts(eName)) {
 				ownForces.put(r, r.getArmies());
 			}
-			// keep on assigning dudes until we have at least 5 more in our
-			// superregion than they have
+			// keep on assigning dudes until we have at least extraArmiesDefence
+			// more in every region
 			// and add them in the most vulnerable region
-			while (diff < extraArmiesDefence) {
-				float minRequiredQuota = Float.MAX_VALUE;
+
+			int minDiff = Integer.MAX_VALUE;
+			for (Region r : s.getFronts(eName)) {
+				int currentDiff = ownForces.get(r)
+						- r.getHighestThreateningForce(eName);
+				if (currentDiff < minDiff) {
+					minDiff = currentDiff;
+					mostVulnerableRegion = r;
+				}
+
+			}
+			while (minDiff < extraArmiesDefence) {
+				minDiff = Integer.MAX_VALUE;
 				for (Region r : s.getFronts(eName)) {
-					currentRequiredQuota = ownForces.get(r)
-							/ r.getHighestThreateningForce(eName);
-					if (currentRequiredQuota < minRequiredQuota) {
-						minRequiredQuota = currentRequiredQuota;
+					int currentDiff = ownForces.get(r)
+							- r.getHighestThreateningForce(eName);
+					if (currentDiff < minDiff) {
+						minDiff = currentDiff;
 						mostVulnerableRegion = r;
 					}
 
@@ -89,7 +96,7 @@ public class DefensiveCommander extends TemplateCommander {
 						"DefensiveCommander"));
 				ownForces.put(mostVulnerableRegion,
 						ownForces.get(mostVulnerableRegion) + 1);
-				diff++;
+
 			}
 
 		}
@@ -153,7 +160,8 @@ public class DefensiveCommander extends TemplateCommander {
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they need more
 			// defence
-			needHelp.put(r, r.getHighestThreateningForce(eName) - r.getArmies());
+			needHelp.put(r, r.getHighestThreateningForce(eName)
+					+ extraArmiesDefence - r.getArmies());
 			needHelpRegions.add(r);
 
 		}
@@ -164,12 +172,8 @@ public class DefensiveCommander extends TemplateCommander {
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(),
 				new PathfinderWeighter() {
 					public int weight(Region nodeA, Region nodeB) {
-						if (nodeB.getPlayerName().equals(mName)) {
-							return costOfMovingThroughFriendlyTerritory;
-						} else {
-							return Values.calculateRegionWeighedCost(mName,
-									eName, nodeB);
-						}
+						return Values.calculateRegionWeighedCost(mName, eName,
+								nodeB);
 
 					}
 				});
@@ -183,7 +187,16 @@ public class DefensiveCommander extends TemplateCommander {
 				proposals.add(new ActionProposal(calculateWeight(
 						r.getSuperRegion(), eName), r, r, r.getArmies(),
 						new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
-			} else {
+			} 
+			// if it needs to be defended set a proposal to contain the needed amount of forces
+			else if (needHelp.get(r) != null && needHelp.get(r) <= 0) {
+				proposals.add(new ActionProposal(calculateWeight(
+						r.getSuperRegion(), eName), r, r, r.getArmies()
+						+ needHelp.get(r), new Plan(r, r.getSuperRegion()),
+						"DefensiveCommander"));
+			}
+
+			else {
 				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(
 						r, needHelpRegions, mName);
 				for (Path path : paths) {

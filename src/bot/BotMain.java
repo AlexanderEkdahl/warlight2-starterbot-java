@@ -142,9 +142,9 @@ public class BotMain implements Bot {
 				int disposed = Math.min(required,
 						available.get(currentOriginRegion));
 				// check for attack with only one dude which sucks
-				if (disposed < 2 && !currentTargetRegion.getPlayerName().equals(mName)){
-					continue;
-				}
+//				if (disposed < 2 && !currentTargetRegion.getPlayerName().equals(mName)){
+//					continue;
+//				}
 				
 				FromTo currentMove = new FromTo(currentOriginRegion,
 						currentTargetRegion);
