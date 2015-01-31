@@ -18,7 +18,7 @@ import concepts.PlacementProposal;
 import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
-	public static final int valueDenialMultiplier = 15;
+	
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -98,7 +98,7 @@ public class GriefCommander extends TemplateCommander {
 
 			float reward = s.getArmiesReward();
 
-			plans.put(s.getId(), reward * valueDenialMultiplier);
+			plans.put(s.getId(), reward * Values.valueDenialMultiplier);
 
 		}
 		return plans;

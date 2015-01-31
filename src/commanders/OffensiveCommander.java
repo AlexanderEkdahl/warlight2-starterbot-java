@@ -13,8 +13,7 @@ import map.*;
 import map.Pathfinder.Path;
 
 public class OffensiveCommander extends TemplateCommander {
-	private static final int rewardMultiplier = 35;
-	private static final int staticRegionBonus = 0;
+	
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
@@ -94,7 +93,7 @@ public class OffensiveCommander extends TemplateCommander {
 			return -1;
 		} else {
 			int reward = s.getArmiesReward();
-			return ((reward * rewardMultiplier) + staticRegionBonus);
+			return ((reward * Values.rewardMultiplier) + Values.staticRegionBonus);
 
 		}
 	}

@@ -1,30 +1,29 @@
 package concepts;
 
+import bot.BotState;
 import map.Region;
 import map.SuperRegion;
 
-public class Plan implements Comparable<Plan> {
-	SuperRegion sr;
-	Region r;
-	float weight;
+public class Plan {
+	private ActionType actionType;
+	
+	
+	
+	public ActionType getActionType() {
+		return actionType;
+	}
+
+	public void setActionType(ActionType aType) {
+		this.actionType = aType;
+	}
+
+	private SuperRegion sr;
+	private Region r;
 
 	public Plan(Region r, SuperRegion sr) {
 		this.sr = sr;
 		this.r = r;
-		weight = 0;
-	}
-
-	public Plan(SuperRegion sr, int weight) {
-		this.sr = sr;
-		this.weight = weight;
-	}
-
-	public float getWeight() {
-		return weight;
-	}
-
-	public void setWeight(float f) {
-		this.weight = f;
+		this.actionType = r.getPlayerName().equals(BotState.getMyName()) ?  ActionType.DEFEND : ActionType.ATTACK;
 	}
 
 	public void setSr(SuperRegion sr) {
@@ -43,15 +42,6 @@ public class Plan implements Comparable<Plan> {
 //		return ("Region: " + r + " SuperRegion: " + sr);
 //	}
  
-	@Override
-	public int compareTo(Plan otherPlan) {
-		if (otherPlan.getWeight() > weight) {
-			return 1;
-		} else if (otherPlan.getWeight() == weight) {
-			return 0;
-		} else {
-			return -1;
-		}
-	}
+
 
 }

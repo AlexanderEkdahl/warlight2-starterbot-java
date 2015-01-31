@@ -22,8 +22,8 @@ import move.PlaceArmiesMove;
 import move.Move;
 
 public class BotState {
-	private String myName = "";
-	private String opponentName = "";
+	private static String myName = "";
+	private static String opponentName = "";
 	private Map map = new Map();
 	private ArrayList<Region> pickableStartingRegions;
 	private int startingArmies;
@@ -201,5 +201,13 @@ public class BotState {
 
 	public ArrayList<Region> getPickableStartingRegions() {
 		return pickableStartingRegions;
+	}
+	
+	public static String getMyName(){
+		return myName;
+	}
+	
+	public static String getMyOpponentName(){
+		return opponentName;
 	}
 }

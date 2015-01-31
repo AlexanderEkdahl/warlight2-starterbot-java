@@ -79,12 +79,11 @@ public class SuperRegion {
 	
 	public ArrayList<Region> getFronts(String eName){
 		ArrayList<Region> fronts = new ArrayList<Region>();
-		outerLoop:
 		for (Region r : subRegions){
 			for (Region n : r.getNeighbors()){
 				if (n.getPlayerName().equals(eName)){
 					fronts.add(r);
-					continue outerLoop;
+					break;
 				}
 			}
 			

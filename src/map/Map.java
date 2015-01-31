@@ -44,8 +44,7 @@ public class Map {
 	public void add(SuperRegion superRegion) {
 		for (SuperRegion s : superRegions)
 			if (s.getId() == superRegion.getId()) {
-				System.err
-						.println("SuperRegion cannot be added: id already exists.");
+				System.err.println("SuperRegion cannot be added: id already exists.");
 				return;
 			}
 		superRegions.add(superRegion);
@@ -104,7 +103,6 @@ public class Map {
 
 		return owned;
 	}
-	
 
 	public ArrayList<SuperRegion> getOwnedSuperRegions(String name) {
 		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
@@ -117,19 +115,18 @@ public class Map {
 		return owned;
 
 	}
-	
-	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s){
+
+	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s) {
 		ArrayList<Region> unOwned = new ArrayList<Region>();
-		for (Region r : s.getSubRegions()){
-			if (!r.getPlayerName().equals(name)){
+		for (Region r : s.getSubRegions()) {
+			if (!r.getPlayerName().equals(name)) {
 				unOwned.add(r);
 			}
 		}
-		
-		return unOwned;
-		
-	}
 
+		return unOwned;
+
+	}
 
 	private int getSuspectedOwnedRegion(Region region, String opponentPlayerName) {
 		if (region.getPlayerName().equals(opponentPlayerName)) {
@@ -140,8 +137,7 @@ public class Map {
 			return -10000;
 	}
 
-	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion,
-			String opponentPlayerName) {
+	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion, String opponentPlayerName) {
 		int total = 0;
 		for (Region r : superRegion.getSubRegions()) {
 			total += getSuspectedOwnedRegion(r, opponentPlayerName);
@@ -153,8 +149,7 @@ public class Map {
 
 	}
 
-	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(
-			String opponentPlayerName) {
+	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
 		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
@@ -165,41 +160,27 @@ public class Map {
 
 		return suspected;
 	}
-	
 
 	public ArrayList<Region> getOwnedFrontRegions(BotState state) {
 
-		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(state.getMyPlayerName());
-		ArrayList<Region> ownedRegionsInOwnedSuperRegions = new ArrayList<Region>();
-		ArrayList<Region> neighbors;
+		ArrayList<SuperRegion> ownedSuperRegions = getOwnedFrontSuperRegions(state);
 		ArrayList<Region> front = new ArrayList<Region>();
-		
-		for (SuperRegion s : ownedSuperRegions){
-			ownedRegionsInOwnedSuperRegions.addAll(s.getSubRegions());
-		}
-		
-		for (Region r : ownedRegionsInOwnedSuperRegions) {
-			neighbors = r.getNeighbors();
-			for (Region n : neighbors) {
-				if (n.getPlayerName().equals(state.getOpponentPlayerName())) {
-					front.add(r);
-					continue;
-				}
-			}
+
+		for (SuperRegion s : ownedSuperRegions) {
+			front.addAll(s.getFronts(BotState.getMyOpponentName()));
 		}
 
 		return front;
 
 	}
 
-	
-
 	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
 		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
-		ArrayList<Region> rFront = getOwnedFrontRegions(state);
-		for (Region r : rFront) {
-			if (!sFront.contains(r.getSuperRegion())) {
-				sFront.add(r.getSuperRegion());
+		ArrayList<SuperRegion> ownedSuperRegions = state.getFullMap().getOwnedSuperRegions(BotState.getMyName());
+		
+		for (SuperRegion s : ownedSuperRegions){
+			if (s.getFronts(BotState.getMyOpponentName()).size() > 0){
+				sFront.add(s);
 			}
 		}
 
@@ -209,19 +190,16 @@ public class Map {
 	public ArrayList<Region> getPockets(BotState state) {
 		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
 		ArrayList<Region> pockets = new ArrayList<Region>();
-		
-		outerLoop:
-		for (Region r : owned){
-			for (Region n :  r.getNeighbors()){
-				if (n.getPlayerName().equals(state.getMyPlayerName())){
+
+		outerLoop: for (Region r : owned) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getPlayerName().equals(state.getMyPlayerName())) {
 					continue outerLoop;
 				}
 			}
 			pockets.add(r);
 		}
-		
-		
-		
+
 		return pockets;
 	}
 
@@ -229,7 +207,5 @@ public class Map {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	 
 
 }
