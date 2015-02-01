@@ -1,5 +1,5 @@
 package concepts;
 
 public enum ActionType {
-	ATTACK, MOVE; 
+	ATTACK, DEFEND; 
 }

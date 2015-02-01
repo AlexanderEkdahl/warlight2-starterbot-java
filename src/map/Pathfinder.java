@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Pathfinder {
 	private PathfinderWeighter pathfinderWeighter;
-	private HashMap<Region, Integer> distances;
+	private HashMap<Region, Float> distances;
 	private Map map;
 
 	public Pathfinder(Map map, PathfinderWeighter pathfinderWeighter) {
@@ -14,7 +14,7 @@ public class Pathfinder {
 
 	public Pathfinder(Map map) {
 		this(map, new PathfinderWeighter() {
-			public int weight(Region nodeA, Region nodeB) {
+			public float weight(Region nodeA, Region nodeB) {
 				return 1;
 			}
 		});
@@ -106,15 +106,15 @@ public class Pathfinder {
 	}
 
 	public class Path {
-		private int distance;
+		private Float distance;
 		private LinkedList<Region> path;
 
-		private Path(int distance, LinkedList<Region> path) {
-			this.distance = distance;
+		private Path(Float float1, LinkedList<Region> path) {
+			this.distance = float1;
 			this.path = path;
 		}
 
-		public int getDistance() {
+		public float getDistance() {
 			return distance;
 		}
 
@@ -192,10 +192,10 @@ public class Pathfinder {
 
 	private Iterator<Path> distanceIterator(Collection<Region> regions) {
 		HashMap<Region, Region> previous = new HashMap<Region, Region>();
-		distances = new HashMap<Region, Integer>();
+		distances = new HashMap<Region, Float>();
 
 		for (Region region : regions) {
-			distances.put(region, 0);
+			distances.put(region, 0f);
 		}
 
 		for (Iterator<Region> iterator = new BFSIterator(regions); iterator
@@ -203,7 +203,7 @@ public class Pathfinder {
 			Region next = iterator.next();
 
 			for (Region neighbor : next.getNeighbors()) {
-				int distance = getComputedDistance(next)
+				float distance = getComputedDistance(next)
 						+ pathfinderWeighter.weight(next, neighbor);
 
 				if (distance < getComputedDistance(neighbor)) {
@@ -215,7 +215,7 @@ public class Pathfinder {
 
 		LinkedList<Path> paths = new LinkedList<Path>();
 
-		for (java.util.Map.Entry<Region, Integer> entry : entriesSortedByValues(distances)) {
+		for (java.util.Map.Entry<Region, Float> entry : entriesSortedByValues(distances)) {
 			LinkedList<Region> path = new LinkedList<Region>();
 			Region step = entry.getKey();
 
@@ -237,11 +237,11 @@ public class Pathfinder {
 		return distanceIterator(java.util.Collections.singleton(origin));
 	}
 
-	private int getComputedDistance(Region node) {
-		Integer d = distances.get(node);
+	private Float getComputedDistance(Region node) {
+		Float d = distances.get(node);
 
 		if (d == null) {
-			return Integer.MAX_VALUE;
+			return Float.MAX_VALUE;
 		} else {
 			return d;
 		}

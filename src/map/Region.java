@@ -12,6 +12,8 @@ package map;
 
 import java.util.ArrayList;
 
+import bot.BotState;
+
 public class Region {
     private int id;
     private ArrayList<Region> neighbors;
@@ -127,10 +129,10 @@ public class Region {
       return visible;
     }
     
-    public int getTotalThreateningForce(String oName){
+    public int getTotalThreateningForce(){
     	int totalForce = 0;
     	for (Region n : neighbors){
-    		if (n.getPlayerName().equals(oName)){
+    		if (n.getPlayerName().equals(BotState.getMyOpponentName())){
     			totalForce += n.getArmies()-1;
     		}
     		
@@ -138,16 +140,27 @@ public class Region {
 		return totalForce;
     }
     
-    public int getHighestThreateningForce(String oName){
+    public int getHighestThreateningForce(){
     	int maxForce = 0;
     	for (Region n : neighbors){
-    		if (n.getPlayerName().equals(oName)){
+    		if (n.getPlayerName().equals(BotState.getMyOpponentName())){
     			if (n.getArmies() - 1 > maxForce){
-    				maxForce = n.getArmies() - 1;
+    				maxForce = n.getArmies();
     			}
     		}
     		
     	}
 		return maxForce;
+    }
+    
+    public ArrayList<Region> getEnemyNeighbors(){
+    	ArrayList<Region> enemyNeighbors = new ArrayList<Region>();
+    	for (Region r : neighbors){
+    		if (r.getPlayerName().equals(BotState.getMyOpponentName())){
+    			enemyNeighbors.add(r);
+    		}
+    	}
+		return enemyNeighbors;
+    	
     }
 }

@@ -47,8 +47,7 @@ public class Map {
 	public void add(SuperRegion superRegion) {
 		for (SuperRegion s : superRegions)
 			if (s.getId() == superRegion.getId()) {
-				System.err
-						.println("SuperRegion cannot be added: id already exists.");
+				System.err.println("SuperRegion cannot be added: id already exists.");
 				return;
 			}
 		superRegions.add(superRegion);
@@ -120,10 +119,10 @@ public class Map {
 
 	}
 
-	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s){
+	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s) {
 		ArrayList<Region> unOwned = new ArrayList<Region>();
-		for (Region r : s.getSubRegions()){
-			if (!r.getPlayerName().equals(name)){
+		for (Region r : s.getSubRegions()) {
+			if (!r.getPlayerName().equals(name)) {
 				unOwned.add(r);
 			}
 		}
@@ -141,8 +140,7 @@ public class Map {
 			return -10000;
 	}
 
-	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion,
-			String opponentPlayerName) {
+	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion, String opponentPlayerName) {
 		int total = 0;
 		for (Region r : superRegion.getSubRegions()) {
 			total += getSuspectedOwnedRegion(r, opponentPlayerName);
@@ -154,8 +152,7 @@ public class Map {
 
 	}
 
-	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(
-			String opponentPlayerName) {
+	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
 		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
@@ -193,10 +190,11 @@ public class Map {
 
 	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
 		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
-		ArrayList<Region> rFront = getOwnedFrontRegions(state);
-		for (Region r : rFront) {
-			if (!sFront.contains(r.getSuperRegion())) {
-				sFront.add(r.getSuperRegion());
+		ArrayList<SuperRegion> ownedSuperRegions = state.getFullMap().getOwnedSuperRegions(BotState.getMyName());
+
+		for (SuperRegion s : ownedSuperRegions){
+			if (s.getFronts(BotState.getMyOpponentName()).size() > 0){
+				sFront.add(s);
 			}
 		}
 
