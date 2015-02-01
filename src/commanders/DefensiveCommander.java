@@ -105,7 +105,7 @@ public class DefensiveCommander extends TemplateCommander {
 	private ArrayList<PlacementProposal> organizePocketDefence(BotState state) {
 		ArrayList<Region> pockets = state.getFullMap().getPockets(state);
 		ArrayList<PlacementProposal> pocketPlacementProposals = new ArrayList<PlacementProposal>();
-		String eName = state.getOpponentPlayerName();
+		ArrayList<Region> needHelpRegions = state.getFullMap().getOwnedFrontRegions(state);
 
 		for (Region r : pockets) {
 			int highestEnemy = r.getHighestThreateningForce();
@@ -125,6 +125,7 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = state.getFullMap().getOwnedFrontRegions(state);
 		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
+		ArrayList<Region> needHelpRegions = (ArrayList<Region>) fronts.clone();
 
 		final String eName = state.getOpponentPlayerName();
 		final String mName = state.getMyPlayerName();
@@ -138,7 +139,7 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public int weight(Region nodeA, Region nodeB) {
+			public float weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(mName, eName, nodeB);
 
 			}
@@ -152,29 +153,32 @@ public class DefensiveCommander extends TemplateCommander {
 			// if it needs to be defended set a proposal to contain the needed
 			// amount of forces
 			if (needDefence.get(r) != null) {
-				int required = Math.min(needDefence.get(r), r.getArmies()-1);
-				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion()), r, r, required, new Plan(r, r.getSuperRegion()),
-						"DefensiveCommander"));
+				int disposed = Math.min(needDefence.get(r), r.getArmies() - 1);
+				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion()), r, r, disposed, new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
+				needDefence.put(r, needDefence.get(r) - disposed);
 			}
 
-//			else {
-//				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, needHelpRegions, mName);
-//				for (Path path : paths) {
-//					float currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
-//					float currentWorth = calculateWorth(r.getSuperRegion());
-//					float currentWeight = currentWorth / currentCost;
-//
-//					int totalRequired = needHelp.get(path.getTarget());
-//					for (int i = 1; i < path.getPath().size(); i++) {
-//						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(mName, path.getPath().get(i));
-//					}
-//					int disposed = Math.min(totalRequired, r.getArmies() - 1);
-//
-//					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget()
-//							.getSuperRegion()), "DefensiveCommander"));
-//
-//				}
-//			}
+			else {
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, needHelpRegions, mName);
+				for (Path path : paths) {
+					int totalRequired = needDefence.get(path.getTarget());
+					if (totalRequired < 1) {
+						continue;
+					}
+					float currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
+					float currentWorth = calculateWorth(r.getSuperRegion());
+					float currentWeight = currentWorth / currentCost;
+
+					for (int i = 1; i < path.getPath().size(); i++) {
+						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(mName, path.getPath().get(i));
+					}
+					int disposed = Math.min(totalRequired, r.getArmies() - 1);
+
+					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget()
+							.getSuperRegion()), "DefensiveCommander"));
+
+				}
+			}
 
 		}
 

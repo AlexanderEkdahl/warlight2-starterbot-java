@@ -18,20 +18,20 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final int rewardMultiplier = 35;
-	public static final int staticRegionBonus = 0;
-	public static final int valueDenialMultiplier = 15;
-	public static final int rewardDefenseImportanceMultiplier = 40;
+	public static final float rewardMultiplier = 40;
+	public static final float staticRegionBonus = 0;
+	public static final float valueDenialMultiplier = 12;
+	public static final float rewardDefenseImportanceMultiplier = 40;
 
 	// ////// COSTS
 
-	public static final int costMultiplierEnemy = 2;
-	public static final int costMultiplierNeutral = 3;
-	public static final int staticCostUnknown = 5;
-	public static final int staticCostOwned = 5;
-	public static final int staticCostUnknownEnemy = 8;
-	public static final int multipleFrontPenalty = 5;
-	public static final int staticRegionCost = 3;
+	public static final float costMultiplierEnemy = 2;
+	public static final float costMultiplierNeutral = 4;
+	public static final float staticCostUnknown = 5;
+	public static final float staticCostOwned = 5;
+	public static final float staticCostUnknownEnemy = 8;
+	public static final float multipleFrontPenalty = 5;
+	public static final float staticRegionCost = 3;
 	public static final float costMultiplierDefendingAgainstEnemy = 0.5f;
 
 	// ////// SATISFACTION
@@ -40,11 +40,10 @@ public class Values {
 	public static final int maxRegionSatisfactionMultiplier = 1;
 
 	private static float startingRegion(SuperRegion s) {
-		if (s.getArmiesReward() == 0) {
-			return Float.MIN_VALUE;
-		}
-
-		return (float) (s.getArmiesReward()) / (float) ((float) s.getInitialNeutralCount() + (float) s.getSubRegions().size());
+		float worth = calculateSuperRegionWorth(s);
+		float cost = Values.calculateSuperRegionWeighedCost(s) * 1.5f;
+		float weight = worth / cost;
+		return weight;
 	}
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions) {
@@ -63,7 +62,17 @@ public class Values {
 
 	}
 
-	public static int calculateRegionWeighedCost(String mName, String eName, Region r) {
+	public static float calculateSuperRegionWorth(SuperRegion s) {
+		if (s.getArmiesReward() < 1) {
+			return -1;
+		} else {
+			int reward = s.getArmiesReward();
+			return ((reward * Values.rewardMultiplier) + Values.staticRegionBonus);
+
+		}
+	}
+
+	public static float calculateRegionWeighedCost(String mName, String eName, Region r) {
 		if (r.getPlayerName().equals(eName)) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
@@ -73,6 +82,8 @@ public class Values {
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
 				return costMultiplierNeutral * 10;
+			} else if (r.getVisible() == false && !r.getWasteland()) {
+				return staticCostUnknown;
 			} else {
 				return r.getArmies() * costMultiplierNeutral;
 			}
@@ -83,8 +94,8 @@ public class Values {
 		return staticCostOwned;
 	}
 
-	public static int calculateRegionInSuperRegionWeighedCost(String mName, String eName, Region r) {
-		if (r.getPlayerName().equals(eName)) {
+	public static float calculateRegionInSuperRegionWeighedCost(Region r) {
+		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy;
 			} else {
@@ -93,20 +104,21 @@ public class Values {
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
 				return costMultiplierNeutral * 10;
+			} else if (r.getVisible() == false && !r.getWasteland()) {
+				return staticCostUnknown;
 			} else {
 				return r.getArmies() * costMultiplierNeutral;
 			}
-
 		} else if (r.getPlayerName().equals("unknown")) {
 			return staticCostUnknown;
 		}
 		return 0;
 	}
 
-	public static int calculateSuperRegionWeighedCost(String mName, String eName, SuperRegion sr) {
+	public static int calculateSuperRegionWeighedCost(SuperRegion sr) {
 		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInSuperRegionWeighedCost(mName, eName, r) + staticRegionCost;
+			totalCost += calculateRegionInSuperRegionWeighedCost(r) + staticRegionCost;
 		}
 		return totalCost;
 	}
@@ -207,7 +219,7 @@ public class Values {
 		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
 		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
 			if (s.ownedByPlayer(state.getMyPlayerName())) {
-				roomLeft.put(s, 100000);
+				roomLeft.put(s, Integer.MAX_VALUE);
 			} else {
 				roomLeft.put(s, (int) ((Values.calculateRequiredForcesAttack(mName, s)) * maxSuperRegionSatisfactionMultiplier));
 			}

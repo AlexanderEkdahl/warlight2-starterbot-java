@@ -111,8 +111,7 @@ public class BotMain implements Bot {
 		}
 		HashMap<Region, Integer> availablePotential = new HashMap<Region, Integer>();
 
-		outerLoop:
-		for (int i = 0; i < proposals.size(); i++) {
+		outerLoop: for (int i = 0; i < proposals.size(); i++) {
 			ActionProposal currentProposal = proposals.get(i);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
@@ -132,16 +131,8 @@ public class BotMain implements Bot {
 				int disposed = Math.min(required, available.get(currentOriginRegion));
 
 				// attack is the best defence
-				if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
-					potentialAttacks.addAll(generatePotentialAttacks(currentOriginRegion, available));
-					int used = Math.min(Values.calculateRequiredForcesDefendRegionAgainstAll(currentOriginRegion), available.get(currentOriginRegion));
-					System.err.println("Generated potential attacks for " + currentOriginRegion.getId() + " there are " + potentialAttacks.size()
-							+ " potential attacks in total");
-					int left = available.get(currentOriginRegion) - used;
-					System.err.println("was " + available.get(currentOriginRegion));
-					available.put(currentOriginRegion, left);
-					System.err.println(available.get(currentOriginRegion) + " left");
-					availablePotential.put(currentOriginRegion, used);
+				if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND) && currentProposal.getOrigin().equals(currentProposal.getTarget())) {
+					addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
 					continue outerLoop;
 				}
 
@@ -155,27 +146,13 @@ public class BotMain implements Bot {
 
 				if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName())) {
 					addAttacking(currentTargetRegion, attacking, disposed);
-
 					// since this is an attack we will
 					// search for potential attacks to help
-					ArrayList<PotentialAttack> allPotentialAttacks = (ArrayList<PotentialAttack>) potentialAttacks.clone();
-					for (PotentialAttack p : allPotentialAttacks) {
-						if (alreadySatisfied(currentFinalTargetRegion, currentTargetSuperRegion, regionSatisfied, superRegionSatisfied)) {
-							break;
-						}
-						if (p.getTo().equals(currentTargetRegion)) {
-							disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies()-1), p.getForces());
-							addAttacking(p.getTo(), attacking, disposed);
-							currentMove = new FromTo(p.getFrom(), p.getTo());
-							addMove(currentMove, decisions, disposed);
-							System.err.println("Potential Attack: " + currentProposal.toString());
-							available.put(p.getFrom(), available.get(p.getFrom()) - disposed);
-							potentialAttacks.remove(p);
-							availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
-
-						}
-
+					if (alreadySatisfied(currentFinalTargetRegion, currentTargetSuperRegion, regionSatisfied, superRegionSatisfied)) {
+						break;
 					}
+					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, available, decisions);
+
 				}
 
 			}
@@ -192,7 +169,6 @@ public class BotMain implements Bot {
 			int required = currentProposal.getForces();
 			if (available.get(currentOriginRegion) > 0 && required > 0) {
 				int disposed = Math.min(required, available.get(currentOriginRegion));
-
 				FromTo currentMove = new FromTo(currentOriginRegion, currentTargetRegion);
 				System.err.println("Backup Proposal: " + currentProposal.toString());
 				addMove(currentMove, decisions, disposed);
@@ -202,28 +178,14 @@ public class BotMain implements Bot {
 					addAttacking(currentTargetRegion, attacking, disposed);
 					// since this is an attack we will
 					// search for potential attacks to help
-					ArrayList<PotentialAttack> allPotentialAttacks = (ArrayList<PotentialAttack>) potentialAttacks.clone();
-					for (PotentialAttack p : allPotentialAttacks) {
-						if (p.getTo().equals(currentTargetRegion)) {
-							disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies()-1), p.getForces());
-							addAttacking(p.getTo(), attacking, disposed);
-							currentMove = new FromTo(p.getFrom(), p.getTo());
-							addMove(currentMove, decisions, disposed);
-							System.err.println("Potential Attack: " + currentProposal.toString());
-							available.put(p.getFrom(), available.get(p.getFrom()) - disposed);
-							potentialAttacks.remove(p);
-							availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
-
-						}
-
-					}
+					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, available, decisions);
 				}
 
 			}
 		}
-		
-		for (PotentialAttack p : potentialAttacks){
-			int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies()-1), p.getForces());
+
+		for (PotentialAttack p : potentialAttacks) {
+			int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies() - 1), p.getForces());
 			addAttacking(p.getTo(), attacking, disposed);
 			FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
 			addMove(currentMove, decisions, disposed);
@@ -250,6 +212,38 @@ public class BotMain implements Bot {
 
 		}
 		return orders;
+	}
+
+	private void addPotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, Region currentOriginRegion, HashMap<Region, Integer> available,
+			HashMap<Region, Integer> availablePotential) {
+		potentialAttacks.addAll(generatePotentialAttacks(currentOriginRegion, available));
+		int used = Math.min(Values.calculateRequiredForcesDefendRegionAgainstAll(currentOriginRegion), available.get(currentOriginRegion));
+		System.err.println("Generated potential attacks for " + currentOriginRegion.getId() + " there are " + potentialAttacks.size()
+				+ " potential attacks in total");
+		int left = available.get(currentOriginRegion) - used;
+		System.err.println("was " + available.get(currentOriginRegion));
+		available.put(currentOriginRegion, left);
+		System.err.println(available.get(currentOriginRegion) + " left");
+		availablePotential.put(currentOriginRegion, used);
+
+	}
+
+	private void usePotentialAttacks(HashMap<Region, Integer> availablePotential, ArrayList<PotentialAttack> potentialAttacks, Region currentTargetRegion,
+			HashMap<Region, Integer> attacking, HashMap<Region, Integer> available, HashMap<FromTo, Integer> decisions) {
+		ArrayList<PotentialAttack> allPotentialAttacks = (ArrayList<PotentialAttack>) potentialAttacks.clone();
+		for (PotentialAttack p : allPotentialAttacks) {
+			if (p.getTo().equals(currentTargetRegion)) {
+				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies() - 1), p.getForces());
+				addAttacking(p.getTo(), attacking, disposed);
+				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
+				addMove(currentMove, decisions, disposed);
+				System.err.println("Potential Attack from: " + p.getFrom());
+				available.put(p.getFrom(), available.get(p.getFrom()) - disposed);
+				potentialAttacks.remove(p);
+				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
+
+			}
+		}
 	}
 
 	// potential attacks are attacks that may be performed from a tile if it
