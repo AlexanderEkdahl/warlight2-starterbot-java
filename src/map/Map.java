@@ -13,6 +13,9 @@ package map;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+
+import map.Pathfinder.Path;
 
 import bot.BotState;
 
@@ -27,7 +30,7 @@ public class Map {
 
 	/**
 	 * add a Region to the map
-	 * 
+	 *
 	 * @param region
 	 *            : Region to be added
 	 */
@@ -37,7 +40,7 @@ public class Map {
 
 	/**
 	 * add a SuperRegion to the map
-	 * 
+	 *
 	 * @param superRegion
 	 *            : SuperRegion to be added
 	 */
@@ -104,7 +107,6 @@ public class Map {
 
 		return owned;
 	}
-	
 
 	public ArrayList<SuperRegion> getOwnedSuperRegions(String name) {
 		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
@@ -117,7 +119,7 @@ public class Map {
 		return owned;
 
 	}
-	
+
 	public ArrayList<Region> getUnOwnedRegionsInSuperRegion(String name, SuperRegion s){
 		ArrayList<Region> unOwned = new ArrayList<Region>();
 		for (Region r : s.getSubRegions()){
@@ -125,11 +127,10 @@ public class Map {
 				unOwned.add(r);
 			}
 		}
-		
-		return unOwned;
-		
-	}
 
+		return unOwned;
+
+	}
 
 	private int getSuspectedOwnedRegion(Region region, String opponentPlayerName) {
 		if (region.getPlayerName().equals(opponentPlayerName)) {
@@ -165,19 +166,17 @@ public class Map {
 
 		return suspected;
 	}
-	
 
 	public ArrayList<Region> getOwnedFrontRegions(BotState state) {
-
 		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(state.getMyPlayerName());
 		ArrayList<Region> ownedRegionsInOwnedSuperRegions = new ArrayList<Region>();
 		ArrayList<Region> neighbors;
 		ArrayList<Region> front = new ArrayList<Region>();
-		
+
 		for (SuperRegion s : ownedSuperRegions){
 			ownedRegionsInOwnedSuperRegions.addAll(s.getSubRegions());
 		}
-		
+
 		for (Region r : ownedRegionsInOwnedSuperRegions) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
@@ -191,8 +190,6 @@ public class Map {
 		return front;
 
 	}
-
-	
 
 	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
 		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
@@ -209,7 +206,7 @@ public class Map {
 	public ArrayList<Region> getPockets(BotState state) {
 		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
 		ArrayList<Region> pockets = new ArrayList<Region>();
-		
+
 		outerLoop:
 		for (Region r : owned){
 			for (Region n :  r.getNeighbors()){
@@ -219,9 +216,7 @@ public class Map {
 			}
 			pockets.add(r);
 		}
-		
-		
-		
+
 		return pockets;
 	}
 
@@ -229,7 +224,45 @@ public class Map {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
-	 
 
+	// remove me later
+	static <K, V extends Comparable<? super V>> java.util.SortedSet<java.util.Map.Entry<K, V>> entriesSortedByValues(
+			java.util.Map<K, V> map) {
+		java.util.SortedSet<java.util.Map.Entry<K, V>> sortedEntries = new java.util.TreeSet<java.util.Map.Entry<K, V>>(
+				new java.util.Comparator<java.util.Map.Entry<K, V>>() {
+					@Override
+					public int compare(java.util.Map.Entry<K, V> e1,
+							java.util.Map.Entry<K, V> e2) {
+						int res = e2.getValue().compareTo(e1.getValue());
+						return res != 0 ? res : 1; // Special fix to preserve
+													// items with equal values
+					}
+				});
+		sortedEntries.addAll(map.entrySet());
+		return sortedEntries;
+	}
+
+	public void computeBottlenecks() {
+		Pathfinder pathfinder = new Pathfinder(this);
+		HashMap<Region, Float> traffic = new HashMap<Region, Float>();
+
+		for (Region region : regions.values()) {
+			for (Iterator<Path> iterator = pathfinder.distanceIterator(region); iterator.hasNext();) {
+				Path path = iterator.next();
+
+				float currentTraffic = 1f / path.getDistance();
+				if (traffic.containsKey(path.getTarget())) {
+					traffic.put(path.getTarget(), traffic.get(path.getTarget()) + currentTraffic);
+				} else {
+					traffic.put(path.getTarget(), currentTraffic);
+				}
+			}
+		}
+
+		System.err.println("---- Computing bottlenecks ----");
+		for (java.util.Map.Entry<Region, Float> entry : entriesSortedByValues(traffic)) {
+			System.err.println("Region " + entry.getKey().getId() + " : " + entry.getValue());
+		}
+		System.err.println("-------------------------------");
+	}
 }
