@@ -34,7 +34,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public float weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(mName, oName, nodeB);
+				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
@@ -47,12 +47,13 @@ public class OffensiveCommander extends TemplateCommander {
 				// Super region is already controlled
 				continue;
 			}
-			int required = Values.calculateRequiredForcesAttack(mName, path.getTarget().getSuperRegion()) - path.getOrigin().getArmies() + 1;
+			int required = Values.calculateRequiredForcesAttack(path.getTarget().getSuperRegion()) - path.getOrigin().getArmies() + 1;
 			if (required < 1) {
 				continue;
 			}
+			required += Values.calculateRequiredForcesDefend(path.getTarget());
 
-			float cost = path.getDistance() - Values.calculateRegionWeighedCost(mName, oName, path.getTarget())
+			float cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(map.getSuperRegion(s));
 
 			float value = worth.get(s) / cost;
@@ -86,7 +87,7 @@ public class OffensiveCommander extends TemplateCommander {
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public float weight(Region nodeA, Region nodeB) {
 
-				return Values.calculateRegionWeighedCost(mName, eName, nodeB);
+				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
@@ -107,13 +108,13 @@ public class OffensiveCommander extends TemplateCommander {
 					continue;
 				}
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(mName, eName, path.getTarget());
+				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
 				float currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
 				float currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(mName, path.getPath().get(i));
+					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);

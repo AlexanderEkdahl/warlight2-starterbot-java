@@ -48,7 +48,7 @@ public class GriefCommander extends TemplateCommander {
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public float weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(mName, oName, nodeB);
+				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
@@ -62,10 +62,10 @@ public class GriefCommander extends TemplateCommander {
 			}
 			int required = -path.getOrigin().getArmies() + 1;
 			for (int i = 1; i < path.getPath().size(); i++) {
-				required += Values.calculateRequiredForcesAttack(mName, path.getPath().get(i));
+				required += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 			}
 			if (required < 1) {
-				break;
+				continue;
 			}
 			float cost = path.getDistance();
 
@@ -114,7 +114,7 @@ public class GriefCommander extends TemplateCommander {
 				if (nodeB.getPlayerName().equals(mName)) {
 					return 5;
 				} else {
-					return Values.calculateRegionWeighedCost(mName, eName, nodeB);
+					return Values.calculateRegionWeighedCost(nodeB);
 				}
 
 			}
@@ -135,13 +135,13 @@ public class GriefCommander extends TemplateCommander {
 					continue;
 				}
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(mName, eName, path.getTarget());
+				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
 				float currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
 				float currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(mName, path.getPath().get(i));
+					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);

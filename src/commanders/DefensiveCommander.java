@@ -131,7 +131,7 @@ public class DefensiveCommander extends TemplateCommander {
 		final String mName = state.getMyPlayerName();
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they defence
-			needDefence.put(r, Values.calculateRequiredForcesDefendRegionAgainstAll(r));
+			needDefence.put(r, Values.calculateRequiredForcesDefend(r));
 
 		}
 		System.err.println("There are " + fronts.size() + " fronts");
@@ -140,7 +140,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public float weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(mName, eName, nodeB);
+				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
@@ -170,7 +170,7 @@ public class DefensiveCommander extends TemplateCommander {
 					float currentWeight = currentWorth / currentCost;
 
 					for (int i = 1; i < path.getPath().size(); i++) {
-						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(mName, path.getPath().get(i));
+						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 					}
 					int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
