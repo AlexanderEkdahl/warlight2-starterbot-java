@@ -36,13 +36,11 @@ public class BotParser {
 				continue;
 			}
 			System.err.println("Input(" + currentState.getRoundNumber() + "): " + line);
-
 			String[] parts = line.split(" ");
 			if (parts[0].equals("pick_starting_region")) {
 				currentState.setPickableStartingRegions(parts);
 				Region startingRegion = bot.getStartingRegion(currentState,
 						Long.valueOf(parts[1]));
-
 				output(Integer.toString(startingRegion.getId()));
 			} else if (parts[0].equals("go")) {
 				String output = "";

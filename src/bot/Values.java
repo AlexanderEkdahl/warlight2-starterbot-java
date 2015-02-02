@@ -77,27 +77,27 @@ public class Values {
 	public static float calculateRegionWeighedCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
-				return r.getArmies() * costMultiplierEnemy;
+				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
 			} else {
 				return staticCostUnknownEnemy;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 10 + staticRegionCost;
 			} else if (r.getVisible() == false && !r.getWasteland()) {
-				return staticCostUnknown;
+				return staticCostUnknown + staticRegionCost;
 			} else {
-				return r.getArmies() * costMultiplierNeutral;
+				return r.getArmies() * costMultiplierNeutral + staticRegionCost;
 			}
 
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 10 + staticRegionCost;
 			} else {
-				return staticCostUnknown;
+				return staticCostUnknown + staticRegionCost;
 			}
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
-			return staticCostOwned;
+			return staticRegionCost;
 		} else {
 			// this shouldn't happen
 			return (Float) null;
@@ -107,26 +107,26 @@ public class Values {
 	public static float calculateRegionInSuperRegionWeighedCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
-				return r.getArmies() * costMultiplierEnemy;
+				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
 			} else {
 				return staticCostUnknownEnemy;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 10 + staticRegionCost;
 			} else if (r.getVisible() == false && !r.getWasteland()) {
-				return staticCostUnknown;
+				return staticCostUnknown + staticRegionCost;
 			} else {
-				return r.getArmies() * costMultiplierNeutral;
+				return r.getArmies() * costMultiplierNeutral + staticRegionCost;
 			}
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 10 + staticRegionCost;
 			} else {
-				return staticCostUnknown;
+				return staticCostUnknown + staticRegionCost;
 			}
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
-			return staticCostOwned;
+			return 0;
 		} else {
 			// this shouldn't happen
 			return (Float) null;
@@ -136,7 +136,7 @@ public class Values {
 	public static int calculateSuperRegionWeighedCost(SuperRegion sr) {
 		int totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInSuperRegionWeighedCost(r) + staticRegionCost;
+			totalCost += calculateRegionInSuperRegionWeighedCost(r);
 		}
 		return totalCost;
 	}
