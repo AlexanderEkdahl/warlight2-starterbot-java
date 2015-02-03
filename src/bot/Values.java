@@ -13,7 +13,7 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 
-	public static final int extraArmiesDefence = 7;
+	public static final int extraArmiesDefence = 5;
 	public static final int staticSuperRegionDefence = 0;
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 5;
 
