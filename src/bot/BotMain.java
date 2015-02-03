@@ -96,8 +96,8 @@ public class BotMain implements Bot {
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 
 		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
-		HashMap<SuperRegion, Integer> superRegionSatisfied = Values.calculateSuperRegionSatisfaction(state);
-		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(state);
+		HashMap<SuperRegion, Integer> superRegionSatisfied = Values.calculateSuperRegionSatisfaction(state.getFullMap());
+		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(state.getFullMap());
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
@@ -108,7 +108,7 @@ public class BotMain implements Bot {
 		}
 		HashMap<Region, Integer> availablePotential = new HashMap<Region, Integer>();
 
-		outerLoop: for (int i = 0; i < proposals.size(); i++) {
+		for (int i = 0; i < proposals.size(); i++) {
 			ActionProposal currentProposal = proposals.get(i);
 			Region currentOriginRegion = currentProposal.getOrigin();
 			Region currentTargetRegion = currentProposal.getTarget();
@@ -130,7 +130,7 @@ public class BotMain implements Bot {
 				// attack is the best defence
 				if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND) && currentProposal.getOrigin().equals(currentProposal.getTarget())) {
 					addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
-					continue outerLoop;
+					continue;
 				}
 
 				FromTo currentMove = new FromTo(currentOriginRegion, currentTargetRegion);

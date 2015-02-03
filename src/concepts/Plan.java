@@ -6,9 +6,14 @@ import map.SuperRegion;
 
 public class Plan {
 	private ActionType actionType;
+	private SuperRegion sr;
+	private Region r;
 	
-	
-	
+	public Plan(Region r, SuperRegion sr) {
+		this.sr = sr;
+		this.r = r;
+		this.actionType = r.getPlayerName().equals(BotState.getMyName()) ?  ActionType.DEFEND : ActionType.ATTACK;
+	}
 	public ActionType getActionType() {
 		return actionType;
 	}
@@ -17,14 +22,6 @@ public class Plan {
 		this.actionType = aType;
 	}
 
-	private SuperRegion sr;
-	private Region r;
-
-	public Plan(Region r, SuperRegion sr) {
-		this.sr = sr;
-		this.r = r;
-		this.actionType = r.getPlayerName().equals(BotState.getMyName()) ?  ActionType.DEFEND : ActionType.ATTACK;
-	}
 
 	public void setSr(SuperRegion sr) {
 		this.sr = sr;
@@ -38,9 +35,9 @@ public class Plan {
 		return r;
 	}
 	
-//	public String toString(){
-//		return ("Region: " + r + " SuperRegion: " + sr);
-//	}
+	public String toString(){
+		return ("Region: " + r + " SuperRegion: " + sr +" ActionType: " + actionType);
+	}
  
 
 

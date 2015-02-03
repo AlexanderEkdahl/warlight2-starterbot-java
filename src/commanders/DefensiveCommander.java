@@ -38,8 +38,6 @@ public class DefensiveCommander extends TemplateCommander {
 	private ArrayList<PlacementProposal> organizeSuperRegionDefence(BotState state) {
 
 		ArrayList<SuperRegion> vulnerable = state.getFullMap().getOwnedFrontSuperRegions(state);
-		String mName = state.getMyPlayerName();
-		String eName = state.getOpponentPlayerName();
 
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 		for (SuperRegion s : vulnerable) {
@@ -48,7 +46,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
 
-			for (Region r : s.getFronts(eName)) {
+			for (Region r : s.getFronts()) {
 				ownForces.put(r, r.getArmies());
 			}
 			// keep on assigning dudes until we have at least extraArmiesDefence
@@ -56,7 +54,7 @@ public class DefensiveCommander extends TemplateCommander {
 			// and add them in the most vulnerable region
 
 			int minDiff = Integer.MAX_VALUE;
-			for (Region r : s.getFronts(eName)) {
+			for (Region r : s.getFronts()) {
 				int currentDiff = ownForces.get(r) - r.getHighestThreateningForce();
 				if (currentDiff < minDiff) {
 					minDiff = currentDiff;
@@ -66,7 +64,7 @@ public class DefensiveCommander extends TemplateCommander {
 			}
 			while (minDiff < Values.extraArmiesDefence) {
 				minDiff = Integer.MAX_VALUE;
-				for (Region r : s.getFronts(eName)) {
+				for (Region r : s.getFronts()) {
 					int currentDiff = ownForces.get(r) - r.getHighestThreateningForce();
 					if (currentDiff < minDiff) {
 						minDiff = currentDiff;
@@ -97,8 +95,8 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	private double calculateCost(SuperRegion s) {
-		double cost = (s.getFronts(BotState.getMyOpponentName()).size() * Values.multipleFrontPenalty)
-				+ (s.getTotalThreateningForce(BotState.getMyOpponentName()) * Values.costMultiplierDefendingAgainstEnemy);
+		double cost = (s.getFronts().size() * Values.multipleFrontPenalty)
+				+ (s.getTotalThreateningForce() * Values.costMultiplierDefendingAgainstEnemy);
 		return cost;
 	}
 
@@ -112,7 +110,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 			if (r.getArmies() < highestEnemy) {
 				int difference = highestEnemy - r.getArmies();
-				int weight = Values.staticPocketDefence;
+				double weight = Values.staticPocketDefence;
 				pocketPlacementProposals.add(new PlacementProposal(weight, r, new Plan(r, r.getSuperRegion()), difference + 1, "DefensiveCommander"));
 			}
 
@@ -127,8 +125,6 @@ public class DefensiveCommander extends TemplateCommander {
 		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
 		ArrayList<Region> needHelpRegions = (ArrayList<Region>) fronts.clone();
 
-		final String eName = state.getOpponentPlayerName();
-		final String mName = state.getMyPlayerName();
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they defence
 			needDefence.put(r, Values.calculateRequiredForcesDefend(r));

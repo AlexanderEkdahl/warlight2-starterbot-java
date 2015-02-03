@@ -28,7 +28,6 @@ public class GriefCommander extends TemplateCommander {
 		if (state.getRoundNumber() < 2) {
 			return proposals;
 		}
-		ArrayList<Region> enemyRegions = state.getFullMap().getOwnedRegions(state.getOpponentPlayerName());
 
 		HashMap<Integer, Double> worth = new HashMap<Integer, Double>();
 		worth = calculatePlans(state);
@@ -41,8 +40,6 @@ public class GriefCommander extends TemplateCommander {
 
 	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Double> worth, BotState state) {
 		Set<Integer> keys = worth.keySet();
-		final String oName = state.getOpponentPlayerName();
-		final String mName = state.getMyPlayerName();
 		Map map = state.getFullMap();
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 
@@ -70,7 +67,7 @@ public class GriefCommander extends TemplateCommander {
 			double cost = path.getDistance();
 
 			double value = worth.get(s) / cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getOrigin(), path.getOrigin().getSuperRegion()), required,
+			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), required,
 					"GriefCommander"));
 
 		}
@@ -107,11 +104,9 @@ public class GriefCommander extends TemplateCommander {
 		HashMap<Integer, Double> ranking = calculatePlans(state);
 
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
-		final String mName = state.getMyPlayerName();
-		final String eName = state.getOpponentPlayerName();
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
-				if (nodeB.getPlayerName().equals(mName)) {
+				if (nodeB.getPlayerName().equals(BotState.getMyName())) {
 					return 5;
 				} else {
 					return Values.calculateRegionWeighedCost(nodeB);
@@ -128,7 +123,7 @@ public class GriefCommander extends TemplateCommander {
 			if (r.getArmies() < 2) {
 				continue;
 			}
-			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, mName);
+			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
 				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
 					// no interest in this path

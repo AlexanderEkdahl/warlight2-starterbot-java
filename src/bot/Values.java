@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+import map.Map;
 import map.Region;
 import map.SuperRegion;
 
@@ -12,15 +13,16 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 
-	public static final int extraArmiesDefence = 5;
-	public static final int staticPocketDefence = 30;
+	public static final int extraArmiesDefence = 7;
 	public static final int staticSuperRegionDefence = 0;
+	public static final int unknownRegionAppreciatedRequiredForcesAttack = 5;
 
 	// ////// REWARDS
-
+	
+	public static final double staticPocketDefence = 30;
 	public static final double rewardMultiplier = 40;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 15;
+	public static final double valueDenialMultiplier = 18;
 	public static final double rewardDefenseImportanceMultiplier = 40;
 
 	// ////// COSTS
@@ -76,12 +78,15 @@ public class Values {
 	}
 
 	public static double calculateRegionWeighedCost(Region r) {
+		// enemy region
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
 			} else {
 				return staticCostUnknownEnemy + staticRegionCost;
 			}
+
+			// neutral region
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
 				return costMultiplierNeutral * 10 + staticRegionCost;
@@ -91,12 +96,15 @@ public class Values {
 				return r.getArmies() * costMultiplierNeutral + staticRegionCost;
 			}
 
+			// unknown region
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
 				return costMultiplierNeutral * 10 + staticRegionCost;
 			} else {
 				return staticCostUnknown + staticRegionCost;
 			}
+
+			// my region
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return staticRegionCost;
 		} else {
@@ -106,31 +114,11 @@ public class Values {
 	}
 
 	public static double calculateRegionInSuperRegionWeighedCost(Region r) {
-		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
-			if (r.getVisible()) {
-				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
-			} else {
-				return staticCostUnknownEnemy + staticRegionCost;
-			}
-		} else if (r.getPlayerName().equals("neutral")) {
-			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10 + staticRegionCost;
-			} else if (r.getVisible() == false && !r.getWasteland()) {
-				return staticCostUnknown + staticRegionCost;
-			} else {
-				return r.getArmies() * costMultiplierNeutral + staticRegionCost;
-			}
-		} else if (r.getPlayerName().equals("unknown")) {
-			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10 + staticRegionCost;
-			} else {
-				return staticCostUnknown + staticRegionCost;
-			}
-		} else if (r.getPlayerName().equals(BotState.getMyName())) {
-			return 0;
+
+		if (!r.getPlayerName().equals(BotState.getMyName())) {
+			return calculateRegionWeighedCost(r);
 		} else {
-			// this shouldn't happen
-			return (Double) null;
+			return 0;
 		}
 	}
 
@@ -140,6 +128,7 @@ public class Values {
 			totalCost += calculateRegionInSuperRegionWeighedCost(r);
 		}
 
+		// add some kind of exponential growth to discourage enormous regions
 		totalCost *= Math.pow(superRegionExponentialMultiplier, sr.getSubRegions().size());
 
 		return totalCost;
@@ -147,11 +136,12 @@ public class Values {
 
 	public static int calculateRequiredForcesAttack(Region r) {
 
-		// these numbers will be prone to change
+		// minimum number of forces required for an attack, should probably be
+		// able to win
 
 		int armySize = r.getArmies();
 		if (r.getPlayerName().equals("unknown")) {
-			return 6;
+			return unknownRegionAppreciatedRequiredForcesAttack;
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
 		}
@@ -168,7 +158,8 @@ public class Values {
 
 	public static int calculateRequiredForcesAttackTotalVictory(Region r) {
 
-		// these numbers will be prone to change
+		// maximum number of forces required for an attack, should definitely be
+		// able to win
 
 		int armySize = r.getArmies();
 		if (r.getPlayerName().equals("unknown")) {
@@ -239,12 +230,10 @@ public class Values {
 
 	}
 
-	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(BotState state) {
-		String mName = state.getMyPlayerName();
-		String eName = state.getOpponentPlayerName();
+	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(Map map) {
 		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
-		for (SuperRegion s : state.getFullMap().getSuperRegions()) {
-			if (s.ownedByPlayer(state.getMyPlayerName())) {
+		for (SuperRegion s : map.getSuperRegions()) {
+			if (s.ownedByPlayer(BotState.getMyName())) {
 				roomLeft.put(s, Integer.MAX_VALUE);
 			} else {
 				roomLeft.put(s, (int) ((Values.calculateRequiredForcesAttack(s)) * maxSuperRegionSatisfactionMultiplier));
@@ -254,10 +243,9 @@ public class Values {
 		return roomLeft;
 	}
 
-	public static HashMap<Region, Integer> calculateRegionSatisfaction(BotState state) {
+	public static HashMap<Region, Integer> calculateRegionSatisfaction(Map map) {
 		HashMap<Region, Integer> roomLeft = new HashMap<Region, Integer>();
-
-		for (Region r : state.getFullMap().getRegionList()) {
+		for (Region r : map.getRegionList()) {
 			if (!r.getPlayerName().equals(BotState.getMyName()))
 				roomLeft.put(r, calculateRequiredForcesAttackTotalVictory(r));
 			else {

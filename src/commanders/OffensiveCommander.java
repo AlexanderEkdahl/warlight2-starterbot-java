@@ -45,17 +45,16 @@ public class OffensiveCommander extends TemplateCommander {
 				// Super region is already controlled
 				continue;
 			}
-			int required = Values.calculateRequiredForcesAttack(path.getTarget().getSuperRegion()) - path.getOrigin().getArmies() + 1;
+			int required = Values.calculateRequiredForcesAttack(path.getTarget()) - path.getOrigin().getArmies() + 1;
 			if (required < 1) {
 				continue;
 			}
 			required += Values.calculateRequiredForcesDefend(path.getTarget());
-
 			double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(map.getSuperRegion(s));
 
 			double value = worth.get(s) / cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getOrigin(), path.getOrigin().getSuperRegion()), required,
+			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), required,
 					"OffensiveCommander"));
 
 		}
@@ -80,8 +79,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
 
-		final String mName = state.getMyPlayerName();
-		final String eName = state.getOpponentPlayerName();
+
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 
@@ -99,7 +97,7 @@ public class OffensiveCommander extends TemplateCommander {
 			if (r.getArmies() < 2) {
 				continue;
 			}
-			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, mName);
+			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
 				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
 					// no interest in this path

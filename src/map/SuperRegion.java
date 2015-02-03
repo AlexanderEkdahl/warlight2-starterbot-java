@@ -9,7 +9,10 @@
  */
 
 package map;
+
 import java.util.ArrayList;
+
+import bot.BotState;
 
 public class SuperRegion {
 	private int id;
@@ -23,15 +26,16 @@ public class SuperRegion {
 	}
 
 	public void addSubRegion(Region subRegion) {
-		if(!subRegions.contains(subRegion))
+		if (!subRegions.contains(subRegion))
 			subRegions.add(subRegion);
 	}
 
 	/**
-	 * @return A string with the name of the player that fully owns this SuperRegion
+	 * @return A string with the name of the player that fully owns this
+	 *         SuperRegion
 	 */
-	public boolean ownedByPlayer(String name)	{
-		for(Region region : subRegions) {
+	public boolean ownedByPlayer(String name) {
+		for (Region region : subRegions) {
 			if (!name.equals(region.getPlayerName()))
 				return false;
 		}
@@ -46,7 +50,8 @@ public class SuperRegion {
 	}
 
 	/**
-	 * @return The number of armies a Player is rewarded when he fully owns this SuperRegion
+	 * @return The number of armies a Player is rewarded when he fully owns this
+	 *         SuperRegion
 	 */
 	public int getArmiesReward() {
 		return armiesReward;
@@ -60,8 +65,9 @@ public class SuperRegion {
 	}
 
 	/**
-	* @return The number of neutrals in this superregion at the start of the game
-	*/
+	 * @return The number of neutrals in this superregion at the start of the
+	 *         game
+	 */
 	public int getInitialNeutralCount() {
 		int neutrals = 0;
 
@@ -76,47 +82,47 @@ public class SuperRegion {
 
 		return neutrals;
 	}
-	
-	public ArrayList<Region> getFronts(String eName){
+
+	public ArrayList<Region> getFronts() {
 		ArrayList<Region> fronts = new ArrayList<Region>();
-		for (Region r : subRegions){
-			for (Region n : r.getNeighbors()){
-				if (n.getPlayerName().equals(eName)){
+		for (Region r : subRegions) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getPlayerName().equals(BotState.getMyOpponentName())) {
 					fronts.add(r);
 					break;
 				}
 			}
-			
+
 		}
 		return fronts;
-		
+
 	}
-	
-	public int getTotalThreateningForce(String eName){
+
+	public int getTotalThreateningForce() {
 		ArrayList<Region> checked = new ArrayList<Region>();
 		int totalForce = 0;
-		for (Region r : subRegions){
-			for (Region n : r.getNeighbors()){
-				if (n.getPlayerName().equals(eName) && !checked.contains(n)){
+		for (Region r : subRegions) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getPlayerName().equals(BotState.getMyOpponentName()) && !checked.contains(n)) {
 					checked.add(n);
-					totalForce += n.getArmies()-1;
+					totalForce += n.getArmies() - 1;
 				}
 			}
-			
+
 		}
-		
+
 		return totalForce;
-		
+
 	}
 
 	public int getTotalFriendlyForce(String myName) {
 		int totalForce = 0;
-		for (Region r : getSubRegions()){
-			if (r.getPlayerName().equals(myName)){
-				totalForce += r.getArmies()-1;
+		for (Region r : getSubRegions()) {
+			if (r.getPlayerName().equals(myName)) {
+				totalForce += r.getArmies() - 1;
 			}
 		}
 		return totalForce;
 	}
-	
+
 }

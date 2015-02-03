@@ -193,7 +193,7 @@ public class Map {
 		ArrayList<SuperRegion> ownedSuperRegions = state.getFullMap().getOwnedSuperRegions(BotState.getMyName());
 
 		for (SuperRegion s : ownedSuperRegions){
-			if (s.getFronts(BotState.getMyOpponentName()).size() > 0){
+			if (s.getFronts().size() > 0){
 				sFront.add(s);
 			}
 		}
