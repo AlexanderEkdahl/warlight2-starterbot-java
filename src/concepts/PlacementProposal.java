@@ -6,7 +6,7 @@ import move.PlaceArmiesMove;
 
 public class PlacementProposal extends TemplateProposal {
 
-	public PlacementProposal(float weight, Region region, Plan plan,  int requiredForces,
+	public PlacementProposal(double weight, Region region, Plan plan,  int requiredForces,
 			String issuedBy) {
 		super(weight, region, plan, requiredForces, issuedBy);
 	}

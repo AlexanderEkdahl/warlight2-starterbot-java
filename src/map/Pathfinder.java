@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Pathfinder {
 	private PathfinderWeighter pathfinderWeighter;
-	private HashMap<Region, Float> distances;
+	private HashMap<Region, Double> distances;
 	private Map map;
 
 	public Pathfinder(Map map, PathfinderWeighter pathfinderWeighter) {
@@ -14,16 +14,14 @@ public class Pathfinder {
 
 	public Pathfinder(Map map) {
 		this(map, new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 				return 1;
 			}
 		});
 	}
 
-	public Path getPathToSuperRegionFromRegionOwnedByPlayer(
-			SuperRegion superRegion, String playerName) {
-		for (Iterator<Path> iterator = distanceIterator(map
-				.getOwnedRegions(playerName)); iterator.hasNext();) {
+	public Path getPathToSuperRegionFromRegionOwnedByPlayer(SuperRegion superRegion, String playerName) {
+		for (Iterator<Path> iterator = distanceIterator(map.getOwnedRegions(playerName)); iterator.hasNext();) {
 			Path path = iterator.next();
 			if (path.getTarget().getSuperRegion() == superRegion) {
 				return path;
@@ -34,8 +32,7 @@ public class Pathfinder {
 	}
 
 	public Path getPathToRegionOwnedByPlayer(Region origin, String playerName) {
-		for (Iterator<Path> iterator = distanceIterator(origin); iterator
-				.hasNext();) {
+		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path path = iterator.next();
 
 			if (path.getTarget().getPlayerName().equals(playerName)) {
@@ -47,8 +44,7 @@ public class Pathfinder {
 	}
 
 	public Path getPath(Region origin, Region target) {
-		for (Iterator<Path> iterator = distanceIterator(origin); iterator
-				.hasNext();) {
+		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path next = iterator.next();
 
 			if (next.getTarget() == target) {
@@ -59,10 +55,8 @@ public class Pathfinder {
 		return null;
 	}
 
-	public Path getPathToSuperRegionFromRegion(SuperRegion superRegion,
-			Region origin) {
-		for (Iterator<Path> iterator = distanceIterator(origin); iterator
-				.hasNext();) {
+	public Path getPathToSuperRegionFromRegion(SuperRegion superRegion, Region origin) {
+		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path path = iterator.next();
 
 			if (path.getTarget().getSuperRegion() == superRegion) {
@@ -73,12 +67,10 @@ public class Pathfinder {
 		return null;
 	}
 
-	public ArrayList<Path> getPathToAllRegionsNotOwnedByPlayerFromRegion(
-			Region origin, String playerName) {
+	public ArrayList<Path> getPathToAllRegionsNotOwnedByPlayerFromRegion(Region origin, String playerName) {
 		ArrayList<Path> paths = new ArrayList<Path>();
 
-		for (Iterator<Path> iterator = distanceIterator(origin); iterator
-				.hasNext();) {
+		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path path = iterator.next();
 
 			if (!path.getTarget().getPlayerName().equals(playerName)) {
@@ -89,11 +81,10 @@ public class Pathfinder {
 		return paths;
 	}
 
-	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions, String playerName){
+	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions, String playerName) {
 		ArrayList<Path> paths = new ArrayList<Path>();
 
-		for (Iterator<Path> iterator = distanceIterator(origin); iterator
-				.hasNext();) {
+		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path path = iterator.next();
 
 			if (regions.contains(path.getTarget())) {
@@ -106,15 +97,15 @@ public class Pathfinder {
 	}
 
 	public class Path {
-		private Float distance;
+		private Double distance;
 		private LinkedList<Region> path;
 
-		private Path(Float float1, LinkedList<Region> path) {
-			this.distance = float1;
+		private Path(Double double1, LinkedList<Region> path) {
+			this.distance = double1;
 			this.path = path;
 		}
 
-		public float getDistance() {
+		public double getDistance() {
 			return distance;
 		}
 
@@ -131,10 +122,7 @@ public class Pathfinder {
 		}
 
 		public String toString() {
-			return "Path{" +
-							"distance=" + distance +
-							", path=" + path +
-							'}';
+			return "Path{" + "distance=" + distance + ", path=" + path + '}';
 		}
 	}
 
@@ -174,37 +162,32 @@ public class Pathfinder {
 		}
 	}
 
-	static <K, V extends Comparable<? super V>> SortedSet<java.util.Map.Entry<K, V>> entriesSortedByValues(
-			java.util.Map<K, V> map) {
-		SortedSet<java.util.Map.Entry<K, V>> sortedEntries = new TreeSet<java.util.Map.Entry<K, V>>(
-				new Comparator<java.util.Map.Entry<K, V>>() {
-					@Override
-					public int compare(java.util.Map.Entry<K, V> e1,
-							java.util.Map.Entry<K, V> e2) {
-						int res = e1.getValue().compareTo(e2.getValue());
-						return res != 0 ? res : 1; // Special fix to preserve
-													// items with equal values
-					}
-				});
+	static <K, V extends Comparable<? super V>> SortedSet<java.util.Map.Entry<K, V>> entriesSortedByValues(java.util.Map<K, V> map) {
+		SortedSet<java.util.Map.Entry<K, V>> sortedEntries = new TreeSet<java.util.Map.Entry<K, V>>(new Comparator<java.util.Map.Entry<K, V>>() {
+			@Override
+			public int compare(java.util.Map.Entry<K, V> e1, java.util.Map.Entry<K, V> e2) {
+				int res = e1.getValue().compareTo(e2.getValue());
+				return res != 0 ? res : 1; // Special fix to preserve
+											// items with equal values
+			}
+		});
 		sortedEntries.addAll(map.entrySet());
 		return sortedEntries;
 	}
 
 	private Iterator<Path> distanceIterator(Collection<Region> regions) {
 		HashMap<Region, Region> previous = new HashMap<Region, Region>();
-		distances = new HashMap<Region, Float>();
+		distances = new HashMap<Region, Double>();
 
 		for (Region region : regions) {
-			distances.put(region, 0f);
+			distances.put(region,Double.valueOf(0));
 		}
 
-		for (Iterator<Region> iterator = new BFSIterator(regions); iterator
-				.hasNext();) {
+		for (Iterator<Region> iterator = new BFSIterator(regions); iterator.hasNext();) {
 			Region next = iterator.next();
 
 			for (Region neighbor : next.getNeighbors()) {
-				float distance = getComputedDistance(next)
-						+ pathfinderWeighter.weight(next, neighbor);
+				double distance = getComputedDistance(next) + pathfinderWeighter.weight(next, neighbor);
 
 				if (distance < getComputedDistance(neighbor)) {
 					distances.put(neighbor, distance);
@@ -215,7 +198,7 @@ public class Pathfinder {
 
 		LinkedList<Path> paths = new LinkedList<Path>();
 
-		for (java.util.Map.Entry<Region, Float> entry : entriesSortedByValues(distances)) {
+		for (java.util.Map.Entry<Region, Double> entry : entriesSortedByValues(distances)) {
 			LinkedList<Region> path = new LinkedList<Region>();
 			Region step = entry.getKey();
 
@@ -237,11 +220,11 @@ public class Pathfinder {
 		return distanceIterator(java.util.Collections.singleton(origin));
 	}
 
-	private Float getComputedDistance(Region node) {
-		Float d = distances.get(node);
+	private Double getComputedDistance(Region node) {
+		Double d = distances.get(node);
 
 		if (d == null) {
-			return Float.MAX_VALUE;
+			return Double.MAX_VALUE;
 		} else {
 			return d;
 		}

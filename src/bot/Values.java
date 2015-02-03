@@ -18,42 +18,42 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final float rewardMultiplier = 40;
-	public static final float staticRegionBonus = 0;
-	public static final float valueDenialMultiplier = 12;
-	public static final float rewardDefenseImportanceMultiplier = 40;
+	public static final double rewardMultiplier = 40;
+	public static final double staticRegionBonus = 0;
+	public static final double valueDenialMultiplier = 15;
+	public static final double rewardDefenseImportanceMultiplier = 40;
 
 	// ////// COSTS
 
-	public static final float costMultiplierEnemy = 2;
-	public static final float costMultiplierNeutral = 4;
-	public static final float staticCostUnknown = 5;
-	public static final float staticCostOwned = 5;
-	public static final float staticCostUnknownEnemy = 8;
-	public static final float multipleFrontPenalty = 5;
-	public static final float staticRegionCost = 3;
-	public static final float costMultiplierDefendingAgainstEnemy = 0.5f;
+	public static final double costMultiplierEnemy = 2;
+	public static final double costMultiplierNeutral = 4;
+	public static final double staticCostUnknown = 5;
+	public static final double staticCostUnknownEnemy = 8;
+	public static final double multipleFrontPenalty = 5;
+	public static final double staticRegionCost = 3;
+	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
+	public static final double superRegionExponentialMultiplier = 1.1;
 
 	// ////// SATISFACTION
 
-	public static final float maxSuperRegionSatisfactionMultiplier = 1.5f;
-	public static final int maxRegionSatisfactionMultiplier = 1;
+	public static final double maxSuperRegionSatisfactionMultiplier = 1.5;
+	public static final double maxRegionSatisfactionMultiplier = 1;
 
-	private static float startingRegion(SuperRegion s) {
-		float initialNeutral = s.getInitialNeutralCount();
-		float subRegions = s.getSubRegions().size();
-		float reward = s.getArmiesReward();
+	private static double startingRegion(SuperRegion s) {
+		double initialNeutral = s.getInitialNeutralCount();
+		double subRegions = s.getSubRegions().size();
+		double reward = s.getArmiesReward();
 
-		float weight = reward / ((initialNeutral * 2) + subRegions);
+		double weight = reward / ((initialNeutral * 2) + subRegions);
 		return weight;
 	}
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions) {
-		Region maxRegion = null;
-		float maxValue = Float.MIN_VALUE;
+		Region maxRegion = pickableStartingRegions.get(0);
+		double maxValue = Double.MIN_VALUE;
 		for (Region currentRegion : pickableStartingRegions) {
 			SuperRegion superRegion = currentRegion.getSuperRegion();
-			float value = Values.startingRegion(superRegion);
+			double value = Values.startingRegion(superRegion);
 			if (value >= maxValue) {
 				maxValue = value;
 				maxRegion = currentRegion;
@@ -64,22 +64,23 @@ public class Values {
 
 	}
 
-	public static float calculateSuperRegionWorth(SuperRegion s) {
+	public static double calculateSuperRegionWorth(SuperRegion s) {
 		if (s.getArmiesReward() < 1) {
 			return -1;
 		} else {
+
 			int reward = s.getArmiesReward();
 			return ((reward * Values.rewardMultiplier) + Values.staticRegionBonus);
 
 		}
 	}
 
-	public static float calculateRegionWeighedCost(Region r) {
+	public static double calculateRegionWeighedCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
 			} else {
-				return staticCostUnknownEnemy;
+				return staticCostUnknownEnemy + staticRegionCost;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
@@ -100,16 +101,16 @@ public class Values {
 			return staticRegionCost;
 		} else {
 			// this shouldn't happen
-			return (Float) null;
+			return (Double) null;
 		}
 	}
 
-	public static float calculateRegionInSuperRegionWeighedCost(Region r) {
+	public static double calculateRegionInSuperRegionWeighedCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
 				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
 			} else {
-				return staticCostUnknownEnemy;
+				return staticCostUnknownEnemy + staticRegionCost;
 			}
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
@@ -129,15 +130,18 @@ public class Values {
 			return 0;
 		} else {
 			// this shouldn't happen
-			return (Float) null;
+			return (Double) null;
 		}
 	}
 
-	public static int calculateSuperRegionWeighedCost(SuperRegion sr) {
-		int totalCost = 1;
+	public static double calculateSuperRegionWeighedCost(SuperRegion sr) {
+		double totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
 			totalCost += calculateRegionInSuperRegionWeighedCost(r);
 		}
+
+		totalCost *= Math.pow(superRegionExponentialMultiplier, sr.getSubRegions().size());
+
 		return totalCost;
 	}
 
@@ -201,7 +205,7 @@ public class Values {
 
 	public static int calculateRequiredForcesDefend(SuperRegion superRegion) {
 		int total = 0;
-		for (Region r : superRegion.getSubRegions()){
+		for (Region r : superRegion.getSubRegions()) {
 			total += calculateRequiredForcesDefend(r);
 		}
 		return total;

@@ -3,13 +3,13 @@ package concepts;
 import map.Region;
 
 public abstract class TemplateProposal implements Comparable<TemplateProposal> {
-	protected float weight;
+	protected double weight;
 	protected Region target;
 	protected int forces;
 	protected Plan plan;
 	protected String issuedBy;
 
-	public TemplateProposal(float weight, Region target, Plan plan, int forces,
+	public TemplateProposal(double weight, Region target, Plan plan, int forces,
 			String issuedBy) {
 		this.weight = weight;
 		this.target = target;
@@ -26,11 +26,11 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 		this.plan = plan;
 	}
 
-	public float getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(float weight) {
+	public void setWeight(double weight) {
 		this.weight = weight;
 	}
 

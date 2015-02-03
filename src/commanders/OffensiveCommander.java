@@ -16,7 +16,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> worth = new HashMap<Integer, Double>();
 
 		worth = calculatePlans(state);
 		ArrayList<PlacementProposal> attackPlans;
@@ -25,15 +25,13 @@ public class OffensiveCommander extends TemplateCommander {
 		return attackPlans;
 	}
 
-	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Float> worth, BotState state) {
+	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Double> worth, BotState state) {
 
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-		final String oName = state.getOpponentPlayerName();
-		final String mName = state.getMyPlayerName();
 		Map map = state.getFullMap();
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
@@ -53,10 +51,10 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 			required += Values.calculateRequiredForcesDefend(path.getTarget());
 
-			float cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
+			double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
 					+ Values.calculateSuperRegionWeighedCost(map.getSuperRegion(s));
 
-			float value = worth.get(s) / cost;
+			double value = worth.get(s) / cost;
 			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getOrigin(), path.getOrigin().getSuperRegion()), required,
 					"OffensiveCommander"));
 
@@ -65,8 +63,8 @@ public class OffensiveCommander extends TemplateCommander {
 		return proposals;
 	}
 
-	private HashMap<Integer, Float> calculatePlans(BotState state) {
-		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
+	private HashMap<Integer, Double> calculatePlans(BotState state) {
+		HashMap<Integer, Double> worth = new HashMap<Integer, Double>();
 		ArrayList<SuperRegion> possibleTargets = state.getFullMap().getSuperRegions();
 
 		for (SuperRegion s : possibleTargets) {
@@ -78,21 +76,21 @@ public class OffensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(BotState state) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		HashMap<Integer, Float> ranking = calculatePlans(state);
+		HashMap<Integer, Double> ranking = calculatePlans(state);
 
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
 
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 
 				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
 
-		float currentWeight;
+		double currentWeight;
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector
@@ -108,14 +106,15 @@ public class OffensiveCommander extends TemplateCommander {
 					continue;
 				}
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
-				float currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
-				float currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
+				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
+				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
+				double currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
+				totalRequired += Values.calculateRequiredForcesDefend(path.getTarget());
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 

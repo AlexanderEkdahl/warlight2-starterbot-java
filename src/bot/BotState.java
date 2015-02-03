@@ -100,7 +100,7 @@ public class BotState {
 							+ e.getMessage());
 				}
 			}
-			map.computeBottlenecks();
+//			map.computeBottlenecks();
 		} else if (mapInput[1].equals("wastelands")) {
 			for (int i = 2; i < mapInput.length; i++) {
 				try {

@@ -30,7 +30,7 @@ public class GriefCommander extends TemplateCommander {
 		}
 		ArrayList<Region> enemyRegions = state.getFullMap().getOwnedRegions(state.getOpponentPlayerName());
 
-		HashMap<Integer, Float> worth = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> worth = new HashMap<Integer, Double>();
 		worth = calculatePlans(state);
 
 		ArrayList<PlacementProposal> attackPlans;
@@ -39,7 +39,7 @@ public class GriefCommander extends TemplateCommander {
 		return attackPlans;
 	}
 
-	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Float> worth, BotState state) {
+	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Double> worth, BotState state) {
 		Set<Integer> keys = worth.keySet();
 		final String oName = state.getOpponentPlayerName();
 		final String mName = state.getMyPlayerName();
@@ -47,7 +47,7 @@ public class GriefCommander extends TemplateCommander {
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
@@ -67,9 +67,9 @@ public class GriefCommander extends TemplateCommander {
 			if (required < 1) {
 				continue;
 			}
-			float cost = path.getDistance();
+			double cost = path.getDistance();
 
-			float value = worth.get(s) / cost;
+			double value = worth.get(s) / cost;
 			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getOrigin(), path.getOrigin().getSuperRegion()), required,
 					"GriefCommander"));
 
@@ -78,16 +78,16 @@ public class GriefCommander extends TemplateCommander {
 		return proposals;
 	}
 
-	private HashMap<Integer, Float> calculatePlans(BotState state) {
+	private HashMap<Integer, Double> calculatePlans(BotState state) {
 		ArrayList<SuperRegion> enemySuperRegions = state.getFullMap().getSuspectedOwnedSuperRegions(state.getOpponentPlayerName());
 
-		HashMap<Integer, Float> plans = new HashMap<Integer, Float>();
+		HashMap<Integer, Double> plans = new HashMap<Integer, Double>();
 
 		for (SuperRegion s : enemySuperRegions) {
 			// for every super region they have, calculate how to execute an
 			// eventual attack and how much it would be worth
 
-			float reward = s.getArmiesReward();
+			double reward = s.getArmiesReward();
 
 			plans.put(s.getId(), reward * Values.valueDenialMultiplier);
 
@@ -104,13 +104,13 @@ public class GriefCommander extends TemplateCommander {
 			return proposals;
 		}
 		proposals = new ArrayList<ActionProposal>();
-		HashMap<Integer, Float> ranking = calculatePlans(state);
+		HashMap<Integer, Double> ranking = calculatePlans(state);
 
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
 		final String mName = state.getMyPlayerName();
 		final String eName = state.getOpponentPlayerName();
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 				if (nodeB.getPlayerName().equals(mName)) {
 					return 5;
 				} else {
@@ -120,7 +120,7 @@ public class GriefCommander extends TemplateCommander {
 			}
 		});
 
-		float currentWeight;
+		double currentWeight;
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector
@@ -135,9 +135,9 @@ public class GriefCommander extends TemplateCommander {
 					continue;
 				}
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				float currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
-				float currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
-				float currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
+				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
+				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
+				double currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {

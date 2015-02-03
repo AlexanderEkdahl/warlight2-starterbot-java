@@ -5,7 +5,7 @@ import map.*;
 public class ActionProposal extends TemplateProposal {
 	private Region origin;
 
-	public ActionProposal(float weight, Region origin, Region target,
+	public ActionProposal(double weight, Region origin, Region target,
 			int requiredForces, Plan plan, String issuedBy) {
 		super(weight, target, plan, requiredForces, issuedBy);
 		this.origin = origin;

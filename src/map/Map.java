@@ -242,13 +242,13 @@ public class Map {
 
 	public void computeBottlenecks() {
 		Pathfinder pathfinder = new Pathfinder(this);
-		HashMap<Region, Float> traffic = new HashMap<Region, Float>();
+		HashMap<Region, Double> traffic = new HashMap<Region, Double>();
 
 		for (Region region : regions.values()) {
 			for (Iterator<Path> iterator = pathfinder.distanceIterator(region); iterator.hasNext();) {
 				Path path = iterator.next();
 
-				float currentTraffic = 1f / path.getDistance();
+				double currentTraffic = 1 / path.getDistance();
 				if (traffic.containsKey(path.getTarget())) {
 					traffic.put(path.getTarget(), traffic.get(path.getTarget()) + currentTraffic);
 				} else {
@@ -258,7 +258,7 @@ public class Map {
 		}
 
 		System.err.println("---- Computing bottlenecks ----");
-		for (java.util.Map.Entry<Region, Float> entry : entriesSortedByValues(traffic)) {
+		for (java.util.Map.Entry<Region, Double> entry : entriesSortedByValues(traffic)) {
 			System.err.println("Region " + entry.getKey().getId() + " : " + entry.getValue());
 		}
 		System.err.println("-------------------------------");

@@ -1,5 +1,5 @@
 package map;
 
 public interface PathfinderWeighter {
-  float weight(Region a, Region b);
+double weight(Region a, Region b);
 }

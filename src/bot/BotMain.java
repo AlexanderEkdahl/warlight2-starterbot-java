@@ -252,7 +252,7 @@ public class BotMain implements Bot {
 			allEnemyRegions.remove(r);
 			int requiredToDefend = Values.calculateRequiredForcesDefendRegionAgainstSpecificRegions(allEnemyRegions);
 			if (requiredToDefend < available.get(currentOriginRegion)) {
-				int disposed = Math.min(Values.calculateRequiredForcesAttack(r), available.get(currentOriginRegion) - requiredToDefend);
+				int disposed = available.get(currentOriginRegion) - requiredToDefend;
 				potentialAttacks.add(new PotentialAttack(currentOriginRegion, r, disposed));
 			}
 			allEnemyRegions.add(r);

@@ -43,7 +43,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 		for (SuperRegion s : vulnerable) {
-			float weight = calculateWeight(s);
+			double weight = calculateWeight(s);
 			Region mostVulnerableRegion = null;
 
 			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
@@ -84,20 +84,20 @@ public class DefensiveCommander extends TemplateCommander {
 		return placementProposals;
 	}
 
-	private float calculateWeight(SuperRegion s) {
-		float worth = calculateWorth(s);
-		float cost = calculateCost(s);
-		float weight = worth / cost;
+	private double calculateWeight(SuperRegion s) {
+		double worth = calculateWorth(s);
+		double cost = calculateCost(s);
+		double weight = worth / cost;
 		return weight;
 	}
 
-	private float calculateWorth(SuperRegion s) {
-		float worth = Values.staticSuperRegionDefence + Values.rewardDefenseImportanceMultiplier * s.getArmiesReward();
+	private double calculateWorth(SuperRegion s) {
+		double worth = Values.staticSuperRegionDefence + Values.rewardDefenseImportanceMultiplier * s.getArmiesReward();
 		return worth;
 	}
 
-	private float calculateCost(SuperRegion s) {
-		float cost = (s.getFronts(BotState.getMyOpponentName()).size() * Values.multipleFrontPenalty)
+	private double calculateCost(SuperRegion s) {
+		double cost = (s.getFronts(BotState.getMyOpponentName()).size() * Values.multipleFrontPenalty)
 				+ (s.getTotalThreateningForce(BotState.getMyOpponentName()) * Values.costMultiplierDefendingAgainstEnemy);
 		return cost;
 	}
@@ -139,7 +139,7 @@ public class DefensiveCommander extends TemplateCommander {
 		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
 
 		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
-			public float weight(Region nodeA, Region nodeB) {
+			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
@@ -158,27 +158,32 @@ public class DefensiveCommander extends TemplateCommander {
 				needDefence.put(r, needDefence.get(r) - disposed);
 			}
 
-			else {
-				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, needHelpRegions, mName);
-				for (Path path : paths) {
-					int totalRequired = needDefence.get(path.getTarget());
-					if (totalRequired < 1) {
-						continue;
-					}
-					float currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
-					float currentWorth = calculateWorth(r.getSuperRegion());
-					float currentWeight = currentWorth / currentCost;
-
-					for (int i = 1; i < path.getPath().size(); i++) {
-						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
-					}
-					int disposed = Math.min(totalRequired, r.getArmies() - 1);
-
-					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget()
-							.getSuperRegion()), "DefensiveCommander"));
-
-				}
-			}
+			// else {
+			// ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r,
+			// needHelpRegions, mName);
+			// for (Path path : paths) {
+			// int totalRequired = needDefence.get(path.getTarget());
+			// if (totalRequired < 1) {
+			// continue;
+			// }
+			// double currentCost = path.getDistance() +
+			// calculateCost(path.getTarget().getSuperRegion());
+			// double currentWorth = calculateWorth(r.getSuperRegion());
+			// double currentWeight = currentWorth / currentCost;
+			//
+			// for (int i = 1; i < path.getPath().size(); i++) {
+			// totalRequired +=
+			// Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+			// }
+			// int disposed = Math.min(totalRequired, r.getArmies() - 1);
+			//
+			// proposals.add(new ActionProposal(currentWeight, r,
+			// path.getPath().get(1), disposed, new Plan(path.getTarget(),
+			// path.getTarget()
+			// .getSuperRegion()), "DefensiveCommander"));
+			//
+			// }
+			// }
 
 		}
 
