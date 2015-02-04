@@ -36,8 +36,9 @@ public class BotMain implements Bot {
 	// right now it just takes the highest priority tasks and executes them
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
 
-		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
+		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(state.getFullMap());
 
+		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 		int armiesLeft = state.getStartingArmies();
 
 		// TODO decide how to merge proposals
@@ -47,21 +48,30 @@ public class BotMain implements Bot {
 		proposals.addAll(dc.getPlacementProposals(state));
 		Collections.sort(proposals);
 
-		int currentProposalnr = 0;
 		PlacementProposal currentProposal;
-		while (armiesLeft > 0 && currentProposalnr < proposals.size()) {
-			currentProposal = proposals.get(currentProposalnr);
-			if (currentProposal.getForces() > armiesLeft) {
-				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), currentProposal.getTarget(), armiesLeft));
-				armiesLeft = 0;
-			} else {
-				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), currentProposal.getTarget(), currentProposal.getForces()));
-				armiesLeft -= currentProposal.getForces();
+		for (int i = 0; i < proposals.size() && armiesLeft > 0; i++) {
+			currentProposal = proposals.get(i);
+			Region currentTargetRegion = currentProposal.getPlan().getR();
+
+			// potentially disqualify based on satisfaction
+			if (regionSatisfaction.get(currentTargetRegion) < 0) {
+				continue;
 			}
-			System.err.println(currentProposal.toString());
-			currentProposalnr++;
+
+			else {
+				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), Math.min(currentProposal.getForces(), armiesLeft));
+
+				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), currentProposal.getTarget(), disposed));
+				regionSatisfaction.put(currentTargetRegion, regionSatisfaction.get(currentTargetRegion) - disposed);
+
+				armiesLeft -= disposed;
+				System.err.println(currentProposal.toString());
+			}
 
 		}
+
+		// there are no forces needed anywhere, we are probably just about to
+		// win so just place them anywhere
 		if (armiesLeft > 0) {
 			orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state.getFullMap().getOwnedRegions(state.getMyPlayerName()).get(0), armiesLeft));
 			armiesLeft = 0;
@@ -86,12 +96,12 @@ public class BotMain implements Bot {
 
 		Collections.sort(proposals);
 
-		orders = generateOrders(state, proposals);
+		orders = generateAttackTransferMoveOrders(state, proposals);
 
 		return orders;
 	}
 
-	private ArrayList<AttackTransferMove> generateOrders(BotState state, ArrayList<ActionProposal> proposals) {
+	private ArrayList<AttackTransferMove> generateAttackTransferMoveOrders(BotState state, ArrayList<ActionProposal> proposals) {
 		HashMap<Region, Integer> attacking = new HashMap<Region, Integer>();
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 

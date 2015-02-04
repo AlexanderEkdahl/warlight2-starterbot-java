@@ -263,4 +263,14 @@ public class Map {
 		}
 		System.err.println("-------------------------------");
 	}
+
+	public ArrayList<Region> getUnOwnedRegions() {
+		ArrayList<Region> unOwned = new ArrayList<Region>();
+		for (SuperRegion s : superRegions){
+			unOwned.addAll(getUnOwnedRegionsInSuperRegion(BotState.getMyName(), s));
+			
+		}
+		return unOwned;
+	}
+	
 }
