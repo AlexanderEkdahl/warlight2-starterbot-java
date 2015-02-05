@@ -15,21 +15,20 @@ import map.Pathfinder.Path;
 public class OffensiveCommander extends TemplateCommander {
 
 	@Override
-	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
+	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
 
 		ArrayList<PlacementProposal> attackPlans;
-		attackPlans = prepareAttacks(state);
+		attackPlans = prepareAttacks(map);
 
 		return attackPlans;
 	}
 
-	private ArrayList<PlacementProposal> prepareAttacks(BotState state) {
+	private ArrayList<PlacementProposal> prepareAttacks(Map map) {
 
-		HashMap<SuperRegion, Double> worths = calculateWorth(state);
+		HashMap<SuperRegion, Double> worths = calculateWorth(map);
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-		Map map = state.getFullMap();
 
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 
@@ -58,9 +57,9 @@ public class OffensiveCommander extends TemplateCommander {
 		return proposals;
 	}
 
-	private HashMap<SuperRegion, Double> calculateWorth(BotState state) {
+	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
 		HashMap<SuperRegion, Double> worth = new HashMap<SuperRegion, Double>();
-		ArrayList<SuperRegion> possibleTargets = state.getFullMap().getSuperRegions();
+		ArrayList<SuperRegion> possibleTargets = map.getSuperRegions();
 
 		for (SuperRegion s : possibleTargets) {
 			if (s.ownedByPlayer(BotState.getMyName())) {
@@ -73,13 +72,13 @@ public class OffensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state) {
+	public ArrayList<ActionProposal> getActionProposals(Map map) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		HashMap<SuperRegion, Double> ranking = calculateWorth(state);
+		HashMap<SuperRegion, Double> ranking = calculateWorth(map);
 
-		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
+		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
 
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 
 				return Values.calculateRegionWeighedCost(nodeB);

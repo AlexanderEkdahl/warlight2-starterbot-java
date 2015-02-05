@@ -211,4 +211,7 @@ public class BotState {
 	public static String getMyOpponentName(){
 		return opponentName;
 	}
+	public Object clone(){
+		return this.clone();
+	}
 }

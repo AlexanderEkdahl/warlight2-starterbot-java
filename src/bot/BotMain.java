@@ -12,6 +12,7 @@ import concepts.FromTo;
 import concepts.PlacementProposal;
 import concepts.Plan;
 import concepts.PotentialAttack;
+import map.Map;
 import map.Region;
 import map.SuperRegion;
 import move.AttackTransferMove;
@@ -40,12 +41,16 @@ public class BotMain implements Bot {
 
 		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 		int armiesLeft = state.getStartingArmies();
+		
+		Map speculativeMap = (Map) state.getFullMap().clone();
+		BotState speculativeState = (BotState) state.clone();
+		
 
 		// TODO decide how to merge proposals
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-		proposals.addAll(oc.getPlacementProposals(state));
-		proposals.addAll(gc.getPlacementProposals(state));
-		proposals.addAll(dc.getPlacementProposals(state));
+		proposals.addAll(oc.getPlacementProposals(state.getFullMap()));
+		proposals.addAll(gc.getPlacementProposals(state.getFullMap()));
+		proposals.addAll(dc.getPlacementProposals(state.getFullMap()));
 		Collections.sort(proposals);
 
 		PlacementProposal currentProposal;
@@ -90,9 +95,9 @@ public class BotMain implements Bot {
 		;
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		proposals.addAll(oc.getActionProposals(state));
-		proposals.addAll(gc.getActionProposals(state));
-		proposals.addAll(dc.getActionProposals(state));
+		proposals.addAll(oc.getActionProposals(state.getFullMap()));
+		proposals.addAll(gc.getActionProposals(state.getFullMap()));
+		proposals.addAll(dc.getActionProposals(state.getFullMap()));
 
 		Collections.sort(proposals);
 

@@ -1,5 +1,6 @@
 package concepts;
 
+import map.Pathfinder.Path;
 import map.Region;
 
 public abstract class TemplateProposal implements Comparable<TemplateProposal> {
@@ -8,6 +9,7 @@ public abstract class TemplateProposal implements Comparable<TemplateProposal> {
 	protected int forces;
 	protected Plan plan;
 	protected String issuedBy;
+	protected Path path;
 
 	public TemplateProposal(double weight, Region target, Plan plan, int forces,
 			String issuedBy) {

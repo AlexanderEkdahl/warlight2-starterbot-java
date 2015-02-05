@@ -3,6 +3,7 @@ package commanders;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import map.Map;
 import map.Pathfinder;
 import map.Pathfinder.Path;
 import map.PathfinderWeighter;
@@ -17,27 +18,27 @@ import bot.Values;
 public class DefensiveCommander extends TemplateCommander {
 
 	@Override
-	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
+	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
 		// pockets are solitary tiles without connection to friendly tiles
 
-		ArrayList<SuperRegion> vulnerableSuperRegions = state.getFullMap().getOwnedFrontSuperRegions(state);
+		ArrayList<SuperRegion> vulnerableSuperRegions = map.getOwnedFrontSuperRegions();
 
-		ArrayList<PlacementProposal> proposals = calculatePlans(state, vulnerableSuperRegions);
+		ArrayList<PlacementProposal> proposals = calculatePlans(map, vulnerableSuperRegions);
 		return proposals;
 	}
 
-	private ArrayList<PlacementProposal> calculatePlans(BotState state, ArrayList<SuperRegion> vulnerableSuperRegions) {
+	private ArrayList<PlacementProposal> calculatePlans(Map map, ArrayList<SuperRegion> vulnerableSuperRegions) {
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 
 		// placementProposals.addAll(organizePocketDefence(state));
-		placementProposals.addAll(organizeSuperRegionDefence(state));
+		placementProposals.addAll(organizeSuperRegionDefence(map));
 
 		return placementProposals;
 	}
 
-	private ArrayList<PlacementProposal> organizeSuperRegionDefence(BotState state) {
+	private ArrayList<PlacementProposal> organizeSuperRegionDefence(Map map) {
 
-		ArrayList<SuperRegion> vulnerable = state.getFullMap().getOwnedFrontSuperRegions(state);
+		ArrayList<SuperRegion> vulnerable = map.getOwnedFrontSuperRegions();
 
 		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
 		for (SuperRegion s : vulnerable) {
@@ -95,15 +96,14 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	private double calculateCost(SuperRegion s) {
-		double cost = (s.getFronts().size() * Values.multipleFrontPenalty)
-				+ (s.getTotalThreateningForce() * Values.costMultiplierDefendingAgainstEnemy);
+		double cost = (s.getFronts().size() * Values.multipleFrontPenalty) + (s.getTotalThreateningForce() * Values.costMultiplierDefendingAgainstEnemy);
 		return cost;
 	}
 
-	private ArrayList<PlacementProposal> organizePocketDefence(BotState state) {
-		ArrayList<Region> pockets = state.getFullMap().getPockets(state);
+	private ArrayList<PlacementProposal> organizePocketDefence(Map map) {
+		ArrayList<Region> pockets = map.getPockets();
 		ArrayList<PlacementProposal> pocketPlacementProposals = new ArrayList<PlacementProposal>();
-		ArrayList<Region> needHelpRegions = state.getFullMap().getOwnedFrontRegions(state);
+		ArrayList<Region> needHelpRegions = map.getOwnedFrontRegions();
 
 		for (Region r : pockets) {
 			int highestEnemy = r.getHighestThreateningForce();
@@ -119,9 +119,9 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state) {
+	public ArrayList<ActionProposal> getActionProposals(Map map) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		ArrayList<Region> fronts = state.getFullMap().getOwnedFrontRegions(state);
+		ArrayList<Region> fronts = map.getOwnedFrontRegions();
 		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
 		ArrayList<Region> needHelpRegions = (ArrayList<Region>) fronts.clone();
 
@@ -132,9 +132,9 @@ public class DefensiveCommander extends TemplateCommander {
 		}
 		System.err.println("There are " + fronts.size() + " fronts");
 
-		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
+		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
 
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 

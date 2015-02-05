@@ -22,7 +22,7 @@ public class Values {
 	public static final double staticPocketDefence = 30;
 	public static final double rewardMultiplier = 40;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 18;
+	public static final double valueDenialMultiplier = 15;
 	public static final double rewardDefenseImportanceMultiplier = 40;
 
 	// ////// COSTS

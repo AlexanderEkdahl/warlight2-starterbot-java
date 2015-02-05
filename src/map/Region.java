@@ -163,4 +163,17 @@ public class Region {
 		return enemyNeighbors;
     	
     }
+
+	public int getSuspectedOwnedRegion(String opponentPlayerName) {
+		if (getPlayerName().equals(opponentPlayerName)) {
+			return 1;
+		} else if (getPlayerName().equals("unknown")) {
+			return 0;
+		} else
+			return -10000;
+	}
+	
+    public Object clone(){
+    	return this.clone();
+    }
 }

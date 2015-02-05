@@ -124,5 +124,17 @@ public class SuperRegion {
 		}
 		return totalForce;
 	}
+	
+	public boolean getSuspectedOwnedSuperRegion(String opponentPlayerName) {
+		int total = 0;
+		for (Region r : getSubRegions()) {
+			total += r.getSuspectedOwnedRegion(opponentPlayerName);
+		}
+		if (total > 0) {
+			return true;
+		}
+		return false;
+
+	}
 
 }

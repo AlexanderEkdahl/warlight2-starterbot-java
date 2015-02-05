@@ -20,91 +20,75 @@ import concepts.Plan;
 public class GriefCommander extends TemplateCommander {
 
 	@Override
-	public ArrayList<PlacementProposal> getPlacementProposals(BotState state) {
-
-		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-
-		// don't start griefing too early
-		if (state.getRoundNumber() < 2) {
-			return proposals;
-		}
-
-		HashMap<Integer, Double> worth = new HashMap<Integer, Double>();
-		worth = calculatePlans(state);
+	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
 
 		ArrayList<PlacementProposal> attackPlans;
-		attackPlans = prepareAttacks(worth, state);
+		attackPlans = prepareAttacks(map);
 
 		return attackPlans;
 	}
 
-	private ArrayList<PlacementProposal> prepareAttacks(HashMap<Integer, Double> worth, BotState state) {
-		Set<Integer> keys = worth.keySet();
-		Map map = state.getFullMap();
+	private ArrayList<PlacementProposal> prepareAttacks(Map map) {
+		HashMap<SuperRegion, Double> worths = calculateWorth(map);
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
 
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
 
-		for (Integer s : keys) {
-			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(map.getSuperRegion(s), state.getMyPlayerName());
+		ArrayList<SuperRegion> interestingSuperRegions = map.getSuspectedOwnedSuperRegions(BotState.getMyOpponentName());
+		ArrayList<Region> interestingRegions = new ArrayList<Region>();
+		for (SuperRegion s : interestingSuperRegions) {
+			interestingRegions.addAll(s.getSubRegions());
+		}
 
-			if (path == null) {
-				// Super region is already controlled
-				continue;
-			}
-			int required = -path.getOrigin().getArmies() + 1;
-			for (int i = 1; i < path.getPath().size(); i++) {
-				required += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-			}
-			if (required < 1) {
-				continue;
-			}
-			double cost = path.getDistance();
+		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
+			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, interestingRegions, BotState.getMyName());
+			for (Path path : paths) {
+				double worth = worths.get(path.getTarget().getSuperRegion());
+				double cost = path.getDistance();
+				double weight = worth / cost;
+				int required = Values.calculateRequiredForcesAttack(path.getPath().get(1)) - r.getArmies() + 1;
 
-			double value = worth.get(s) / cost;
-			proposals.add(new PlacementProposal(value, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), required,
-					"GriefCommander"));
+				if (required < 1) {
+					continue;
+				}
 
+				proposals.add(new PlacementProposal(weight, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), required,
+						"GriefCommander"));
+			}
 		}
 
 		return proposals;
 	}
 
-	private HashMap<Integer, Double> calculatePlans(BotState state) {
-		ArrayList<SuperRegion> enemySuperRegions = state.getFullMap().getSuspectedOwnedSuperRegions(state.getOpponentPlayerName());
+	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
+		HashMap<SuperRegion, Double> worths = new HashMap<SuperRegion, Double>();
 
-		HashMap<Integer, Double> plans = new HashMap<Integer, Double>();
-
-		for (SuperRegion s : enemySuperRegions) {
-			// for every super region they have, calculate how to execute an
-			// eventual attack and how much it would be worth
-
-			double reward = s.getArmiesReward();
-
-			plans.put(s.getId(), reward * Values.valueDenialMultiplier);
+		for (SuperRegion s : map.getSuperRegions()) {
+			if (s.getSuspectedOwnedSuperRegion(BotState.getMyOpponentName())) {
+				double reward = s.getArmiesReward();
+				worths.put(s, reward * Values.valueDenialMultiplier);
+			} else {
+				worths.put(s, -1d);
+			}
 
 		}
-		return plans;
+		return worths;
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(BotState state) {
+	public ArrayList<ActionProposal> getActionProposals(Map map) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
-		// don't start griefing too early
-		if (state.getRoundNumber() < 3) {
-			return proposals;
-		}
 		proposals = new ArrayList<ActionProposal>();
-		HashMap<Integer, Double> ranking = calculatePlans(state);
+		HashMap<SuperRegion, Double> ranking = calculateWorth(map);
 
-		ArrayList<Region> available = state.getFullMap().getOwnedRegions(state.getMyPlayerName());
-		Pathfinder pathfinder = new Pathfinder(state.getFullMap(), new PathfinderWeighter() {
+		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				if (nodeB.getPlayerName().equals(BotState.getMyName())) {
 					return 5;
@@ -125,10 +109,6 @@ public class GriefCommander extends TemplateCommander {
 			}
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
-				if (ranking.get(path.getTarget().getSuperRegion().getId()) == null) {
-					// no interest in this path
-					continue;
-				}
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
 				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
 				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);

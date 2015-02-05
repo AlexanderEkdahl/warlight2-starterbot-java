@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import map.Pathfinder.Path;
-
 import bot.BotState;
 
 public class Map {
@@ -30,7 +29,7 @@ public class Map {
 
 	/**
 	 * add a Region to the map
-	 *
+	 * 
 	 * @param region
 	 *            : Region to be added
 	 */
@@ -40,7 +39,7 @@ public class Map {
 
 	/**
 	 * add a SuperRegion to the map
-	 *
+	 * 
 	 * @param superRegion
 	 *            : SuperRegion to be added
 	 */
@@ -131,53 +130,30 @@ public class Map {
 
 	}
 
-	private int getSuspectedOwnedRegion(Region region, String opponentPlayerName) {
-		if (region.getPlayerName().equals(opponentPlayerName)) {
-			return 1;
-		} else if (region.getPlayerName().equals("unknown")) {
-			return 0;
-		} else
-			return -10000;
-	}
-
-	private boolean getSuspectedOwnedSuperRegion(SuperRegion superRegion, String opponentPlayerName) {
-		int total = 0;
-		for (Region r : superRegion.getSubRegions()) {
-			total += getSuspectedOwnedRegion(r, opponentPlayerName);
-		}
-		if (total > 0) {
-			return true;
-		}
-		return false;
-
-	}
-
 	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
-		ArrayList<SuperRegion> owned = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
-			if (getSuspectedOwnedSuperRegion(sr, opponentPlayerName))
+			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName));
 				suspected.add(sr);
-
 		}
 
 		return suspected;
 	}
 
-	public ArrayList<Region> getOwnedFrontRegions(BotState state) {
-		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(state.getMyPlayerName());
+	public ArrayList<Region> getOwnedFrontRegions() {
+		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(BotState.getMyName());
 		ArrayList<Region> ownedRegionsInOwnedSuperRegions = new ArrayList<Region>();
 		ArrayList<Region> neighbors;
 		ArrayList<Region> front = new ArrayList<Region>();
 
-		for (SuperRegion s : ownedSuperRegions){
+		for (SuperRegion s : ownedSuperRegions) {
 			ownedRegionsInOwnedSuperRegions.addAll(s.getSubRegions());
 		}
 
 		for (Region r : ownedRegionsInOwnedSuperRegions) {
 			neighbors = r.getNeighbors();
 			for (Region n : neighbors) {
-				if (n.getPlayerName().equals(state.getOpponentPlayerName())) {
+				if (n.getPlayerName().equals(BotState.getMyOpponentName())) {
 					front.add(r);
 					continue;
 				}
@@ -188,12 +164,12 @@ public class Map {
 
 	}
 
-	public ArrayList<SuperRegion> getOwnedFrontSuperRegions(BotState state) {
+	public ArrayList<SuperRegion> getOwnedFrontSuperRegions() {
 		ArrayList<SuperRegion> sFront = new ArrayList<SuperRegion>();
-		ArrayList<SuperRegion> ownedSuperRegions = state.getFullMap().getOwnedSuperRegions(BotState.getMyName());
+		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(BotState.getMyName());
 
-		for (SuperRegion s : ownedSuperRegions){
-			if (s.getFronts().size() > 0){
+		for (SuperRegion s : ownedSuperRegions) {
+			if (s.getFronts().size() > 0) {
 				sFront.add(s);
 			}
 		}
@@ -201,14 +177,13 @@ public class Map {
 		return sFront;
 	}
 
-	public ArrayList<Region> getPockets(BotState state) {
-		ArrayList<Region> owned = getOwnedRegions(state.getMyPlayerName());
+	public ArrayList<Region> getPockets() {
+		ArrayList<Region> owned = getOwnedRegions(BotState.getMyName());
 		ArrayList<Region> pockets = new ArrayList<Region>();
 
-		outerLoop:
-		for (Region r : owned){
-			for (Region n :  r.getNeighbors()){
-				if (n.getPlayerName().equals(state.getMyPlayerName())){
+		outerLoop: for (Region r : owned) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getPlayerName().equals(BotState.getMyName())) {
 					continue outerLoop;
 				}
 			}
@@ -218,19 +193,12 @@ public class Map {
 		return pockets;
 	}
 
-	public ArrayList<Region> getRewardBlockers(BotState state) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	// remove me later
-	static <K, V extends Comparable<? super V>> java.util.SortedSet<java.util.Map.Entry<K, V>> entriesSortedByValues(
-			java.util.Map<K, V> map) {
+	static <K, V extends Comparable<? super V>> java.util.SortedSet<java.util.Map.Entry<K, V>> entriesSortedByValues(java.util.Map<K, V> map) {
 		java.util.SortedSet<java.util.Map.Entry<K, V>> sortedEntries = new java.util.TreeSet<java.util.Map.Entry<K, V>>(
 				new java.util.Comparator<java.util.Map.Entry<K, V>>() {
 					@Override
-					public int compare(java.util.Map.Entry<K, V> e1,
-							java.util.Map.Entry<K, V> e2) {
+					public int compare(java.util.Map.Entry<K, V> e1, java.util.Map.Entry<K, V> e2) {
 						int res = e2.getValue().compareTo(e1.getValue());
 						return res != 0 ? res : 1; // Special fix to preserve
 													// items with equal values
@@ -266,11 +234,25 @@ public class Map {
 
 	public ArrayList<Region> getUnOwnedRegions() {
 		ArrayList<Region> unOwned = new ArrayList<Region>();
-		for (SuperRegion s : superRegions){
+		for (SuperRegion s : superRegions) {
 			unOwned.addAll(getUnOwnedRegionsInSuperRegion(BotState.getMyName(), s));
-			
+
 		}
 		return unOwned;
 	}
-	
+
+	public ArrayList<Region> getEnemyRegions() {
+		ArrayList<Region> enemyRegions = new ArrayList<Region>();
+		for (Region r : regions.values()) {
+			if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
+				enemyRegions.add(r);
+			}
+		}
+		return enemyRegions;
+	}
+
+	public Object clone() {
+		return this.clone();
+	}
+
 }
