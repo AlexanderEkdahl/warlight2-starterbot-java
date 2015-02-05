@@ -40,11 +40,7 @@ public class BotMain implements Bot {
 		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(state.getFullMap());
 
 		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
-		int armiesLeft = state.getStartingArmies();
-		
-		Map speculativeMap = (Map) state.getFullMap().clone();
-		BotState speculativeState = (BotState) state.clone();
-		
+		int armiesLeft = state.getStartingArmies();		
 
 		// TODO decide how to merge proposals
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();

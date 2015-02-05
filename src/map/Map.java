@@ -251,8 +251,4 @@ public class Map {
 		return enemyRegions;
 	}
 
-	public Object clone() {
-		return this.clone();
-	}
-
 }

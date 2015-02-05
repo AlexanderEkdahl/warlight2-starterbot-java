@@ -21,7 +21,7 @@ public class EnemyAppreciator {
 	
 	
 	public void setMap(Map map){
-		speculativeMap = (Map) map.clone();
+//		speculativeMap = (Map) map.clone();
 	}
 	
 	public void updateMap(Map map){

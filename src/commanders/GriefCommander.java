@@ -112,7 +112,7 @@ public class GriefCommander extends TemplateCommander {
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
 				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
 				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
-				double currentWorth = ranking.get(path.getTarget().getSuperRegion().getId());
+				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
