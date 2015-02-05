@@ -55,7 +55,7 @@ public class BotMain implements Bot {
 			Region currentTargetRegion = currentProposal.getPlan().getR();
 
 			// potentially disqualify based on satisfaction
-			if (regionSatisfaction.get(currentTargetRegion) < 0) {
+			if (regionSatisfaction.get(currentTargetRegion) < 1) {
 				continue;
 			}
 

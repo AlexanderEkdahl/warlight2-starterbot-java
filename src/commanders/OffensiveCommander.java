@@ -43,7 +43,7 @@ public class OffensiveCommander extends TemplateCommander {
 				double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
 						+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion());
 				double weight = worth / cost;
-				int required = Values.calculateRequiredForcesAttack(path.getPath().get(1)) - r.getArmies() + 1;
+				int required = Values.calculateRequiredForcesAttack(path.getPath().get(1));
 
 				if (required < 1) {
 					continue;
