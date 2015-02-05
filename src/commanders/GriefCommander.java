@@ -115,9 +115,7 @@ public class GriefCommander extends TemplateCommander {
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
 				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
-				}
+				totalRequired = Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(1));
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
