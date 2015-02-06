@@ -111,6 +111,11 @@ public class BotMain implements Bot {
 		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(state.getFullMap());
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		HashMap<Region, Boolean> hasOnlyOnesAttacking = new HashMap<Region, Boolean>();
+		HashMap<Region, Boolean> isTargetOfPotentialAttack = new HashMap<Region, Boolean>();
+
+		for (Region r : state.getFullMap().getRegionList()) {
+			isTargetOfPotentialAttack.put(r, false);
+		}
 
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
 
@@ -160,7 +165,8 @@ public class BotMain implements Bot {
 					if (alreadySatisfied(currentFinalTargetRegion, currentTargetSuperRegion, regionSatisfied, superRegionSatisfied)) {
 						continue;
 					}
-					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions, hasOnlyOnesAttacking);
+					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions, hasOnlyOnesAttacking,
+							isTargetOfPotentialAttack);
 
 				}
 
@@ -187,7 +193,8 @@ public class BotMain implements Bot {
 					addAttacking(currentTargetRegion, attacking, disposed, hasOnlyOnesAttacking);
 					// since this is an attack we will
 					// search for potential attacks to help
-					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions, hasOnlyOnesAttacking);
+					usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions, hasOnlyOnesAttacking,
+							isTargetOfPotentialAttack);
 				}
 
 			}
@@ -198,6 +205,7 @@ public class BotMain implements Bot {
 		for (PotentialAttack p : potentialAttacks) {
 			int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies() - 1), p.getForces());
 			addAttacking(p.getTo(), attacking, disposed, hasOnlyOnesAttacking);
+			isTargetOfPotentialAttack.put(p.getTo(), true);
 			FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
 			addMove(currentMove, decisions, disposed);
 			availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
@@ -207,11 +215,21 @@ public class BotMain implements Bot {
 		Set<Region> aKeys = attacking.keySet();
 		ArrayList<Region> badAttacks = new ArrayList<Region>();
 		for (Region r : aKeys) {
-			if (!r.getPlayerName().equals(BotState.getMyName()) && Values.calculateRequiredForcesAttack(r) > attacking.get(r) || hasOnlyOnesAttacking.get(r)) {
-				badAttacks.add(r);
+			if (!r.getPlayerName().equals(BotState.getMyName())) {
+				if (isTargetOfPotentialAttack.get(r) == true && r.getPlayerName().equals(BotState.getMyOpponentName())) {
+					// need extra attacking forces here
+					if (Values.calculateRequiredForcesAttack(r) + Values.extraArmiesRequiredForPotentialAttack > attacking.get(r)) {
+						badAttacks.add(r);
+					}
+				} else if (hasOnlyOnesAttacking.get(r)) {
+					badAttacks.add(r);
+				} else if (!r.getPlayerName().equals(BotState.getMyName()) && Values.calculateRequiredForcesAttack(r) > attacking.get(r)) {
+					badAttacks.add(r);
+				}
 			}
 		}
 
+		// add special rules for attack with support of potentialAttacks
 		Set<FromTo> keys = decisions.keySet();
 
 		for (FromTo f : keys) {
@@ -242,13 +260,15 @@ public class BotMain implements Bot {
 	}
 
 	private void usePotentialAttacks(HashMap<Region, Integer> availablePotential, ArrayList<PotentialAttack> potentialAttacks, Region currentTargetRegion,
-			HashMap<Region, Integer> attacking, HashMap<FromTo, Integer> decisions, HashMap<Region, Boolean> hasOnlyOnesAttacking) {
+			HashMap<Region, Integer> attacking, HashMap<FromTo, Integer> decisions, HashMap<Region, Boolean> hasOnlyOnesAttacking,
+			HashMap<Region, Boolean> isTargetOfPotentialAttack) {
 		ArrayList<PotentialAttack> allPotentialAttacks = (ArrayList<PotentialAttack>) potentialAttacks.clone();
 		for (PotentialAttack p : allPotentialAttacks) {
 			if (p.getTo().equals(currentTargetRegion)) {
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), p.getFrom().getArmies() - 1), p.getForces());
 				addAttacking(p.getTo(), attacking, disposed, hasOnlyOnesAttacking);
 				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
+				isTargetOfPotentialAttack.put(p.getTo(), true);
 				addMove(currentMove, decisions, disposed);
 				System.err.println("Potential Attack from: " + p.getFrom());
 				potentialAttacks.remove(p);

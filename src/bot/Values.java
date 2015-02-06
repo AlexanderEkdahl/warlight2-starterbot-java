@@ -16,6 +16,7 @@ public class Values {
 	public static final int extraArmiesDefence = 5;
 	public static final int staticSuperRegionDefence = 0;
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 5;
+	public static final int extraArmiesRequiredForPotentialAttack = 5;
 
 	// ////// REWARDS
 	
@@ -35,6 +36,7 @@ public class Values {
 	public static final double staticRegionCost = 3;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
 	public static final double superRegionExponentialMultiplier = 1.1;
+//	public static final double enemyVicinityPenalty ;
 
 	// ////// SATISFACTION
 

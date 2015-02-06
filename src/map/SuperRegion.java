@@ -127,10 +127,11 @@ public class SuperRegion {
 	
 	public boolean getSuspectedOwnedSuperRegion(String opponentPlayerName) {
 		int total = 0;
+		int totalRequired = getSubRegions().size() / 2;
 		for (Region r : getSubRegions()) {
 			total += r.getSuspectedOwnedRegion(opponentPlayerName);
 		}
-		if (total > 0) {
+		if (total >= totalRequired) {
 			return true;
 		}
 		return false;
