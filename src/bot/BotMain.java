@@ -44,7 +44,7 @@ public class BotMain implements Bot {
 		int armiesLeft = state.getStartingArmies();
 
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
-		appreciator.setMap(state.getFullMap());
+		appreciator.setMap(state.getFullMap().duplicate());
 		appreciator.speculate();
 		Map speculativeMap = appreciator.getSpeculativePlacementMap();
 
