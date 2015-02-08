@@ -46,18 +46,21 @@ public class GriefCommander extends TemplateCommander {
 		}
 
 		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
-			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, interestingRegions, BotState.getMyName());
+			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, interestingRegions);
 			for (Path path : paths) {
 				double worth = worths.get(path.getTarget().getSuperRegion());
 				double cost = path.getDistance();
 				double weight = worth / cost;
-				int required = Values.calculateRequiredForcesAttack(path.getPath().get(1)) - r.getArmies() + 1;
+				int totalRequired = 0;
+				for (int i = 1; i < path.getPath().size(); i++) {
+					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+				}
 
-				if (required < 1) {
+				if (totalRequired < 1) {
 					continue;
 				}
 
-				proposals.add(new PlacementProposal(weight, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), required,
+				proposals.add(new PlacementProposal(weight, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), totalRequired,
 						"GriefCommander"));
 			}
 		}
@@ -110,15 +113,13 @@ public class GriefCommander extends TemplateCommander {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
-				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion);
+				double currentPathCost = path.getDistance();
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
-				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
+				currentWeight = currentWorth / currentPathCost;
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
-
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
 				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), targetSuperRegion),

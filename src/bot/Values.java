@@ -1,5 +1,7 @@
 package bot;
 
+import imaginary.EnemyAppreciator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,13 +15,11 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 
-	public static final int extraArmiesDefence = 5;
-	public static final int staticSuperRegionDefence = 0;
+	public static final int extraArmiesDefence = 3;
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 5;
-	public static final int extraArmiesRequiredForPotentialAttack = 5;
 
 	// ////// REWARDS
-	
+
 	public static final double staticPocketDefence = 30;
 	public static final double rewardMultiplier = 40;
 	public static final double staticRegionBonus = 0;
@@ -30,13 +30,13 @@ public class Values {
 
 	public static final double costMultiplierEnemy = 2;
 	public static final double costMultiplierNeutral = 4;
-	public static final double staticCostUnknown = 5;
-	public static final double staticCostUnknownEnemy = 8;
+	public static final double staticCostUnknown = 9;
+	public static final double staticCostUnknownEnemy = 6;
 	public static final double multipleFrontPenalty = 5;
 	public static final double staticRegionCost = 3;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
 	public static final double superRegionExponentialMultiplier = 1.1;
-//	public static final double enemyVicinityPenalty ;
+	public static final double enemyVicinityExponentialPenalty = 1.2;
 
 	// ////// SATISFACTION
 
@@ -48,7 +48,7 @@ public class Values {
 		double subRegions = s.getSubRegions().size();
 		double reward = s.getArmiesReward();
 
-		double weight = reward / ((initialNeutral * 2) + subRegions);
+		double weight = reward * 1.5 / ((initialNeutral * 2) + subRegions);
 		return weight;
 	}
 
@@ -81,59 +81,92 @@ public class Values {
 
 	public static double calculateRegionWeighedCost(Region r) {
 		// enemy region
+		double totalCost = 0;
+		totalCost += calculateRegionInitialCost(r);
+		totalCost += staticRegionCost;
+
+		return totalCost;
+	}
+
+	public static double calculateRegionInSuperRegionsWeighedCost(Region r) {
+		double totalCost = 0;
+		totalCost += calculateRegionInitialCost(r);
+		if (!r.getPlayerName().equals(BotState.getMyName())) {
+			totalCost += staticRegionCost;
+		}
+		return totalCost;
+
+	}
+
+	private static double calculateRegionInitialCost(Region r) {
+		// enemy region
 		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 			if (r.getVisible()) {
-				return r.getArmies() * costMultiplierEnemy + staticRegionCost;
+				return r.getArmies() * costMultiplierEnemy;
 			} else {
-				return staticCostUnknownEnemy + staticRegionCost;
+				return staticCostUnknownEnemy;
 			}
-
 			// neutral region
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10 + staticRegionCost;
+				return costMultiplierNeutral * 10;
 			} else if (r.getVisible() == false && !r.getWasteland()) {
-				return staticCostUnknown + staticRegionCost;
+				return staticCostUnknown;
 			} else {
-				return r.getArmies() * costMultiplierNeutral + staticRegionCost;
+				return r.getArmies() * costMultiplierNeutral;
 			}
 
 			// unknown region
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10 + staticRegionCost;
+				return costMultiplierNeutral * 10;
 			} else {
-				return staticCostUnknown + staticRegionCost;
+				return staticCostUnknown;
 			}
 
 			// my region
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
-			return staticRegionCost;
+			return 0;
 		} else {
 			// this shouldn't happen
 			return (Double) null;
 		}
+
 	}
 
-	public static double calculateRegionInSuperRegionWeighedCost(Region r) {
-
-		if (!r.getPlayerName().equals(BotState.getMyName())) {
-			return calculateRegionWeighedCost(r);
-		} else {
-			return 0;
-		}
-	}
-
-	public static double calculateSuperRegionWeighedCost(SuperRegion sr) {
+	public static double calculateSuperRegionWeighedCost(SuperRegion sr, Map map) {
 		double totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInSuperRegionWeighedCost(r);
+			totalCost += calculateRegionInitialCost(r);
 		}
 
-		// add some kind of exponential growth to discourage enormous regions
+		// add some kind of exponential growth to discourage attacking enormous
+		// regions
 		totalCost *= Math.pow(superRegionExponentialMultiplier, sr.getSubRegions().size());
+		totalCost *= calculateSuperRegionVulnerability(sr, map);
 
 		return totalCost;
+	}
+
+	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
+		// determine if this superregion borders an enemy region and if so how many
+
+		ArrayList<Region> enemyPositions = map.getEnemyRegions();
+		ArrayList<Region> enemyNeighbors = new ArrayList<Region>();
+		for (Region r : enemyPositions) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getSuperRegion().getId() == (sr.getId())) {
+					enemyNeighbors.add(r);
+					break;
+				}
+			}
+		}
+		if (enemyNeighbors.size() == 0){
+			// calculate instead the distance to the closest enemy
+		}
+
+		return Math.pow(enemyVicinityExponentialPenalty, enemyNeighbors.size());
+
 	}
 
 	public static int calculateRequiredForcesAttack(Region r) {
@@ -165,7 +198,7 @@ public class Values {
 
 		int armySize = r.getArmies();
 		if (r.getPlayerName().equals("unknown")) {
-			return 10;
+			return unknownRegionAppreciatedRequiredForcesAttack;
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
 		} else if (r.getPlayerName().equals("neutral")) {
@@ -175,11 +208,11 @@ public class Values {
 				return (int) (armySize * 2);
 			}
 		} else if (armySize <= 3) {
-			return armySize + 8;
+			return armySize + 3;
 		} else if (armySize <= 5) {
-			return armySize + 11;
+			return armySize + 6;
 		} else {
-			return (int) (armySize * 2.5);
+			return (int) (armySize * 2);
 		}
 
 	}

@@ -19,6 +19,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 	@Override
 	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
+
 		// pockets are solitary tiles without connection to friendly tiles
 
 		ArrayList<SuperRegion> vulnerableSuperRegions = map.getOwnedFrontSuperRegions();
@@ -91,7 +92,7 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	private double calculateWorth(SuperRegion s) {
-		double worth = Values.staticSuperRegionDefence + Values.rewardDefenseImportanceMultiplier * s.getArmiesReward();
+		double worth = Values.rewardDefenseImportanceMultiplier * s.getArmiesReward();
 		return worth;
 	}
 
@@ -120,6 +121,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(Map map) {
+
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
 		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
@@ -156,7 +158,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 			// else {
 			// ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r,
-			// needHelpRegions, mName);
+			// needHelpRegions);
 			// for (Path path : paths) {
 			// int totalRequired = needDefence.get(path.getTarget());
 			// if (totalRequired < 1) {
@@ -177,6 +179,8 @@ public class DefensiveCommander extends TemplateCommander {
 			// path.getPath().get(1), disposed, new Plan(path.getTarget(),
 			// path.getTarget()
 			// .getSuperRegion()), "DefensiveCommander"));
+			// needDefence.put(path.getTarget(),
+			// needDefence.get(path.getTarget()) - disposed);
 			//
 			// }
 			// }

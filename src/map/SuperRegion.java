@@ -137,5 +137,11 @@ public class SuperRegion {
 		return false;
 
 	}
+	public SuperRegion duplicate(){
+		SuperRegion newSuperRegion = new SuperRegion(this.id, this.armiesReward);
+		
+		return newSuperRegion;
+		
+	}
 
 }

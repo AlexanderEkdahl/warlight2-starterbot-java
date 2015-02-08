@@ -81,7 +81,7 @@ public class Pathfinder {
 		return paths;
 	}
 
-	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions, String playerName) {
+	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions) {
 		ArrayList<Path> paths = new ArrayList<Path>();
 
 		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {

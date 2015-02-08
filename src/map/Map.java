@@ -10,9 +10,12 @@
 
 package map;
 
+import imaginary.EnemyAppreciator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import map.Pathfinder.Path;
@@ -21,10 +24,15 @@ import bot.BotState;
 public class Map {
 	private HashMap<Integer, Region> regions;
 	private ArrayList<SuperRegion> superRegions;
+	private EnemyAppreciator appreciator;
 
 	public Map() {
 		this.regions = new HashMap<Integer, Region>();
 		this.superRegions = new ArrayList<SuperRegion>();
+	}
+
+	public void initAppreciator() {
+		appreciator = new EnemyAppreciator(duplicate());
 	}
 
 	/**
@@ -133,8 +141,9 @@ public class Map {
 	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
-			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName));
-				suspected.add(sr);
+			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName))
+				;
+			suspected.add(sr);
 		}
 
 		return suspected;
@@ -251,4 +260,162 @@ public class Map {
 		return enemyRegions;
 	}
 
+	public Map duplicate() {
+
+		HashMap<Integer, Region> newRegions = (HashMap<Integer, Region>) regions.clone();
+		ArrayList<SuperRegion> newSuperRegions = (ArrayList<SuperRegion>) superRegions.clone();
+		Map newMap = new Map();
+		newMap.setSuperRegions(newSuperRegions);
+		newMap.setRegions(newRegions);
+
+		return newMap;
+	}
+
+	private void setRegions(HashMap<Integer, Region> newRegions) {
+		this.regions = newRegions;
+
+	}
+
+	private void setSuperRegions(ArrayList<SuperRegion> newSuperRegions) {
+		this.superRegions = newSuperRegions;
+	}
+
+	public void updateMap(String[] mapInput) {
+		ArrayList<Region> visibleRegions = new ArrayList<Region>();
+		HashSet<Region> invisibleRegions = new HashSet<Region>(regions.values());
+
+		for (int i = 1; i < mapInput.length; i++) {
+			try {
+				Region region = getRegion(Integer.parseInt(mapInput[i]));
+				String playerName = mapInput[i + 1];
+				int armies = Integer.parseInt(mapInput[i + 2]);
+
+				region.setPlayerName(playerName);
+				region.setArmies(armies);
+				visibleRegions.add(region);
+				i += 2;
+			} catch (Exception e) {
+				System.err.println("Unable to parse Map Update " + e.getMessage());
+			}
+		}
+
+		for (Region region : visibleRegions) {
+			region.setVisible(true);
+			invisibleRegions.remove(region);
+		}
+
+		for (Region region : invisibleRegions) {
+			region.setVisible(false);
+			if (region.getPlayerName().equals(BotState.getMyName())) {
+				System.err.println("Region: " + region.getId() + " was lost out of sight. It must have been taken by the enemy.");
+				region.setPlayerName(BotState.getMyOpponentName());
+			}
+		}
+		appreciator.updateMap(duplicate());
+
+	}
+
+	public EnemyAppreciator getAppreciator() {
+		return appreciator;
+	}
+
+	public void setAppreciator(EnemyAppreciator appreciator) {
+		this.appreciator = appreciator;
+	}
+
+	public void setupMap(String[] mapInput) {
+		if (mapInput[1].equals("super_regions")) {
+			for (int i = 2; i < mapInput.length; i++) {
+				try {
+					int superRegionId = Integer.parseInt(mapInput[i]);
+					i++;
+					int reward = Integer.parseInt(mapInput[i]);
+					add(new SuperRegion(superRegionId, reward));
+				} catch (Exception e) {
+					System.err.println("Unable to parse SuperRegions");
+				}
+			}
+		} else if (mapInput[1].equals("regions")) {
+			for (int i = 2; i < mapInput.length; i++) {
+				try {
+					int regionId = Integer.parseInt(mapInput[i]);
+					i++;
+					int superRegionId = Integer.parseInt(mapInput[i]);
+					SuperRegion superRegion = getSuperRegion(superRegionId);
+					add(new Region(regionId, superRegion));
+				} catch (Exception e) {
+					System.err.println("Unable to parse Regions " + e.getMessage());
+				}
+			}
+		} else if (mapInput[1].equals("neighbors")) {
+			for (int i = 2; i < mapInput.length; i++) {
+				try {
+					Region region = getRegion(Integer.parseInt(mapInput[i]));
+					i++;
+					String[] neighborIds = mapInput[i].split(",");
+					for (int j = 0; j < neighborIds.length; j++) {
+						Region neighbor = getRegion(Integer.parseInt(neighborIds[j]));
+						region.addNeighbor(neighbor);
+					}
+				} catch (Exception e) {
+					System.err.println("Unable to parse Neighbors " + e.getMessage());
+				}
+			}
+			// map.computeBottlenecks();
+		} else if (mapInput[1].equals("wastelands")) {
+			for (int i = 2; i < mapInput.length; i++) {
+				try {
+					Region region = getRegion(Integer.parseInt(mapInput[i]));
+					region.setWasteland(true);
+				} catch (Exception e) {
+					System.err.println("Unable to parse wastelands " + e.getMessage());
+				}
+			}
+		} else if (mapInput[1].equals("opponent_starting_regions")) {
+			for (int i = 2; i < mapInput.length; i++) {
+				try {
+					Region region = getRegion(Integer.parseInt(mapInput[i]));
+					region.setPlayerName(BotState.getMyOpponentName());
+				} catch (Exception e) {
+					System.err.println("Unable to parse opponent_starting_regions " + e.getMessage());
+				}
+			}
+		} else {
+			System.err.println("Did not parse previous setup_map");
+		}
+
+		appreciator.setMap(duplicate());
+
+	}
+
+	public void readOpponentMoves(String[] moveInput) {
+		appreciator.readOpponentMoves(moveInput);
+	}
+
+	public ArrayList<Region> getAllRegionsThreateningOwnedSuperRegions() {
+		ArrayList<Region> threatening = new ArrayList<Region>();
+		for (Region r : getEnemyRegions()) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getSuperRegion().ownedByPlayer(BotState.getMyName()) && !threatening.contains(n)) {
+					threatening.add(r);
+				}
+			}
+		}
+
+		return threatening;
+
+	}
+
+	public ArrayList<Region> getAllRegionsThreateningOwnedRegions() {
+		ArrayList<Region> threatening = new ArrayList<Region>();
+		for (Region r : getOwnedRegions(BotState.getMyName())) {
+			for (Region n : r.getNeighbors()) {
+				if (n.getPlayerName().equals(BotState.getMyOpponentName()) && !threatening.contains(n)) {
+					threatening.add(n);
+				}
+
+			}
+		}
+		return threatening;
+	}
 }
