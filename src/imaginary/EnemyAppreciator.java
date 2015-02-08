@@ -35,6 +35,7 @@ public class EnemyAppreciator {
 
 	public void updateMap(Map map) {
 		this.speculativeMap = map;
+		speculate();
 		// for (Region r : map.getRegionList()) {
 		// Region region = this.speculativeMap.getRegion(r.getId());
 		// if (r.getVisible()) {
@@ -80,12 +81,12 @@ public class EnemyAppreciator {
 
 	}
 
-	public Map getSpeculativePlacementMap() {
+	public Map getSpeculativeMap() {
 		return speculativeMap;
 
 	}
 
-	public void speculate() {
+	private void speculate() {
 		int enemyPlacedArmies = estimatePlacedArmies();
 		ArrayList<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
 		ArrayList<Region> otherwiseThreatening = speculativeMap.getAllRegionsThreateningOwnedRegions();
@@ -96,9 +97,7 @@ public class EnemyAppreciator {
 				r.setArmies(r.getArmies() + armiesPerRegion);
 				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 			}
-
 		}
-
 		else if (otherwiseThreatening.size() > 0) {
 			int armiesPerRegion = enemyPlacedArmies / otherwiseThreatening.size();
 			for (Region r : otherwiseThreatening) {

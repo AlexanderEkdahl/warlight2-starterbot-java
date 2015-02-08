@@ -38,15 +38,10 @@ public class BotMain implements Bot {
 
 	// right now it just takes the highest priority tasks and executes them
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
-		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(state.getFullMap());
-
-		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
-		int armiesLeft = state.getStartingArmies();
 
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
 		appreciator.setMap(state.getFullMap().duplicate());
-		appreciator.speculate();
-		Map speculativeMap = appreciator.getSpeculativePlacementMap();
+		Map speculativeMap = appreciator.getSpeculativeMap();
 
 		// TODO decide how to merge proposals
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
@@ -55,6 +50,16 @@ public class BotMain implements Bot {
 		proposals.addAll(dc.getPlacementProposals(speculativeMap));
 		Collections.sort(proposals);
 
+		ArrayList<PlaceArmiesMove> orders = generatePlaceArmiesMoveOrders(speculativeMap, proposals, state.getStartingArmies());
+
+		return orders;
+	}
+
+	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map speculativeMap, ArrayList<PlacementProposal> proposals, int armiesLeft) {
+
+		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(speculativeMap);
+
+		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 		PlacementProposal currentProposal;
 		for (int i = 0; i < proposals.size() && armiesLeft > 0; i++) {
 			currentProposal = proposals.get(i);
@@ -65,7 +70,7 @@ public class BotMain implements Bot {
 				continue;
 			} else {
 				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), Math.min(currentProposal.getForces(), armiesLeft));
-				orders.add(new PlaceArmiesMove(state.getMyPlayerName(), currentProposal.getTarget(), disposed));
+				orders.add(new PlaceArmiesMove(BotState.getMyName(), currentProposal.getTarget(), disposed));
 				regionSatisfaction.put(currentTargetRegion, regionSatisfaction.get(currentTargetRegion) - disposed);
 
 				armiesLeft -= disposed;
@@ -77,7 +82,7 @@ public class BotMain implements Bot {
 		// there are no forces needed anywhere, we are probably just about to
 		// win so just place them anywhere
 		if (armiesLeft > 0) {
-			orders.add(new PlaceArmiesMove(state.getMyPlayerName(), state.getFullMap().getOwnedRegions(state.getMyPlayerName()).get(0), armiesLeft));
+			orders.add(new PlaceArmiesMove(BotState.getMyName(), speculativeMap.getOwnedRegions(BotState.getMyName()).get(0), armiesLeft));
 			armiesLeft = 0;
 		}
 
@@ -96,7 +101,7 @@ public class BotMain implements Bot {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
-		Map speculativeMap = appreciator.getSpeculativePlacementMap();
+		Map speculativeMap = appreciator.getSpeculativeMap();
 
 		proposals.addAll(oc.getActionProposals(speculativeMap));
 		proposals.addAll(gc.getActionProposals(speculativeMap));
@@ -104,25 +109,25 @@ public class BotMain implements Bot {
 
 		Collections.sort(proposals);
 
-		orders = generateAttackTransferMoveOrders(state, proposals);
+		orders = generateAttackTransferMoveOrders(speculativeMap, proposals);
 
 		return orders;
 	}
 
-	private ArrayList<AttackTransferMove> generateAttackTransferMoveOrders(BotState state, ArrayList<ActionProposal> proposals) {
+	private ArrayList<AttackTransferMove> generateAttackTransferMoveOrders(Map map, ArrayList<ActionProposal> proposals) {
 		HashMap<Region, Integer> attacking = new HashMap<Region, Integer>();
 		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
 
 		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
-		HashMap<SuperRegion, Integer> superRegionSatisfied = Values.calculateSuperRegionSatisfaction(state.getFullMap());
-		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(state.getFullMap());
+		HashMap<SuperRegion, Integer> superRegionSatisfied = Values.calculateSuperRegionSatisfaction(map);
+		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(map);
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		HashMap<Region, Boolean> hasOnlyOnesAttacking = new HashMap<Region, Boolean>();
 
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
 
 		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
-		for (Region r : state.getFullMap().getOwnedRegions(state.getMyPlayerName())) {
+		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
 			available.put(r, r.getArmies() - 1);
 		}
 		HashMap<Region, Integer> availablePotential = new HashMap<Region, Integer>();
@@ -229,9 +234,9 @@ public class BotMain implements Bot {
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
 				if (decisions.get(f) == 1) {
-					orders.add(0, new AttackTransferMove(state.getMyPlayerName(), f.getR1(), f.getR2(), decisions.get(f)));
+					orders.add(0, new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
 				} else {
-					orders.add(new AttackTransferMove(state.getMyPlayerName(), f.getR1(), f.getR2(), decisions.get(f)));
+					orders.add(new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
 				}
 			}
 
