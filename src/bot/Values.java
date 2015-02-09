@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 
+import commanders.OffensiveCommander;
+
 import map.Map;
 import map.Region;
 import map.SuperRegion;
@@ -52,19 +54,21 @@ public class Values {
 		return weight;
 	}
 
-	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions) {
+	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
 		Region maxRegion = pickableStartingRegions.get(0);
 		double maxValue = Double.MIN_VALUE;
-		for (Region currentRegion : pickableStartingRegions) {
-			SuperRegion superRegion = currentRegion.getSuperRegion();
-			double value = Values.startingRegion(superRegion);
-			if (value >= maxValue) {
-				maxValue = value;
-				maxRegion = currentRegion;
-			}
-		}
+		
+		Region startingRegion = OffensiveCommander.determineStartPosition(pickableStartingRegions, map);
+//		for (Region currentRegion : pickableStartingRegions) {
+//			SuperRegion superRegion = currentRegion.getSuperRegion();
+//			double value = Values.startingRegion(superRegion);
+//			if (value >= maxValue) {
+//				maxValue = value;
+//				maxRegion = currentRegion;
+//			}
+//		}
 
-		return maxRegion;
+		return startingRegion;
 
 	}
 

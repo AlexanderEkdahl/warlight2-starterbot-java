@@ -23,6 +23,37 @@ public class OffensiveCommander extends TemplateCommander {
 		return attackPlans;
 	}
 
+	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
+			public double weight(Region nodeA, Region nodeB) {
+				return Values.calculateRegionWeighedCost(nodeB);
+
+			}
+		});
+
+		HashMap<SuperRegion, Double> worths = calculateWorth(map);
+		ArrayList<Region> unOwned = map.getUnOwnedRegions();
+		ArrayList<Region> allElseUnOwned = (ArrayList<Region>) unOwned.clone();
+		double maxWeight = Double.MIN_VALUE;
+		Region maxRegion = null;
+
+		for (Region r : possiblePicks) {
+			allElseUnOwned.remove(r);
+			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, allElseUnOwned);
+			for (Path path : paths) {
+				double weight = calculatePathWeight(path, worths, map);
+				if (weight > maxWeight) {
+					maxWeight = weight;
+					maxRegion = r;
+				}
+			}
+			allElseUnOwned.add(r);
+		}
+
+		return maxRegion;
+
+	}
+
 	private ArrayList<PlacementProposal> prepareAttacks(Map map) {
 		HashMap<SuperRegion, Double> worths = calculateWorth(map);
 		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
@@ -38,10 +69,7 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
 			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, unOwned);
 			for (Path path : paths) {
-				double worth = worths.get(path.getTarget().getSuperRegion());
-				double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
-						+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
-				double weight = worth / cost;
+				double weight = calculatePathWeight(path, worths, map);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
@@ -59,7 +87,16 @@ public class OffensiveCommander extends TemplateCommander {
 		return proposals;
 	}
 
-	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
+	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> worths, Map map) {
+		double worth = worths.get(path.getTarget().getSuperRegion());
+		double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
+				+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
+		double weight = worth / cost;
+
+		return weight;
+	}
+
+	private static HashMap<SuperRegion, Double> calculateWorth(Map map) {
 		HashMap<SuperRegion, Double> worth = new HashMap<SuperRegion, Double>();
 		ArrayList<SuperRegion> possibleTargets = map.getSuperRegions();
 
@@ -99,11 +136,8 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
-				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
-				double currentPathCost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget());
-				double currentSuperRegionCost = Values.calculateSuperRegionWeighedCost(targetSuperRegion, map);
-				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
-				currentWeight = currentWorth / (currentSuperRegionCost + currentPathCost);
+				double weight = calculatePathWeight(path, ranking, map);
+
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
@@ -111,7 +145,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
-				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), targetSuperRegion),
+				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget().getSuperRegion()),
 						"OffensiveCommander"));
 
 			}

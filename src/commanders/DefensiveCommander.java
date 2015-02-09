@@ -49,7 +49,7 @@ public class DefensiveCommander extends TemplateCommander {
 			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
 
 			for (Region r : s.getFronts()) {
-				ownForces.put(r, r.getArmies());
+				ownForces.put(r, 1);
 			}
 			// keep on assigning dudes until we have at least extraArmiesDefence
 			// more in every region
@@ -156,34 +156,28 @@ public class DefensiveCommander extends TemplateCommander {
 				needDefence.put(r, needDefence.get(r) - disposed);
 			}
 
-			// else {
-			// ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r,
-			// needHelpRegions);
-			// for (Path path : paths) {
-			// int totalRequired = needDefence.get(path.getTarget());
-			// if (totalRequired < 1) {
-			// continue;
-			// }
-			// double currentCost = path.getDistance() +
-			// calculateCost(path.getTarget().getSuperRegion());
-			// double currentWorth = calculateWorth(r.getSuperRegion());
-			// double currentWeight = currentWorth / currentCost;
-			//
-			// for (int i = 1; i < path.getPath().size(); i++) {
-			// totalRequired +=
-			// Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
-			// }
-			// int disposed = Math.min(totalRequired, r.getArmies() - 1);
-			//
-			// proposals.add(new ActionProposal(currentWeight, r,
-			// path.getPath().get(1), disposed, new Plan(path.getTarget(),
-			// path.getTarget()
-			// .getSuperRegion()), "DefensiveCommander"));
-			// needDefence.put(path.getTarget(),
-			// needDefence.get(path.getTarget()) - disposed);
-			//
-			// }
-			// }
+			else {
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, needHelpRegions);
+				for (Path path : paths) {
+					int totalRequired = needDefence.get(path.getTarget());
+					if (totalRequired < 1) {
+						continue;
+					}
+					double currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
+					double currentWorth = calculateWorth(r.getSuperRegion());
+					double currentWeight = currentWorth / currentCost;
+
+					for (int i = 1; i < path.getPath().size(); i++) {
+						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+					}
+					int disposed = Math.min(totalRequired, r.getArmies() - 1);
+
+					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget()
+							.getSuperRegion()), "DefensiveCommander"));
+					needDefence.put(path.getTarget(), needDefence.get(path.getTarget()) - disposed);
+
+				}
+			}
 
 		}
 

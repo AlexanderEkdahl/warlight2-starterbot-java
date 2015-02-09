@@ -141,7 +141,7 @@ public class Map {
 	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
-			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName)){
+			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName)) {
 				suspected.add(sr);
 			}
 		}
@@ -417,5 +417,13 @@ public class Map {
 			}
 		}
 		return threatening;
+	}
+
+	public HashMap<Region, Integer> getRegionArmies() {
+		HashMap<Region, Integer> armies = new HashMap<Region, Integer>();
+		for (Region r : regions.values()) {
+			armies.put(r, r.getArmies() - 1);
+		}
+		return armies;
 	}
 }

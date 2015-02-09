@@ -32,7 +32,7 @@ public class BotMain implements Bot {
 	}
 
 	public Region getStartingRegion(BotState state, Long timeOut) {
-		Region startPosition = Values.getBestStartRegion(state.getPickableStartingRegions());
+		Region startPosition = Values.getBestStartRegion(state.getPickableStartingRegions(), state.getFullMap());
 		return startPosition;
 	}
 
@@ -55,9 +55,10 @@ public class BotMain implements Bot {
 		return orders;
 	}
 
-	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map speculativeMap, ArrayList<PlacementProposal> proposals, int armiesLeft) {
+	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map map, ArrayList<PlacementProposal> proposals, int armiesLeft) {
 
-		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(speculativeMap);
+		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(map);
+		HashMap<Region, Integer> remainingOfInitialForces = map.getRegionArmies();
 
 		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 		PlacementProposal currentProposal;
@@ -69,11 +70,20 @@ public class BotMain implements Bot {
 			if (regionSatisfaction.get(currentTargetRegion) < 1) {
 				continue;
 			} else {
-				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), Math.min(currentProposal.getForces(), armiesLeft));
-				orders.add(new PlaceArmiesMove(BotState.getMyName(), currentProposal.getTarget(), disposed));
+
+				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), currentProposal.getForces());
+				int alreadyAvailable = Math.max(remainingOfInitialForces.get(currentProposal.getTarget()), 0);
+				int wantPlaced = disposed - alreadyAvailable;
+				int actuallyPlaced = Math.min(wantPlaced, armiesLeft);
+				if (actuallyPlaced > 0) {
+					orders.add(new PlaceArmiesMove(BotState.getMyName(), currentProposal.getTarget(), actuallyPlaced));
+					remainingOfInitialForces.put(currentProposal.getTarget(), 0);
+				} else {
+					remainingOfInitialForces.put(currentProposal.getTarget(), alreadyAvailable - disposed);
+				}
 				regionSatisfaction.put(currentTargetRegion, regionSatisfaction.get(currentTargetRegion) - disposed);
 
-				armiesLeft -= disposed;
+				armiesLeft -= actuallyPlaced;
 				System.err.println(currentProposal.toString());
 			}
 
@@ -82,7 +92,7 @@ public class BotMain implements Bot {
 		// there are no forces needed anywhere, we are probably just about to
 		// win so just place them anywhere
 		if (armiesLeft > 0) {
-			orders.add(new PlaceArmiesMove(BotState.getMyName(), speculativeMap.getOwnedRegions(BotState.getMyName()).get(0), armiesLeft));
+			orders.add(new PlaceArmiesMove(BotState.getMyName(), map.getOwnedRegions(BotState.getMyName()).get(0), armiesLeft));
 			armiesLeft = 0;
 		}
 
@@ -90,7 +100,7 @@ public class BotMain implements Bot {
 			Region r = p.getRegion();
 			int newArmies = r.getArmies() + p.getArmies();
 			r.setArmies(newArmies);
-			speculativeMap.getRegion(r.getId()).setArmies(newArmies);
+			map.getRegion(r.getId()).setArmies(newArmies);
 		}
 		return orders;
 	}
