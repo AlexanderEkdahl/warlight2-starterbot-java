@@ -55,11 +55,12 @@ public class BotMain implements Bot {
 		return orders;
 	}
 
-	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map map, ArrayList<PlacementProposal> proposals, int armiesLeft) {
+	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map map, ArrayList<PlacementProposal> proposals, int givenArmies) {
 
 		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(map);
 		HashMap<Region, Integer> remainingOfInitialForces = map.getRegionArmies();
 
+		int armiesLeft = givenArmies;
 		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
 		PlacementProposal currentProposal;
 		for (int i = 0; i < proposals.size() && armiesLeft > 0; i++) {
@@ -72,7 +73,7 @@ public class BotMain implements Bot {
 			} else {
 
 				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), currentProposal.getForces());
-				int alreadyAvailable = Math.max(remainingOfInitialForces.get(currentProposal.getTarget()), 0);
+				int alreadyAvailable = remainingOfInitialForces.get(currentProposal.getTarget());
 				int wantPlaced = disposed - alreadyAvailable;
 				int actuallyPlaced = Math.min(wantPlaced, armiesLeft);
 				if (actuallyPlaced > 0) {
