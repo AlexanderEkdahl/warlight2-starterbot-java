@@ -35,18 +35,10 @@ public class EnemyAppreciator {
 
 	public void updateMap(Map map) {
 		this.speculativeMap = map;
+		for (Region r : map.getRegionList()) {
+			latestInformationRecievedTurn.put(r, BotState.getRoundNumber());
+		}
 		speculate();
-		// for (Region r : map.getRegionList()) {
-		// Region region = this.speculativeMap.getRegion(r.getId());
-		// if (r.getVisible()) {
-		// region.setPlayerName(r.getPlayerName());
-		// region.setArmies(r.getArmies());
-		// region.setVisible(true);
-		// latestInformationRecievedTurn.put(r, BotState.getRoundNumber());
-		// } else {
-		// region.setVisible(false);
-		// }
-		// }
 
 	}
 

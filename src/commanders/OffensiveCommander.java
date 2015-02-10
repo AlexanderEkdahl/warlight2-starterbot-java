@@ -24,6 +24,29 @@ public class OffensiveCommander extends TemplateCommander {
 	}
 
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
+
+		Map modifiedMap = map.duplicate();
+
+		Region maxRegion = null;
+		double maxWeight = Double.MIN_VALUE;
+		ArrayList<Region> unOwned = map.getUnOwnedRegions();
+
+		for (Region r : possiblePicks) {
+			String beforeStatus = modifiedMap.getRegion(r.getId()).getPlayerName();
+			modifiedMap.getRegion(r.getId()).setPlayerName(BotState.getMyName());
+			double weight = calculateStartRegionWorth(r, map);
+			if (weight > maxWeight) {
+				maxWeight = weight;
+				maxRegion = r;
+			}
+			modifiedMap.getRegion(r.getId()).setPlayerName(beforeStatus);
+		}
+
+		return maxRegion;
+
+	}
+
+	private static double calculateStartRegionWorth(Region region, Map map) {
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
@@ -31,26 +54,18 @@ public class OffensiveCommander extends TemplateCommander {
 			}
 		});
 
-		HashMap<SuperRegion, Double> worths = calculateWorth(map);
-		ArrayList<Region> unOwned = map.getUnOwnedRegions();
-		ArrayList<Region> allElseUnOwned = (ArrayList<Region>) unOwned.clone();
 		double maxWeight = Double.MIN_VALUE;
-		Region maxRegion = null;
+		HashMap<SuperRegion, Double> worths = calculateWorth(map);
+		ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(region, map.getUnOwnedRegions());
 
-		for (Region r : possiblePicks) {
-			allElseUnOwned.remove(r);
-			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, allElseUnOwned);
-			for (Path path : paths) {
-				double weight = calculatePathWeight(path, worths, map);
-				if (weight > maxWeight) {
-					maxWeight = weight;
-					maxRegion = r;
-				}
+		for (Path path : paths) {
+			double weight = calculatePathWeight(path, worths, map);
+			if (weight > maxWeight) {
+				maxWeight = weight;
 			}
-			allElseUnOwned.add(r);
 		}
 
-		return maxRegion;
+		return maxWeight;
 
 	}
 
