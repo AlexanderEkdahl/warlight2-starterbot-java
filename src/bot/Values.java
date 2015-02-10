@@ -141,7 +141,7 @@ public class Values {
 	public static double calculateSuperRegionWeighedCost(SuperRegion sr, Map map) {
 		double totalCost = 1;
 		for (Region r : sr.getSubRegions()) {
-			totalCost += calculateRegionInitialCost(r);
+			totalCost += calculateRegionInSuperRegionsWeighedCost(r);
 		}
 
 		// add some kind of exponential growth to discourage attacking enormous
