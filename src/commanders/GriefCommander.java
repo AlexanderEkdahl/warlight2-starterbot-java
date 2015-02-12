@@ -19,55 +19,6 @@ import concepts.Plan;
 
 public class GriefCommander extends TemplateCommander {
 
-	@Override
-	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
-
-		ArrayList<PlacementProposal> attackPlans;
-		attackPlans = prepareAttacks(map);
-
-		return attackPlans;
-	}
-
-	private ArrayList<PlacementProposal> prepareAttacks(Map map) {
-		HashMap<SuperRegion, Double> worths = calculateWorth(map);
-		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(nodeB);
-
-			}
-		});
-
-		ArrayList<SuperRegion> interestingSuperRegions = map.getSuspectedOwnedSuperRegions(BotState.getMyOpponentName());
-		ArrayList<Region> interestingRegions = new ArrayList<Region>();
-		for (SuperRegion s : interestingSuperRegions) {
-			interestingRegions.addAll(s.getSubRegions());
-		}
-
-		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
-			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, interestingRegions);
-			for (Path path : paths) {
-				double worth = worths.get(path.getTarget().getSuperRegion());
-				double cost = path.getDistance();
-				double weight = worth / cost;
-				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
-				}
-
-				if (totalRequired < 1) {
-					continue;
-				}
-
-				proposals.add(new PlacementProposal(weight, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), totalRequired,
-						"GriefCommander"));
-			}
-		}
-
-		return proposals;
-	}
-
 	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
 		HashMap<SuperRegion, Double> worths = new HashMap<SuperRegion, Double>();
 
@@ -93,11 +44,7 @@ public class GriefCommander extends TemplateCommander {
 		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
-				if (nodeB.getPlayerName().equals(BotState.getMyName())) {
-					return 5;
-				} else {
-					return Values.calculateRegionWeighedCost(nodeB);
-				}
+				return Values.calculateRegionWeighedCost(nodeB);
 
 			}
 		});
@@ -107,9 +54,6 @@ public class GriefCommander extends TemplateCommander {
 
 		// calculate plans for every sector
 		for (Region r : available) {
-			if (r.getArmies() < 2) {
-				continue;
-			}
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
 				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
@@ -120,9 +64,8 @@ public class GriefCommander extends TemplateCommander {
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
-				int disposed = Math.min(totalRequired, r.getArmies() - 1);
 
-				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), targetSuperRegion),
+				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), targetSuperRegion),
 						"GriefCommander"));
 
 			}

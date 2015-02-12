@@ -14,14 +14,6 @@ import map.Pathfinder.Path;
 
 public class OffensiveCommander extends TemplateCommander {
 
-	@Override
-	public ArrayList<PlacementProposal> getPlacementProposals(Map map) {
-
-		ArrayList<PlacementProposal> attackPlans;
-		attackPlans = prepareAttacks(map);
-
-		return attackPlans;
-	}
 
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
 
@@ -69,38 +61,7 @@ public class OffensiveCommander extends TemplateCommander {
 
 	}
 
-	private ArrayList<PlacementProposal> prepareAttacks(Map map) {
-		HashMap<SuperRegion, Double> worths = calculateWorth(map);
-		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(nodeB);
-
-			}
-		});
-		ArrayList<Region> unOwned = map.getUnOwnedRegions();
-
-		for (Region r : map.getOwnedRegions(BotState.getMyName())) {
-			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, unOwned);
-			for (Path path : paths) {
-				double weight = calculatePathWeight(path, worths, map);
-				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
-				}
-
-				if (totalRequired < 1) {
-					continue;
-				}
-
-				proposals.add(new PlacementProposal(weight, path.getOrigin(), new Plan(path.getTarget(), path.getTarget().getSuperRegion()), totalRequired,
-						"OffensiveCommander"));
-			}
-		}
-
-		return proposals;
-	}
+	
 
 	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> worths, Map map) {
 		double worth = worths.get(path.getTarget().getSuperRegion());
@@ -139,28 +100,19 @@ public class OffensiveCommander extends TemplateCommander {
 
 			}
 		});
-
-		double currentWeight;
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector
 
 		for (Region r : available) {
-			if (r.getArmies() < 2) {
-				continue;
-			}
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
 				double weight = calculatePathWeight(path, ranking, map);
-
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
 				}
-
-				int disposed = Math.min(totalRequired, r.getArmies() - 1);
-
-				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), disposed, new Plan(path.getTarget(), path.getTarget().getSuperRegion()),
+				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget().getSuperRegion()),
 						"OffensiveCommander"));
 
 			}

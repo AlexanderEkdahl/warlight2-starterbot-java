@@ -24,11 +24,14 @@ public class BotMain implements Bot {
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
+	private ArrayList<PlaceArmiesMove> placeOrders;
+	private ArrayList<AttackTransferMove> moveOrders;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
 		dc = new DefensiveCommander();
 		gc = new GriefCommander();
+
 	}
 
 	public Region getStartingRegion(BotState state, Long timeOut) {
@@ -43,98 +46,33 @@ public class BotMain implements Bot {
 		appreciator.setMap(state.getFullMap().duplicate());
 		Map speculativeMap = appreciator.getSpeculativeMap();
 
-		// TODO decide how to merge proposals
-		ArrayList<PlacementProposal> proposals = new ArrayList<PlacementProposal>();
-		proposals.addAll(oc.getPlacementProposals(speculativeMap));
-		proposals.addAll(gc.getPlacementProposals(speculativeMap));
-		proposals.addAll(dc.getPlacementProposals(speculativeMap));
-		Collections.sort(proposals);
-
-		ArrayList<PlaceArmiesMove> orders = generatePlaceArmiesMoveOrders(speculativeMap, proposals, state.getStartingArmies());
-
-		return orders;
-	}
-
-	private ArrayList<PlaceArmiesMove> generatePlaceArmiesMoveOrders(Map map, ArrayList<PlacementProposal> proposals, int givenArmies) {
-
-		HashMap<Region, Integer> regionSatisfaction = Values.calculateRegionSatisfaction(map);
-		HashMap<Region, Integer> remainingOfInitialForces = map.getRegionArmies();
-
-		int armiesLeft = givenArmies;
-		ArrayList<PlaceArmiesMove> orders = new ArrayList<PlaceArmiesMove>();
-		PlacementProposal currentProposal;
-		for (int i = 0; i < proposals.size() && armiesLeft > 0; i++) {
-			currentProposal = proposals.get(i);
-			Region currentTargetRegion = currentProposal.getPlan().getR();
-
-			// potentially disqualify based on satisfaction
-			if (regionSatisfaction.get(currentTargetRegion) < 1) {
-				continue;
-			} else {
-
-				int disposed = Math.min(regionSatisfaction.get(currentTargetRegion), currentProposal.getForces());
-				int alreadyAvailable = remainingOfInitialForces.get(currentProposal.getTarget());
-				int wantPlaced = disposed - alreadyAvailable;
-				int actuallyPlaced = Math.min(wantPlaced, armiesLeft);
-				if (actuallyPlaced > 0) {
-					orders.add(new PlaceArmiesMove(BotState.getMyName(), currentProposal.getTarget(), actuallyPlaced));
-					remainingOfInitialForces.put(currentProposal.getTarget(), 0);
-				} else {
-					remainingOfInitialForces.put(currentProposal.getTarget(), alreadyAvailable - disposed);
-				}
-				regionSatisfaction.put(currentTargetRegion, regionSatisfaction.get(currentTargetRegion) - disposed);
-
-				armiesLeft -= actuallyPlaced;
-				System.err.println(currentProposal.toString());
-			}
-
-		}
-
-		// there are no forces needed anywhere, we are probably just about to
-		// win so just place them anywhere
-		if (armiesLeft > 0) {
-			orders.add(new PlaceArmiesMove(BotState.getMyName(), map.getOwnedRegions(BotState.getMyName()).get(0), armiesLeft));
-			armiesLeft = 0;
-		}
-
-		for (PlaceArmiesMove p : orders) {
-			Region r = p.getRegion();
-			int newArmies = r.getArmies() + p.getArmies();
-			r.setArmies(newArmies);
-			map.getRegion(r.getId()).setArmies(newArmies);
-		}
-		return orders;
-	}
-
-	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) {
-		ArrayList<AttackTransferMove> orders;
-		;
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-
-		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
-		Map speculativeMap = appreciator.getSpeculativeMap();
-
 		proposals.addAll(oc.getActionProposals(speculativeMap));
 		proposals.addAll(gc.getActionProposals(speculativeMap));
 		proposals.addAll(dc.getActionProposals(speculativeMap));
-
 		Collections.sort(proposals);
 
-		orders = generateAttackTransferMoveOrders(speculativeMap, proposals);
+		// where the magic happens
+		generateOrders(speculativeMap, state.getStartingArmies());
 
-		return orders;
+		return placeOrders;
 	}
 
-	private ArrayList<AttackTransferMove> generateAttackTransferMoveOrders(Map map, ArrayList<ActionProposal> proposals) {
+	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) {
+		return moveOrders;
+
+	}
+
+	private void generateOrders(Map map, int armiesLeft) {
 		HashMap<Region, Integer> attacking = new HashMap<Region, Integer>();
-		ArrayList<AttackTransferMove> orders = new ArrayList<AttackTransferMove>();
+		placeOrders = new ArrayList<PlaceArmiesMove>();
+		moveOrders = new ArrayList<AttackTransferMove>();
 
 		ArrayList<ActionProposal> backUpProposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Integer> superRegionSatisfied = Values.calculateSuperRegionSatisfaction(map);
 		HashMap<Region, Integer> regionSatisfied = Values.calculateRegionSatisfaction(map);
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		HashMap<Region, Boolean> hasOnlyOnesAttacking = new HashMap<Region, Boolean>();
-
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
 
 		HashMap<Region, Integer> available = new HashMap<Region, Integer>();
@@ -142,6 +80,14 @@ public class BotMain implements Bot {
 			available.put(r, r.getArmies() - 1);
 		}
 		HashMap<Region, Integer> availablePotential = new HashMap<Region, Integer>();
+
+		// TODO decide how to merge proposals
+		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
+		proposals.addAll(oc.getActionProposals(map));
+		proposals.addAll(gc.getActionProposals(map));
+		proposals.addAll(dc.getActionProposals(map));
+
+		Collections.sort(proposals);
 
 		for (int i = 0; i < proposals.size(); i++) {
 			ActionProposal currentProposal = proposals.get(i);
@@ -159,12 +105,28 @@ public class BotMain implements Bot {
 			}
 
 			// decision has been made to go forward with the proposal
-			if (available.get(currentOriginRegion) > 0 && required > 0) {
-				int disposed = Math.min(required, available.get(currentOriginRegion));
+			if ((available.get(currentOriginRegion) > 0 || armiesLeft > 0) && required > 0) {
+				int disposed;
+				int wanted = Math.min(required, regionSatisfied.get(currentFinalTargetRegion));
+				if (available.get(currentOriginRegion) < wanted) {
+					int initiallyAvailable = available.get(currentOriginRegion);
+					int placed = Math.min(wanted - initiallyAvailable, armiesLeft);
+					disposed = initiallyAvailable + placed;
+					if (placed > 0) {
+						placeOrders.add(new PlaceArmiesMove(BotState.getMyName(), currentOriginRegion, placed));
+						System.err.println("Placed " + placed + " at " + currentOriginRegion);
+
+					}
+					available.put(currentOriginRegion, disposed);
+					armiesLeft -= placed;
+				} else {
+					disposed = wanted;
+				}
 
 				// attack is the best defence
 				if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND) && currentProposal.getOrigin().equals(currentProposal.getTarget())) {
 					addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
+					System.err.println(currentProposal.toString());
 					continue;
 				}
 
@@ -239,20 +201,24 @@ public class BotMain implements Bot {
 			}
 		}
 
-		// add special rules for attack with support of potentialAttacks
 		Set<FromTo> keys = decisions.keySet();
 
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
 				if (decisions.get(f) == 1) {
-					orders.add(0, new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
+					moveOrders.add(0, new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
 				} else {
-					orders.add(new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
+					moveOrders.add(new AttackTransferMove(BotState.getMyName(), f.getR1(), f.getR2(), decisions.get(f)));
 				}
 			}
 
 		}
-		return orders;
+
+		if (armiesLeft > 0) {
+			placeOrders.add(new PlaceArmiesMove(BotState.getMyName(), map.getOwnedRegions(BotState.getMyName()).get(0), armiesLeft));
+			armiesLeft = 0;
+		}
+
 	}
 
 	private void addPotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, Region currentOriginRegion, HashMap<Region, Integer> available,

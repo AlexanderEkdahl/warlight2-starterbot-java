@@ -97,6 +97,9 @@ public class EnemyAppreciator {
 				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 			}
 		} else {
+			if (speculativeMap.getEnemyRegions().size() == 0){
+				return;
+			}
 			int armiesPerRegion = enemyPlacedArmies / speculativeMap.getEnemyRegions().size();
 			for (Region r : speculativeMap.getEnemyRegions()) {
 				r.setArmies(r.getArmies() + armiesPerRegion);

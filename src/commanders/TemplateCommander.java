@@ -14,8 +14,6 @@ public abstract class TemplateCommander {
 		selfImportance = 0;
 	}
 
-	public abstract ArrayList<PlacementProposal> getPlacementProposals(Map map);
-
 	public abstract ArrayList<ActionProposal> getActionProposals(Map map);
 
 }

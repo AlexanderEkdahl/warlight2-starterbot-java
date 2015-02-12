@@ -26,7 +26,7 @@ public class Values {
 	public static final double rewardMultiplier = 40;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 40;
+	public static final double rewardDefenseImportanceMultiplier = 20;
 
 	// ////// COSTS
 
@@ -59,14 +59,6 @@ public class Values {
 		double maxValue = Double.MIN_VALUE;
 		
 		Region startingRegion = OffensiveCommander.determineStartPosition(pickableStartingRegions, map);
-//		for (Region currentRegion : pickableStartingRegions) {
-//			SuperRegion superRegion = currentRegion.getSuperRegion();
-//			double value = Values.startingRegion(superRegion);
-//			if (value >= maxValue) {
-//				maxValue = value;
-//				maxRegion = currentRegion;
-//			}
-//		}
 
 		return startingRegion;
 
@@ -233,13 +225,6 @@ public class Values {
 
 	}
 
-	public static int calculateRequiredForcesDefend(SuperRegion superRegion) {
-		int total = 0;
-		for (Region r : superRegion.getSubRegions()) {
-			total += calculateRequiredForcesDefend(r);
-		}
-		return total;
-	}
 
 	public static int calculateRequiredForcesDefendRegionAgainstSpecificRegions(ArrayList<Region> regions) {
 		int total = 0;
