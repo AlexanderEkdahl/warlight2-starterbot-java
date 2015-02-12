@@ -4,6 +4,8 @@
 
 - fuck bitches get money
 
+- write script that converts a dump to a replayable fixture
+
 
 ## Strategy
  - Make the bot defend owned SuperRegions if neccesary, possibly important Regions as well, Definitely done by DefensiveCommander.
