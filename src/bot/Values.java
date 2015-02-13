@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import commanders.OffensiveCommander;
-
 import map.Map;
 import map.Region;
 import map.SuperRegion;
@@ -24,9 +23,11 @@ public class Values {
 
 	public static final double staticPocketDefence = 30;
 	public static final double rewardMultiplier = 40;
+	public static final double regionConnectionBonus = 1;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 20;
+	public static final double valueDenialMultiplier = 18;
+	public static final double rewardDefenseImportanceMultiplier = 30;
+	public static final double rewardGriefDefenseMultiplier = 20;
 
 	// ////// COSTS
 
@@ -204,7 +205,7 @@ public class Values {
 				return (int) (armySize * 2);
 			}
 		} else if (armySize <= 3) {
-			return armySize + 3;
+			return armySize + 2;
 		} else if (armySize <= 5) {
 			return armySize + 6;
 		} else {
@@ -279,6 +280,17 @@ public class Values {
 		}
 
 		return roomLeft;
+	}
+
+	public static Double calculateRegionOffensiveWorth(Region r) {
+		int untakenRegions = 0;
+		for (Region n : r.getNeighbors()){
+			if (!n.getPlayerName().equals(BotState.getMyName())){
+				untakenRegions++;
+			}
+		}
+		return untakenRegions * regionConnectionBonus;
+
 	}
 
 }

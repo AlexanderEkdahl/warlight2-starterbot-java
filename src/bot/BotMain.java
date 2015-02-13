@@ -120,7 +120,7 @@ public class BotMain implements Bot {
 					available.put(currentOriginRegion, disposed);
 					armiesLeft -= placed;
 				} else {
-					disposed = wanted;
+					disposed = Math.min(wanted, available.get(currentOriginRegion));
 				}
 
 				// attack is the best defence

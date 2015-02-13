@@ -86,6 +86,7 @@ public class DefensiveCommander extends TemplateCommander {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
+//		ArrayList<Region> rewardBlockers = map.getRewardBlockers();
 		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
 
 		for (Region r : fronts) {
@@ -93,6 +94,7 @@ public class DefensiveCommander extends TemplateCommander {
 			needDefence.put(r, Values.calculateRequiredForcesDefend(r));
 
 		}
+		
 		System.err.println("There are " + fronts.size() + " fronts");
 
 		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
@@ -114,7 +116,6 @@ public class DefensiveCommander extends TemplateCommander {
 			if (fronts.contains(r)) {
 				int disposed = needDefence.get(r);
 				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion()), r, r, disposed, new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
-				needDefence.put(r, disposed);
 			}
 
 //			else {
@@ -129,7 +130,7 @@ public class DefensiveCommander extends TemplateCommander {
 //					double currentWeight = currentWorth / currentCost;
 //
 //					for (int i = 1; i < path.getPath().size(); i++) {
-//						totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+//						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 //					}
 //					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
 //							.getSuperRegion()), "DefensiveCommander"));

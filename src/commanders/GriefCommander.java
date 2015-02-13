@@ -62,7 +62,7 @@ public class GriefCommander extends TemplateCommander {
 				currentWeight = currentWorth / currentPathCost;
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 				}
 
 				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), targetSuperRegion),

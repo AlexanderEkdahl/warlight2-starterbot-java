@@ -14,14 +14,12 @@ import map.Pathfinder.Path;
 
 public class OffensiveCommander extends TemplateCommander {
 
-
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
 
 		Map modifiedMap = map.duplicate();
 
 		Region maxRegion = null;
 		double maxWeight = Double.MIN_VALUE;
-		ArrayList<Region> unOwned = map.getUnOwnedRegions();
 
 		for (Region r : possiblePicks) {
 			String beforeStatus = modifiedMap.getRegion(r.getId()).getPlayerName();
@@ -47,11 +45,12 @@ public class OffensiveCommander extends TemplateCommander {
 		});
 
 		double maxWeight = Double.MIN_VALUE;
-		HashMap<SuperRegion, Double> worths = calculateWorth(map);
+		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
+		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
 		ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(region, map.getUnOwnedRegions());
 
 		for (Path path : paths) {
-			double weight = calculatePathWeight(path, worths, map);
+			double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
 			if (weight > maxWeight) {
 				maxWeight = weight;
 			}
@@ -61,10 +60,18 @@ public class OffensiveCommander extends TemplateCommander {
 
 	}
 
-	
+	private static HashMap<Region, Double> calculateRegionWorth(Map map) {
+		HashMap<Region, Double> worths = new HashMap<Region, Double>();
 
-	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> worths, Map map) {
-		double worth = worths.get(path.getTarget().getSuperRegion());
+		for (Region r : map.getRegionList()) {
+			worths.put(r, Values.calculateRegionOffensiveWorth(r));
+		}
+
+		return worths;
+	}
+
+	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map) {
+		double worth = superRegionWorths.get(path.getTarget().getSuperRegion()) + regionWorths.get(path.getTarget());
 		double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
 				+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
 		double weight = worth / cost;
@@ -72,7 +79,7 @@ public class OffensiveCommander extends TemplateCommander {
 		return weight;
 	}
 
-	private static HashMap<SuperRegion, Double> calculateWorth(Map map) {
+	private static HashMap<SuperRegion, Double> calculateSuperRegionWorth(Map map) {
 		HashMap<SuperRegion, Double> worth = new HashMap<SuperRegion, Double>();
 		ArrayList<SuperRegion> possibleTargets = map.getSuperRegions();
 
@@ -89,7 +96,8 @@ public class OffensiveCommander extends TemplateCommander {
 	@Override
 	public ArrayList<ActionProposal> getActionProposals(Map map) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
-		HashMap<SuperRegion, Double> ranking = calculateWorth(map);
+		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
+		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
 
 		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
 
@@ -107,13 +115,13 @@ public class OffensiveCommander extends TemplateCommander {
 		for (Region r : available) {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
 			for (Path path : paths) {
-				double weight = calculatePathWeight(path, ranking, map);
+				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttackTotalVictory(path.getPath().get(i));
+					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 				}
-				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget().getSuperRegion()),
-						"OffensiveCommander"));
+				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), totalRequired,
+						new Plan(path.getTarget(), path.getTarget().getSuperRegion()), "OffensiveCommander"));
 
 			}
 

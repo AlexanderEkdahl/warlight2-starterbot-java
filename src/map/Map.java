@@ -419,11 +419,20 @@ public class Map {
 		return threatening;
 	}
 
-	public HashMap<Region, Integer> getRegionArmies() {
+	public HashMap<Region, Integer> getRegionUsableArmies() {
 		HashMap<Region, Integer> armies = new HashMap<Region, Integer>();
 		for (Region r : regions.values()) {
 			armies.put(r, r.getArmies() - 1);
 		}
 		return armies;
 	}
+
+//	public ArrayList<Region> getRewardBlockers() {
+//		ArrayList<Region> rewardBlockers = new ArrayList<Region>();
+//		for (Region r : getOwnedRegions(BotState.getMyName())){
+//			if (r.isOnlyFriendlyRegionInSuperRegion() && )
+//		}
+//		
+//		return rewardBlockers;
+//	}
 }
