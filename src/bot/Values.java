@@ -58,7 +58,7 @@ public class Values {
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
 		Region maxRegion = pickableStartingRegions.get(0);
 		double maxValue = Double.MIN_VALUE;
-		
+
 		Region startingRegion = OffensiveCommander.determineStartPosition(pickableStartingRegions, map);
 
 		return startingRegion;
@@ -146,7 +146,8 @@ public class Values {
 	}
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
-		// determine if this superregion borders an enemy region and if so how many
+		// determine if this superregion borders an enemy region and if so how
+		// many
 
 		ArrayList<Region> enemyPositions = map.getEnemyRegions();
 		ArrayList<Region> enemyNeighbors = new ArrayList<Region>();
@@ -158,7 +159,7 @@ public class Values {
 				}
 			}
 		}
-		if (enemyNeighbors.size() == 0){
+		if (enemyNeighbors.size() == 0) {
 			// calculate instead the distance to the closest enemy
 		}
 
@@ -178,8 +179,10 @@ public class Values {
 			return 0;
 		}
 
-		else if (armySize <= 3) {
+		else if (armySize <= 2) {
 			return armySize + 1;
+		} else if (armySize <= 3) {
+			return armySize + 2;
 		} else if (armySize <= 5) {
 			return armySize + 3;
 		} else {
@@ -205,7 +208,7 @@ public class Values {
 				return (int) (armySize * 2);
 			}
 		} else if (armySize <= 3) {
-			return armySize + 2;
+			return armySize + 3;
 		} else if (armySize <= 5) {
 			return armySize + 6;
 		} else {
@@ -225,7 +228,6 @@ public class Values {
 		return totalRequired;
 
 	}
-
 
 	public static int calculateRequiredForcesDefendRegionAgainstSpecificRegions(ArrayList<Region> regions) {
 		int total = 0;
@@ -284,8 +286,8 @@ public class Values {
 
 	public static Double calculateRegionOffensiveWorth(Region r) {
 		int untakenRegions = 0;
-		for (Region n : r.getNeighbors()){
-			if (!n.getPlayerName().equals(BotState.getMyName())){
+		for (Region n : r.getNeighbors()) {
+			if (!n.getPlayerName().equals(BotState.getMyName())) {
 				untakenRegions++;
 			}
 		}
