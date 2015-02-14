@@ -11,6 +11,7 @@
 package bot;
 
 import imaginary.EnemyAppreciator;
+import imaginary.IncomeAppreciator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,10 +33,14 @@ public class BotState {
 	private static int roundNumber;
 	private long totalTimebank;
 	private long timePerMove;
+	private ArrayList<ArrayList<Move>> opponentMoves;
+	private IncomeAppreciator incomeAppreciator;
 
 	public BotState() {
 		roundNumber = 0;
 		map.initAppreciator();
+		opponentMoves = new ArrayList<ArrayList<Move>>();
+		incomeAppreciator = new IncomeAppreciator(this);
 	}
 
 	public void updateSettings(String key, String value) {
@@ -86,8 +91,40 @@ public class BotState {
 	}
 
 	public void readOpponentMoves(String[] moveInput) {
-		map.readOpponentMoves(moveInput);
 
+		map.readOpponentMoves(moveInput); // this is bad... map should not contain state
+		opponentMoves.add(new ArrayList<Move>());
+		for(int i=1; i<moveInput.length; i++)
+		{
+			try {
+				Move move;
+				if(moveInput[i+1].equals("place_armies")) {
+					Region region = map.getRegion(Integer.parseInt(moveInput[i+2]));
+					String playerName = moveInput[i];
+					int armies = Integer.parseInt(moveInput[i+3]);
+					move = new PlaceArmiesMove(playerName, region, armies);
+					i += 3;
+				}
+				else if(moveInput[i+1].equals("attack/transfer")) {
+					Region fromRegion = map.getRegion(Integer.parseInt(moveInput[i+2]));
+					Region toRegion = map.getRegion(Integer.parseInt(moveInput[i+3]));
+
+					String playerName = moveInput[i];
+					int armies = Integer.parseInt(moveInput[i+4]);
+					move = new AttackTransferMove(playerName, fromRegion, toRegion, armies);
+					i += 4;
+				}
+				else { //never happens
+					continue;
+				}
+				opponentMoves.get(roundNumber - 1).add(move);
+			}
+			catch(Exception e) {
+				System.err.println("Unable to parse Opponent moves " + e.getMessage());
+			}
+		}
+		incomeAppreciator.update();
+		System.err.println("Enemy income: " + incomeAppreciator.income());
 	}
 
 	public String getMyPlayerName() {
@@ -122,4 +159,7 @@ public class BotState {
 		return opponentName;
 	}
 
+	public ArrayList<Move> getOpponentMoves(int round){
+		return opponentMoves.get(round - 1);
+	}
 }

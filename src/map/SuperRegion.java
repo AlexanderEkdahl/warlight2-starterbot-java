@@ -124,7 +124,7 @@ public class SuperRegion {
 		}
 		return totalForce;
 	}
-	
+
 	public boolean getSuspectedOwnedSuperRegion(String opponentPlayerName) {
 		int total = 0;
 		int totalRequired = getSubRegions().size() / 2;
@@ -139,9 +139,13 @@ public class SuperRegion {
 	}
 	public SuperRegion duplicate(){
 		SuperRegion newSuperRegion = new SuperRegion(this.id, this.armiesReward);
-		
+
 		return newSuperRegion;
-		
+
+	}
+
+	public String toString() {
+		return "SuperRegion: " + id + " Reward: " + armiesReward;
 	}
 
 }
