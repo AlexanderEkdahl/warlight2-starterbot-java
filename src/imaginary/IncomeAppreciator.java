@@ -158,7 +158,17 @@ public class IncomeAppreciator {
     // Potential: [5, 10, 11, 16]
     // Observed: 11
     // Result: 11-16 + He owns the region yielding 6
-    return 5;
+
+    // Temporary solution
+    int minimum = knownIncome();
+
+    if (observedIncome() > minimum) {
+      minimum = observedIncome();
+    }
+
+    int maximum = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() - 1);
+
+    return (maximum + minimum) / 2;
 
     // if we have observed lets say 9, and the enemy lost nothing, the enemy still has 9 minimum
     // improvements: diff the copy of the previous round map and current. If the player must have lost
