@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import commanders.OffensiveCommander;
+import concepts.Outcome;
 import map.Map;
 import map.Region;
 import map.SuperRegion;
@@ -74,6 +75,36 @@ public class Values {
 			return ((reward * Values.rewardMultiplier) + Values.staticRegionBonus);
 
 		}
+	}
+
+
+	public static void testOutcome(){
+		Outcome outcome1 = calculateAttackOutcome(3, 1);
+		System.out.println("3 against 1: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
+		outcome1 = calculateAttackOutcome(10, 5);
+		System.out.println("10 against 5: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
+		outcome1 = calculateAttackOutcome(5, 10);
+		System.out.println("5 against 10: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
+		outcome1 = calculateAttackOutcome(3, 2);
+		System.out.println("3 against 2: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
+		outcome1 = calculateAttackOutcome(1, 1);
+		System.out.println("1 against 1: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
+	}
+	public static Outcome calculateAttackOutcome(int attacking, int defending) {
+		if (defending < 1){
+			return null;
+		}
+		
+		if (attacking == 1) {
+			return new Outcome(0, Math.max(1, defending - 1));
+		}
+
+		int defendingCopy = defending;
+		defending = (int) Math.round(Math.max(defending - ((0.6 * attacking)), 0));
+		attacking = (int) Math.round(Math.max(attacking - ((0.7 * defendingCopy)), 0)) ;
+
+		return new Outcome(attacking, defending);
+
 	}
 
 	public static double calculateRegionWeighedCost(Region r) {

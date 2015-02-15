@@ -178,7 +178,7 @@ public class Map {
 		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(BotState.getMyName());
 
 		for (SuperRegion s : ownedSuperRegions) {
-			if (s.getFronts().size() > 0) {
+			if (s.getArmiesReward() > 0 && s.getFronts().size() > 0) {
 				sFront.add(s);
 			}
 		}

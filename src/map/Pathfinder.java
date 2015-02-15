@@ -81,13 +81,13 @@ public class Pathfinder {
 		return paths;
 	}
 
-	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> regions) {
+	public ArrayList<Path> getPathToRegionsFromRegion(Region origin, ArrayList<Region> targetRegions) {
 		ArrayList<Path> paths = new ArrayList<Path>();
 
 		for (Iterator<Path> iterator = distanceIterator(origin); iterator.hasNext();) {
 			Path path = iterator.next();
 
-			if (regions.contains(path.getTarget())) {
+			if (targetRegions.contains(path.getTarget())) {
 				paths.add(path);
 			}
 

@@ -3,8 +3,8 @@ package concepts;
 import map.Region;
 
 public class FromTo {
-	private Region r1;
-	private Region r2;
+	private Integer r1;
+	private Integer r2;
 
 	@Override
 	public boolean equals(Object o) {
@@ -18,28 +18,28 @@ public class FromTo {
 
 	@Override
 	public int hashCode() {
-		int result = r1.getId();
-		result = 31 * result + r2.getId();
+		int result = r1;
+		result = 31 * result + r2;
 		return result;
 	}
 
-	public Region getR1() {
+	public Integer getR1() {
 		return r1;
 	}
 
-	public void setR1(Region r1) {
+	public void setR1(Integer r1) {
 		this.r1 = r1;
 	}
 
-	public Region getR2() {
+	public Integer getR2() {
 		return r2;
 	}
 
-	public void setR2(Region r2) {
+	public void setR2(Integer r2) {
 		this.r2 = r2;
 	}
 
-	public FromTo(Region r1, Region r2) {
+	public FromTo(Integer r1, Integer r2) {
 		super();
 		this.r1 = r1;
 		this.r2 = r2;

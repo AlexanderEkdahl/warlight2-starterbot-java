@@ -94,13 +94,10 @@ public class OffensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Region> available) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
 		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
-
-		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
-
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 

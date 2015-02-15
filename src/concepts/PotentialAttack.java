@@ -8,13 +8,13 @@ public class PotentialAttack {
 	
 	public PotentialAttack(Region from, Region to, int forces) {
 		
-		this.fromTo = new FromTo(from, to);
+		this.fromTo = new FromTo(from.getId(), to.getId());
 		this.forces = forces;
 	}
-	public Region getFrom() {
+	public Integer getFrom() {
 		return fromTo.getR1();
 	}
-	public Region getTo(){
+	public Integer getTo(){
 		return fromTo.getR2();
 	}
 

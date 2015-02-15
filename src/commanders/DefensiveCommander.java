@@ -2,6 +2,7 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import map.Map;
 import map.Pathfinder;
@@ -82,7 +83,7 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Region> available) {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
@@ -95,10 +96,6 @@ public class DefensiveCommander extends TemplateCommander {
 
 		}
 		
-		System.err.println("There are " + fronts.size() + " fronts");
-
-		ArrayList<Region> available = map.getOwnedRegions(BotState.getMyName());
-
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
 				return Values.calculateRegionWeighedCost(nodeB);
