@@ -145,7 +145,7 @@ public class IncomeAppreciator {
     // player must own all potential regions.
     if (lastPotentialIncome.size() > 1
       && lastObservedIncome > lastPotentialIncome.get(lastPotentialIncome.size() - 2)) {
-        System.err.println("AWESOME! - There is inconclusive evidence that the enemy owns hidden regions")
+        System.err.println("AWESOME! - There is inconclusive evidence that the enemy owns hidden regions");
     }
     observedIncome.add(lastObservedIncome);
 
