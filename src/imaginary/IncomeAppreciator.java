@@ -9,9 +9,7 @@ import move.*;
 public class IncomeAppreciator {
   private BotState state;
   private ArrayList<Integer> lastPotentialIncome;
-  private ArrayList<ArrayList<Integer>> potentialIncomes;
-  private ArrayList<Integer> observedIncome;
-  private ArrayList<Integer> knownMinimumIncome;
+  private ArrayList<SuperRegion> lastPotentiallyOwnedSuperRegions;
 
   private static ArrayList<ArrayList<SuperRegion>> powerset(ArrayList<SuperRegion> set) {
     if (set == null) return null;
@@ -42,9 +40,6 @@ public class IncomeAppreciator {
 
   public IncomeAppreciator(BotState state) {
     this.state = state;
-    potentialIncomes = new ArrayList<ArrayList<Integer>>();
-    observedIncome = new ArrayList<Integer>();
-    knownMinimumIncome = new ArrayList<Integer>();
   }
 
   private int observedIncome() {
@@ -110,42 +105,63 @@ public class IncomeAppreciator {
     return currentPotentialIncome;
   }
 
-  // if we have observed lets say 9, and the enemy lost nothing, the enemy still has 9 minimum
-  // improvements: diff the copy of the previous round map and current. If the player must have lost
-  // super regions that can be deducted from their income
+  // If observed income is higher than the penultimate potential income the
+  // player must own all potential regions.
+  public void evidenceOfOwnership(int currentObservedIncome) {
+    // The algorithm can be improved...
+    if (lastPotentialIncome.size() > 1
+      && currentObservedIncome > lastPotentialIncome.get(lastPotentialIncome.size() - 2)) {
+        System.err.println("\tThere is inconclusive evidence that the enemy owns hidden regions");
+        System.err.println("\tHe placed " + currentObservedIncome + " armies last round");
+        System.err.println("\tEnemy must own the following: ");
+
+        for (SuperRegion superRegion : lastPotentiallyOwnedSuperRegions) {
+          System.err.println("\t\t" + superRegion);
+          for (Region region : superRegion.getSubRegions()) {
+            // In case of extremely broken logic - remove the following line and
+            // this class wont do anything
+            region.setPlayerName(state.getMyOpponentName());
+          }
+        }
+        System.err.println();
+    }
+  }
 
   // When this method executes the current map state matches that of the moves made
   // by the opponent that round.
   public void updateMap() {
     int currentKnownMinimumIncome = knownIncome();
     lastPotentialIncome = potentialIncome(currentKnownMinimumIncome);
+    lastPotentiallyOwnedSuperRegions = potentiallyOwnedSuperRegions();
   }
 
   // When this method executes the current map state matches the upcoming round
   public void updateMoves() {
     int currentObservedIncome = observedIncome();
 
-    // If observed income is higher than the penultimate potential income the
-    // player must own all potential regions.
-    if (lastPotentialIncome.size() > 1
-      && currentObservedIncome > lastPotentialIncome.get(lastPotentialIncome.size() - 2)) {
-        System.err.println("AWESOME! - There is inconclusive evidence that the enemy owns hidden regions");
-    }
-    observedIncome.add(currentObservedIncome);
+    System.err.println("IncomeAppreciator: ");
+    evidenceOfOwnership(currentObservedIncome);
 
     int currentKnownMinimumIncome = knownIncome();
-    knownMinimumIncome.add(currentKnownMinimumIncome);
-    potentialIncomes.add(potentialIncome(currentKnownMinimumIncome));
-    System.err.println("IncomeAppreciator: ");
     System.err.println("\tcurrentKnownMinimumIncome: " + currentKnownMinimumIncome);
     System.err.println("\tpotentialIncomes: " + potentialIncome(currentKnownMinimumIncome));
     System.err.println("\tobservedIncome: " + currentObservedIncome);
   }
 
   public int income() {
-    // Known 8
-    // Potential 8, 10
+    // Known: 8
+    // Potential: [8, 10]
     // Observed 9
+    // Result: 10
+
+    // Known: 5
+    // Potential: [5, 10, 11, 16]
+    // Observed: 11
+    // Result: 11-16 + He owns the region yielding 6
     return 5;
+
+    // if we have observed lets say 9, and the enemy lost nothing, the enemy still has 9 minimum
+    // improvements: diff the copy of the previous round map and current. If the player must have lost
+    // super regions that can be deducted from their income
   }
 }

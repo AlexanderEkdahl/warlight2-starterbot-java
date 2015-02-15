@@ -40,3 +40,7 @@ for (Region region : path.getPath()) {
 # Lines of Code
 
     find . -name '*.java' | xargs wc -l
+
+# Clean a dump from the website
+
+    ruby clean_dump.rb < dump > fixtures/full
