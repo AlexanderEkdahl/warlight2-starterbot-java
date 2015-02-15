@@ -44,7 +44,7 @@
     <java jar="${build.dir}/${ant.project.name}.jar" fork="true"/>
   </target>
 
-  <target name="zip" depends="compile">
+  <target name="zip" depends="clean,compile">
     <zip destfile="${basedir}/output.zip">
       <zipfileset dir="src"/>
     </zip>
