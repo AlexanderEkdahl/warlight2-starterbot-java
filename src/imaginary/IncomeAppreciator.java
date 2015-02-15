@@ -8,6 +8,7 @@ import move.*;
 
 public class IncomeAppreciator {
   private BotState state;
+  private ArrayList<Integer> lastPotentialIncome;
   private ArrayList<ArrayList<Integer>> potentialIncomes;
   private ArrayList<Integer> observedIncome;
   private ArrayList<Integer> knownMinimumIncome;
@@ -46,7 +47,7 @@ public class IncomeAppreciator {
     knownMinimumIncome = new ArrayList<Integer>();
   }
 
-  private void observedIncome() {
+  private int observedIncome() {
     int currentObservedIncome = 0;
 
     for (Move move : state.getOpponentMoves(state.getRoundNumber())) {
@@ -55,11 +56,12 @@ public class IncomeAppreciator {
       }
     }
 
-    observedIncome.add(currentObservedIncome);
-    System.err.println("IncomeAppreciator: last observedIncome: " + currentObservedIncome);
+    System.err.println("IncomeAppreciator: observedIncome: " + currentObservedIncome);
+
+    return currentObservedIncome;
   }
 
-  private void knownIncome() {
+  private int knownIncome() {
     ArrayList<SuperRegion> knownOwnedSuperRegions = new ArrayList<SuperRegion>();
 
     for (SuperRegion superRegion : state.getFullMap().getSuperRegions()) {
@@ -68,16 +70,17 @@ public class IncomeAppreciator {
       }
     }
 
-    int currentknownMinimumIncome = 5;
+    int currentKnownMinimumIncome = 5;
     for (SuperRegion superRegion : knownOwnedSuperRegions) {
-      currentknownMinimumIncome += superRegion.getArmiesReward();
+      currentKnownMinimumIncome += superRegion.getArmiesReward();
     }
 
-    knownMinimumIncome.add(currentknownMinimumIncome);
-    System.err.println("IncomeAppreciator: last knownOwnedSuperRegions: " + knownOwnedSuperRegions);
+    System.err.println("IncomeAppreciator: knownOwnedSuperRegions: " + knownOwnedSuperRegions + " with a minimum income of: " + currentKnownMinimumIncome);
+
+    return currentKnownMinimumIncome;
   }
 
-  private void potentialIncome() {
+  private ArrayList<SuperRegion> potentiallyOwnedSuperRegions() {
     ArrayList<SuperRegion> potentiallyOwnedSuperRegions = new ArrayList<SuperRegion>();
 
     superRegions:
@@ -92,24 +95,63 @@ public class IncomeAppreciator {
       }
     }
 
+    return potentiallyOwnedSuperRegions;
+  }
+
+  private ArrayList<Integer> potentialIncome(int minimumIncome) {
     ArrayList<Integer> currentPotentialIncome = new ArrayList<Integer>();
-    for (ArrayList<SuperRegion> subset : powerset(potentiallyOwnedSuperRegions)) {
-      int subsetPotentialIncome = knownMinimumIncome.get(knownMinimumIncome.size() - 1);
+
+    for (ArrayList<SuperRegion> subset : powerset(potentiallyOwnedSuperRegions())) {
+      int subsetPotentialIncome = minimumIncome;
       for (SuperRegion superRegion : subset) {
         subsetPotentialIncome += superRegion.getArmiesReward();
       }
       currentPotentialIncome.add(subsetPotentialIncome);
     }
-    potentialIncomes.add(currentPotentialIncome);
-    System.err.println("IncomeAppreciator: last potentialIncomes: " + currentPotentialIncome);
+
+    Collections.sort(currentPotentialIncome);
+    System.err.println("IncomeAppreciator: potentialIncomes: " + currentPotentialIncome);
+
+    return currentPotentialIncome;
   }
 
   // this is not good enough... there should be an update before update_map in order
   // to calculate diff
-  public void update() {
-    knownIncome();
-    potentialIncome();
-    observedIncome();
+  // The information given from update_map represents the income that will be given for the next round
+
+  // in order to make educated guesses about enemy income and their observed income
+  // the map has to be stored. The update_map gives information about the round to come but does not
+  // represent the potential/actual income the player had when he placed his units
+
+  // solution. save a copy of the previous map
+  // calculcate potential and whatnot, see if there is any conclusive evidence of any super regions
+
+  // if we have observed lets say 9, and the enemy lost nothing, the enemy still has 9 minimum
+
+  // improvements: diff the copy of the previous round map and current. If the player must have lost
+  // super regions that can be deducted from their income
+
+  // When this method executes the current map state matches that of the moves made
+  // by the opponent that round.
+  public void updateMap() {
+    int currentKnownMinimumIncome = knownIncome();
+    lastPotentialIncome = potentialIncome(currentKnownMinimumIncome);
+  }
+
+  // When this method executes the current map state matches the upcoming round
+  public void updateMoves() {
+    int lastObservedIncome = observedIncome();
+    // If observed income is higher than the penultimate potential income the
+    // player must own all potential regions.
+    if (lastPotentialIncome.size() > 1
+      && lastObservedIncome > lastPotentialIncome.get(lastPotentialIncome.size() - 2)) {
+        System.err.println("AWESOME! - There is inconclusive evidence that the enemy owns hidden regions")
+    }
+    observedIncome.add(lastObservedIncome);
+
+    int currentKnownMinimumIncome = knownIncome();
+    knownMinimumIncome.add(currentKnownMinimumIncome);
+    potentialIncomes.add(potentialIncome(currentKnownMinimumIncome));
   }
 
   public int income() {

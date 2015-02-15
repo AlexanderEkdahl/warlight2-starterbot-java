@@ -66,7 +66,7 @@ public class BotState {
 	// player and armies info
 	public void setupMap(String[] mapInput) {
 		map.setupMap(mapInput);
-	
+
 
 	}
 
@@ -85,9 +85,8 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
+		incomeAppreciator.updateMap();
 		map.updateMap(mapInput);
-		
-
 	}
 
 	public void readOpponentMoves(String[] moveInput) {
@@ -123,7 +122,7 @@ public class BotState {
 				System.err.println("Unable to parse Opponent moves " + e.getMessage());
 			}
 		}
-		incomeAppreciator.update();
+		incomeAppreciator.updateMoves();
 		System.err.println("Enemy income: " + incomeAppreciator.income());
 	}
 
