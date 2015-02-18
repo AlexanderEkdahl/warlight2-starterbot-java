@@ -62,11 +62,8 @@ public class BotMain implements Bot {
 		placeOrders = new ArrayList<PlaceArmiesMove>();
 		moveOrders = new ArrayList<AttackTransferMove>();
 		Map speculativeMap = original.duplicate();
-		HashMap<Integer, Integer> defending = new HashMap<Integer, Integer>();
-		for (Region r : speculativeMap.getRegionList()){
-			defending.put(r.getId(), 0);
-		}
-		
+		HashMap<Integer, Integer> offensiveSatisfaction = Values.calculateRegionOffensiveSatisfaction(speculativeMap);
+		HashMap<Integer, Integer> defensiveSatisfaction = Values.calculateRegionDefensiveSatisfaction(speculativeMap);
 		HashMap<Integer, Integer> attacking = new HashMap<Integer, Integer>();
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		HashMap<Integer, Boolean> hasOnlyOnesAttacking = new HashMap<Integer, Boolean>();
@@ -99,43 +96,49 @@ public class BotMain implements Bot {
 				int required = currentProposal.getForces();
 
 				// decision has been made to go forward with the proposal
-				if ((available.get(currentOriginRegion) > 0 || armiesLeft > 0) && required > 0 ) {
-					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)){
-						if (required <= defending.get(currentFinalTargetRegion.getId())){
+				if ((available.get(currentOriginRegion) > 0 || armiesLeft > 0) && required > 0) {
+					
+					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
+						if (defensiveSatisfaction.get(currentFinalTargetRegion.getId()) <= 0) {
 							continue;
+						} else {
+							required = Math.min(defensiveSatisfaction.get(currentFinalTargetRegion.getId()), required);
 						}
-						else{
-							required = required - defending.get(currentFinalTargetRegion.getId());
+					}
+					if (currentProposal.getPlan().getActionType().equals(ActionType.ATTACK)) {
+						if (offensiveSatisfaction.get(currentFinalTargetRegion.getId()) <= 0) {
+							continue;
+						} else {
+							required = Math.min(offensiveSatisfaction.get(currentFinalTargetRegion.getId()), required);
 						}
 					}
 					somethingWasDone = true;
 					int disposed;
-					int wanted = required;
-					if (available.get(currentOriginRegion) < wanted) {
+					if (available.get(currentOriginRegion) < required) {
 						int initiallyAvailable = available.get(currentOriginRegion);
-						int placed = Math.min(wanted - initiallyAvailable, armiesLeft);
+						int placed = Math.min(required - initiallyAvailable, armiesLeft);
 						disposed = initiallyAvailable + placed;
 						if (placed > 0) {
 							placeOrders.add(new PlaceArmiesMove(BotState.getMyName(), currentOriginRegion, placed));
 							System.err.println("Placed " + placed + " at " + currentOriginRegion);
 							currentOriginRegion.setArmies(currentOriginRegion.getArmies() + placed);
+							available.put(currentOriginRegion, available.get(currentOriginRegion) + placed);
 						}
 						armiesLeft -= placed;
 					} else {
-						disposed = wanted;
-					}
-					
-					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)){
-						defending.put(currentFinalTargetRegion.getId(), defending.get(currentFinalTargetRegion.getId()) + disposed);
-
+						disposed = required;
 					}
 
-					// attack is the best defence
-					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND) && currentProposal.getOrigin().equals(currentProposal.getTarget())) {
-						addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
-						System.err.println(currentProposal.toString());
-						break;
+					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
+						defensiveSatisfaction.put(currentFinalTargetRegion.getId(), defensiveSatisfaction.get(currentFinalTargetRegion.getId()) - disposed);
+						// attack is the best defence
+						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
+							addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
+							System.err.println(currentProposal.toString());
+							break;
+						}
 					}
+
 
 					FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
 					addMove(currentMove, decisions, disposed);
@@ -144,6 +147,9 @@ public class BotMain implements Bot {
 					available.put(currentOriginRegion, available.get(currentOriginRegion) - disposed);
 
 					// modify map
+					if (isAttack(currentFinalTargetRegion)){
+						offensiveSatisfaction.put(currentFinalTargetRegion.getId(), offensiveSatisfaction.get(currentFinalTargetRegion.getId()) - disposed);
+					}
 					if (isAttack(currentTargetRegion)) {
 						addAttacking(currentTargetRegion.getId(), attacking, disposed, hasOnlyOnesAttacking);
 						Outcome outcome = Values.calculateAttackOutcome(disposed, currentTargetRegion.getArmies());
@@ -152,12 +158,13 @@ public class BotMain implements Bot {
 						if (defendingLeft == 0) {
 							currentTargetRegion.setArmies(attackingLeft);
 							currentTargetRegion.setPlayerName(BotState.getMyName());
+							defensiveSatisfaction.put(currentTargetRegion.getId(), defensiveSatisfaction.get(currentTargetRegion.getId()) - attackingLeft);
 						} else {
 							currentTargetRegion.setArmies(defendingLeft);
 						}
 						// since this is an attack we will
 						// search for potential attacks to help
-						usePotentialAttacks(availablePotential, potentialAttacks, original.getRegion(currentTargetRegion.getId()), attacking, decisions,
+						usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions,
 								hasOnlyOnesAttacking, speculativeMap);
 
 					} else {
@@ -189,10 +196,10 @@ public class BotMain implements Bot {
 			if (isAttack(original.getRegion(r))) {
 				if (hasOnlyOnesAttacking.get(r)) {
 					badAttacks.add(r);
-					System.out.println("Cancelled attack against: " + r);
-				} else if (Values.calculateRequiredForcesAttack(original.getRegion(r)) > attacking.get(r)) {
+					System.err.println("Cancelled attack against: " + r);
+				} else if (!speculativeMap.getRegion(r).getPlayerName().equals(BotState.getMyName())) {
 					badAttacks.add(r);
-					System.out.println("Cancelled attack against: " + r);
+					System.err.println("Cancelled attack against: " + r);
 				}
 			}
 		}

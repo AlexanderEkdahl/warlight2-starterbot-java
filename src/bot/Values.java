@@ -77,8 +77,7 @@ public class Values {
 		}
 	}
 
-
-	public static void testOutcome(){
+	public static void testOutcome() {
 		Outcome outcome1 = calculateAttackOutcome(3, 1);
 		System.out.println("3 against 1: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
 		outcome1 = calculateAttackOutcome(10, 5);
@@ -90,18 +89,19 @@ public class Values {
 		outcome1 = calculateAttackOutcome(1, 1);
 		System.out.println("1 against 1: attacking:" + outcome1.getAttackingArmies() + " defending: " + outcome1.getDefendingArmies());
 	}
+
 	public static Outcome calculateAttackOutcome(int attacking, int defending) {
-		if (defending < 1){
+		if (defending < 1) {
 			return null;
 		}
-		
+
 		if (attacking == 1) {
 			return new Outcome(0, Math.max(1, defending - 1));
 		}
 
 		int defendingCopy = defending;
 		defending = (int) Math.round(Math.max(defending - ((0.6 * attacking)), 0));
-		attacking = (int) Math.round(Math.max(attacking - ((0.7 * defendingCopy)), 0)) ;
+		attacking = (int) Math.round(Math.max(attacking - ((0.7 * defendingCopy)), 0));
 
 		return new Outcome(attacking, defending);
 
@@ -326,4 +326,24 @@ public class Values {
 
 	}
 
+	public static HashMap<Integer, Integer> calculateRegionOffensiveSatisfaction(Map map) {
+		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
+
+		for (Region r : map.getRegionList()) {
+			roomLeft.put(r.getId(), calculateRequiredForcesAttackTotalVictory(r));
+
+		}
+		return roomLeft;
+
+	}
+
+	public static HashMap<Integer, Integer> calculateRegionDefensiveSatisfaction(Map map) {
+		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
+
+		for (Region r : map.getRegionList()) {
+			roomLeft.put(r.getId(), Values.calculateRequiredForcesDefend(r));
+
+		}
+		return roomLeft;
+	}
 }

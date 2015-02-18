@@ -115,25 +115,25 @@ public class DefensiveCommander extends TemplateCommander {
 				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion()), r, r, disposed, new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
 			}
 
-//			else {
-//				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, fronts);
-//				for (Path path : paths) {
-//					int totalRequired = needDefence.get(path.getTarget());
-//					if (totalRequired < 1) {
-//						continue;
-//					}
-//					double currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
-//					double currentWorth = calculateWorth(r.getSuperRegion());
-//					double currentWeight = currentWorth / currentCost;
-//
-//					for (int i = 1; i < path.getPath().size(); i++) {
-//						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-//					}
-//					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
-//							.getSuperRegion()), "DefensiveCommander"));
-//
-//				}
-//			}
+			else {
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, fronts);
+				for (Path path : paths) {
+					int totalRequired = needDefence.get(path.getTarget());
+					if (totalRequired < 1) {
+						continue;
+					}
+					double currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
+					double currentWorth = calculateWorth(r.getSuperRegion());
+					double currentWeight = currentWorth / currentCost;
+
+					for (int i = 1; i < path.getPath().size(); i++) {
+						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
+					}
+					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
+							.getSuperRegion()), "DefensiveCommander"));
+
+				}
+			}
 
 		}
 
