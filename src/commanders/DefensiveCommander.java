@@ -123,7 +123,7 @@ public class DefensiveCommander extends TemplateCommander {
 						continue;
 					}
 					double currentCost = path.getDistance() + calculateCost(path.getTarget().getSuperRegion());
-					double currentWorth = calculateWorth(r.getSuperRegion());
+					double currentWorth = calculateWorth(path.getTarget().getSuperRegion());
 					double currentWeight = currentWorth / currentCost;
 
 					for (int i = 1; i < path.getPath().size(); i++) {
