@@ -27,7 +27,7 @@ public class Values {
 	public static final double regionConnectionBonus = 1;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 18;
-	public static final double rewardDefenseImportanceMultiplier = 30;
+	public static final double rewardDefenseImportanceMultiplier = 35;
 	public static final double rewardGriefDefenseMultiplier = 20;
 
 	// ////// COSTS
@@ -37,7 +37,7 @@ public class Values {
 	public static final double staticCostUnknown = 9;
 	public static final double staticCostUnknownEnemy = 6;
 	public static final double multipleFrontPenalty = 5;
-	public static final double staticRegionCost = 3;
+	public static final double staticRegionCost = 5;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
 	public static final double superRegionExponentialMultiplier = 1.1;
 	public static final double enemyVicinityExponentialPenalty = 1.2;
@@ -137,7 +137,7 @@ public class Values {
 			// neutral region
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 6;
 			} else if (r.getVisible() == false && !r.getWasteland()) {
 				return staticCostUnknown;
 			} else {
@@ -147,7 +147,7 @@ public class Values {
 			// unknown region
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 6;
 			} else {
 				return staticCostUnknown;
 			}
@@ -301,13 +301,13 @@ public class Values {
 		return roomLeft;
 	}
 
-	public static HashMap<Region, Integer> calculateRegionSatisfaction(Map map) {
-		HashMap<Region, Integer> roomLeft = new HashMap<Region, Integer>();
+	public static HashMap<Integer, Integer> calculateRegionSatisfaction(Map map) {
+		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
 		for (Region r : map.getRegionList()) {
 			if (!r.getPlayerName().equals(BotState.getMyName()))
-				roomLeft.put(r, calculateRequiredForcesAttackTotalVictory(r));
+				roomLeft.put(r.getId(), calculateRequiredForcesAttackTotalVictory(r));
 			else {
-				roomLeft.put(r, Values.calculateRequiredForcesDefend(r));
+				roomLeft.put(r.getId(), Values.calculateRequiredForcesDefend(r));
 			}
 
 		}

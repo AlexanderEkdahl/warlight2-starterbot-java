@@ -11,59 +11,11 @@ import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
 import concepts.ActionProposal;
-import concepts.PlacementProposal;
 import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 
-public class DefensiveCommander extends TemplateCommander {
-
-	private ArrayList<PlacementProposal> organizeSuperRegionDefence(Map map) {
-
-		ArrayList<SuperRegion> vulnerable = map.getOwnedFrontSuperRegions();
-
-		ArrayList<PlacementProposal> placementProposals = new ArrayList<PlacementProposal>();
-		for (SuperRegion s : vulnerable) {
-			double weight = calculateWeight(s);
-			Region mostVulnerableRegion = null;
-
-			HashMap<Region, Integer> ownForces = new HashMap<Region, Integer>();
-
-			for (Region r : s.getFronts()) {
-				ownForces.put(r, 1);
-			}
-			// keep on assigning dudes until we have at least extraArmiesDefence
-			// more in every region
-			// and add them in the most vulnerable region
-
-			int minDiff = Integer.MAX_VALUE;
-			for (Region r : s.getFronts()) {
-				int currentDiff = ownForces.get(r) - r.getHighestThreateningForce();
-				if (currentDiff < minDiff) {
-					minDiff = currentDiff;
-					mostVulnerableRegion = r;
-				}
-
-			}
-			while (minDiff < Values.extraArmiesDefence) {
-				minDiff = Integer.MAX_VALUE;
-				for (Region r : s.getFronts()) {
-					int currentDiff = ownForces.get(r) - r.getHighestThreateningForce();
-					if (currentDiff < minDiff) {
-						minDiff = currentDiff;
-						mostVulnerableRegion = r;
-					}
-
-				}
-				placementProposals.add(new PlacementProposal(weight, mostVulnerableRegion,
-						new Plan(mostVulnerableRegion, mostVulnerableRegion.getSuperRegion()), 1, "DefensiveCommander"));
-				ownForces.put(mostVulnerableRegion, ownForces.get(mostVulnerableRegion) + 1);
-
-			}
-
-		}
-		return placementProposals;
-	}
+public class DefensiveCommander implements TemplateCommander {
 
 	private double calculateWeight(SuperRegion s) {
 		double worth = calculateWorth(s);
@@ -83,17 +35,17 @@ public class DefensiveCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Region> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
-//		ArrayList<Region> rewardBlockers = map.getRewardBlockers();
-		HashMap<Region, Integer> needDefence = new HashMap<Region, Integer>();
+		HashMap<Integer, Integer> needDefence = new HashMap<Integer, Integer>();
+		ArrayList<Region> needDefenceRegions = new ArrayList<Region>();
 
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they defense
-			needDefence.put(r, Values.calculateRequiredForcesDefend(r));
-
+			needDefence.put(r.getId(), Values.calculateRequiredForcesDefend(r));
+			needDefenceRegions.add(r);
 		}
 		
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
@@ -103,22 +55,22 @@ public class DefensiveCommander extends TemplateCommander {
 			}
 		});
 
-		for (Region r : available) {
+		for (Integer r : available) {
 			// if this region is in need of defence and has too few currently on
 			// it to defend, don't fucking attack anyone else you dipshit, at
 			// least that's what I think but hey I'm just the defensivecommander
 			// who cares what I think
 			// if it needs to be defended set a proposal to contain the needed
 			// amount of forces
-			if (fronts.contains(r)) {
+			if (needDefence.get(r) != null) {
 				int disposed = needDefence.get(r);
-				proposals.add(new ActionProposal(calculateWeight(r.getSuperRegion()), r, r, disposed, new Plan(r, r.getSuperRegion()), "DefensiveCommander"));
+				proposals.add(new ActionProposal(calculateWeight(map.getRegion(r).getSuperRegion()), map.getRegion(r), map.getRegion(r), disposed, new Plan(map.getRegion(r), map.getRegion(r).getSuperRegion()), "DefensiveCommander"));
 			}
 
 			else {
-				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, fronts);
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), needDefenceRegions);
 				for (Path path : paths) {
-					int totalRequired = needDefence.get(path.getTarget());
+					int totalRequired = needDefence.get(path.getTarget().getId());
 					if (totalRequired < 1) {
 						continue;
 					}
@@ -129,7 +81,7 @@ public class DefensiveCommander extends TemplateCommander {
 					for (int i = 1; i < path.getPath().size(); i++) {
 						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 					}
-					proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
+					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
 							.getSuperRegion()), "DefensiveCommander"));
 
 				}

@@ -76,7 +76,7 @@ public class SuperRegion {
 
 			// Wasteland contains 10 neutral enemies
 			if (region.getWasteland()) {
-				neutrals += 8;
+				neutrals += 4;
 			}
 		}
 
@@ -125,11 +125,11 @@ public class SuperRegion {
 		return totalForce;
 	}
 
-	public boolean getSuspectedOwnedSuperRegion(String opponentPlayerName) {
+	public boolean getSuspectedOwnedSuperRegion() {
 		int total = 0;
 		int totalRequired = getSubRegions().size() / 2;
 		for (Region r : getSubRegions()) {
-			total += r.getSuspectedOwnedRegion(opponentPlayerName);
+			total += r.getSuspectedOwnedRegion();
 		}
 		if (total >= totalRequired) {
 			return true;

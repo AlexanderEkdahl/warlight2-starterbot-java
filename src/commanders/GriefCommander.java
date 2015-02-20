@@ -14,20 +14,19 @@ import map.Pathfinder.Path;
 import bot.BotState;
 import bot.Values;
 import concepts.ActionProposal;
-import concepts.PlacementProposal;
 import concepts.Plan;
 
-public class GriefCommander extends TemplateCommander {
+public class GriefCommander implements TemplateCommander {
 
 	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
 		HashMap<SuperRegion, Double> worths = new HashMap<SuperRegion, Double>();
 
 		for (SuperRegion s : map.getSuperRegions()) {
-			if (s.getSuspectedOwnedSuperRegion(BotState.getMyOpponentName())) {
+			if (s.getSuspectedOwnedSuperRegion()) {
 				double reward = s.getArmiesReward();
 				worths.put(s, reward * Values.valueDenialMultiplier);
 			} else {
-				worths.put(s, -1d);
+				worths.put(s, 0d);
 			}
 
 		}
@@ -35,7 +34,7 @@ public class GriefCommander extends TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Region> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		proposals = new ArrayList<ActionProposal>();
@@ -52,10 +51,12 @@ public class GriefCommander extends TemplateCommander {
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector
-		for (Region r : available) {
-			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
+		for (Integer r : available) {
+			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
-				SuperRegion targetSuperRegion = path.getTarget().getSuperRegion();
+				if (path.getTarget().getPlayerName().equals(BotState.getMyName())){
+					continue;
+				}
 				double currentPathCost = path.getDistance();
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / currentPathCost;
@@ -64,8 +65,8 @@ public class GriefCommander extends TemplateCommander {
 					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 				}
 
-				proposals.add(new ActionProposal(currentWeight, r, path.getPath().get(1), totalRequired, new Plan(path.getTarget(), targetSuperRegion),
-						"GriefCommander"));
+				proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(),
+						path.getTarget().getSuperRegion()), "GriefCommander"));
 
 			}
 

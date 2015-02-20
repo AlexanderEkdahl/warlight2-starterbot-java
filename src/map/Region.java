@@ -163,13 +163,13 @@ public class Region {
 
 	}
 
-	public int getSuspectedOwnedRegion(String opponentPlayerName) {
-		if (getPlayerName().equals(opponentPlayerName)) {
+	public int getSuspectedOwnedRegion() {
+		if (getPlayerName().equals(BotState.getMyOpponentName())) {
 			return 1;
 		} else if (getPlayerName().equals("unknown")) {
 			return 0;
 		} else
-			return -10000;
+			return -1000;
 	}
 
 	public Region duplicate() {

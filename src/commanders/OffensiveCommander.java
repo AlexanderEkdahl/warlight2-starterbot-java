@@ -5,14 +5,13 @@ import java.util.HashMap;
 import java.util.Set;
 
 import concepts.ActionProposal;
-import concepts.PlacementProposal;
 import concepts.Plan;
 import bot.BotState;
 import bot.Values;
 import map.*;
 import map.Pathfinder.Path;
 
-public class OffensiveCommander extends TemplateCommander {
+public class OffensiveCommander  {
 
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
 
@@ -93,8 +92,7 @@ public class OffensiveCommander extends TemplateCommander {
 		return worth;
 	}
 
-	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Region> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
 		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
@@ -109,15 +107,15 @@ public class OffensiveCommander extends TemplateCommander {
 
 		// calculate plans for every sector
 
-		for (Region r : available) {
-			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(r, BotState.getMyName());
+		for (Integer r : available) {
+			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
 				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
 				int totalRequired = 0;
 				for (int i = 1; i < path.getPath().size(); i++) {
 					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
 				}
-				proposals.add(new ActionProposal(weight, r, path.getPath().get(1), totalRequired,
+				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired,
 						new Plan(path.getTarget(), path.getTarget().getSuperRegion()), "OffensiveCommander"));
 
 			}

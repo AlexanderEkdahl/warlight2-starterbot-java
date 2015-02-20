@@ -141,7 +141,7 @@ public class Map {
 	public ArrayList<SuperRegion> getSuspectedOwnedSuperRegions(String opponentPlayerName) {
 		ArrayList<SuperRegion> suspected = new ArrayList<SuperRegion>();
 		for (SuperRegion sr : getSuperRegions()) {
-			if (sr.getSuspectedOwnedSuperRegion(opponentPlayerName)) {
+			if (sr.getSuspectedOwnedSuperRegion()) {
 				suspected.add(sr);
 			}
 		}
