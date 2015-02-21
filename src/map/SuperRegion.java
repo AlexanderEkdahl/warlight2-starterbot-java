@@ -139,7 +139,6 @@ public class SuperRegion {
 	}
 	public SuperRegion duplicate(){
 		SuperRegion newSuperRegion = new SuperRegion(this.id, this.armiesReward);
-
 		return newSuperRegion;
 
 	}

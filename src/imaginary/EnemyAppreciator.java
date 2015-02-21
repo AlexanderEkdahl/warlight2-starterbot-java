@@ -80,6 +80,8 @@ public class EnemyAppreciator {
 
 	private void speculate() {
 		int enemyPlacedArmies = estimatePlacedArmies();
+		ArrayList<Region> vulnerable = speculativeMap.getAllVulnerableRegions();
+//		ArrayList<Region> annoying = speculativeMap.getallAnnoyingRegions();
 		ArrayList<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
 		ArrayList<Region> otherwiseThreatening = speculativeMap.getAllRegionsThreateningOwnedRegions();
 

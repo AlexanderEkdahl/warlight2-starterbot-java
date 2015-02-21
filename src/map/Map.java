@@ -261,9 +261,30 @@ public class Map {
 	}
 
 	public Map duplicate() {
+		HashMap<Integer, Region> newRegions = new HashMap<Integer, Region>();
+		ArrayList<SuperRegion> newSuperRegions = new ArrayList<SuperRegion>();
 
-		HashMap<Integer, Region> newRegions = (HashMap<Integer, Region>) regions.clone();
-		ArrayList<SuperRegion> newSuperRegions = (ArrayList<SuperRegion>) superRegions.clone();
+		HashMap<Integer, Region> regionDuplicateNumbers = new HashMap<Integer, Region>();
+		HashMap<Integer, SuperRegion> superRegionDuplicateNumbers = new HashMap<Integer, SuperRegion>();
+		HashMap<Integer, ArrayList<Region>> regionDuplicateNeighbors = new HashMap<Integer, ArrayList<Region>>();
+
+		for (SuperRegion s : superRegions) {
+			SuperRegion superRegionDuplicate = s.duplicate();
+			newSuperRegions.add(superRegionDuplicate);
+			superRegionDuplicateNumbers.put(s.getId(), superRegionDuplicate);
+		}
+		for (Region r : regions.values()) {
+			Region regionDuplicate = r.duplicateInto(superRegionDuplicateNumbers.get(r.getSuperRegion().getId()));
+			regionDuplicateNumbers.put(regionDuplicate.getId(), regionDuplicate);
+			newRegions.put(regionDuplicate.getId(), regionDuplicate);
+
+		}
+		for (Region r : regions.values()){
+			for (Region n : r.getNeighbors()){
+				regionDuplicateNumbers.get(r.getId()).addNeighbor(regionDuplicateNumbers.get(n.getId()));
+			}
+		}
+		
 		Map newMap = new Map();
 		newMap.setSuperRegions(newSuperRegions);
 		newMap.setRegions(newRegions);
@@ -427,12 +448,35 @@ public class Map {
 		return armies;
 	}
 
-//	public ArrayList<Region> getRewardBlockers() {
-//		ArrayList<Region> rewardBlockers = new ArrayList<Region>();
-//		for (Region r : getOwnedRegions(BotState.getMyName())){
-//			if (r.isOnlyFriendlyRegionInSuperRegion() && )
-//		}
-//		
-//		return rewardBlockers;
-//	}
+	public ArrayList<Region> getAllVulnerableRegions() {
+		ArrayList<Region> vulnerable = new ArrayList<Region>();
+		for (SuperRegion s : getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())){
+			for (Region r : s.getSubRegions()){
+				if (r.getPlayerName().equals(BotState.getMyOpponentName())){
+					for (Region n : r.getNeighbors()){
+						if (n.getPlayerName().equals(BotState.getMyName())){
+							vulnerable.add(r);
+							break;
+						}
+					}
+				}
+				
+			}
+		}
+		// TODO Auto-generated method stub
+		return vulnerable;
+	}
+
+	public ArrayList<Region> getallAnnoyingRegions() {
+		return null;
+	}
+
+	// public ArrayList<Region> getRewardBlockers() {
+	// ArrayList<Region> rewardBlockers = new ArrayList<Region>();
+	// for (Region r : getOwnedRegions(BotState.getMyName())){
+	// if (r.isOnlyFriendlyRegionInSuperRegion() && )
+	// }
+	//
+	// return rewardBlockers;
+	// }
 }

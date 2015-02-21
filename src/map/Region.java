@@ -17,6 +17,7 @@ import bot.BotState;
 public class Region {
 	private int id;
 	private ArrayList<Region> neighbors;
+
 	private SuperRegion superRegion;
 	private int armies;
 	private String playerName;
@@ -35,6 +36,16 @@ public class Region {
 		this.armies = armies;
 
 		superRegion.addSubRegion(this);
+	}
+	
+	public Region(int id, SuperRegion superRegion, String playerName, int armies, boolean visible, boolean wasteland) {
+		this.id = id;
+		this.superRegion = superRegion;
+		this.neighbors = new ArrayList<Region>();
+		this.playerName = playerName;
+		this.armies = armies;
+		this.visible = visible;
+		this.wasteland = wasteland;
 	}
 
 	public void addNeighbor(Region neighbor) {
@@ -127,6 +138,11 @@ public class Region {
 	public boolean getVisible() {
 		return visible;
 	}
+	
+	public void setNeighbors(ArrayList<Region> neighbors) {
+		this.neighbors = neighbors;
+	}
+
 
 	public int getTotalThreateningForce() {
 		int totalForce = 0;
@@ -172,9 +188,9 @@ public class Region {
 			return -1000;
 	}
 
-	public Region duplicate() {
-		Region newRegion = new Region(this.id, this.superRegion, this.playerName, this.armies);
-
+	public Region duplicateInto(SuperRegion s) {
+		Region newRegion = new Region(this.id, s, this.playerName, this.armies, this.visible, this.wasteland);
+		s.addSubRegion(this);
 		return newRegion;
 
 	}
