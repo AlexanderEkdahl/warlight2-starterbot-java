@@ -147,4 +147,15 @@ public class SuperRegion {
 		return "SuperRegion: " + id + " Reward: " + armiesReward;
 	}
 
+	public ArrayList<Region> getUnownedRegions() {
+		ArrayList<Region> unowned = new ArrayList<Region>();
+		for (Region r : subRegions){
+			if (!r.getPlayerName().equals(BotState.getMyName())){
+				unowned.add(r);
+			}
+		}
+		
+		return unowned;
+	}
+
 }

@@ -84,7 +84,7 @@ public class OffensiveCommander  {
 
 		for (SuperRegion s : possibleTargets) {
 			if (s.ownedByPlayer(BotState.getMyName())) {
-				worth.put(s, 0.001);
+				worth.put(s, 0d);
 			} else {
 				worth.put(s, Values.calculateSuperRegionWorth(s));
 			}

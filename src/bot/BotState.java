@@ -34,13 +34,14 @@ public class BotState {
 	private long totalTimebank;
 	private long timePerMove;
 	private ArrayList<ArrayList<Move>> opponentMoves;
-	private IncomeAppreciator incomeAppreciator;
+
+	// private IncomeAppreciator incomeAppreciator;
 
 	public BotState() {
 		roundNumber = 0;
 		map.initAppreciator();
 		opponentMoves = new ArrayList<ArrayList<Move>>();
-		incomeAppreciator = new IncomeAppreciator(this);
+		// incomeAppreciator = new IncomeAppreciator(this);
 	}
 
 	public void updateSettings(String key, String value) {
@@ -58,15 +59,45 @@ public class BotState {
 			startingArmies = Integer.parseInt(value);
 			roundNumber++; // next round
 		} else if (key.equals("starting_regions")) {
+
 			// Do nothing
 		}
+	}
+
+	public void setStartingRegions(String[] value) {
+		pickableStartingRegions = new ArrayList<Region>();
+		pickableStartingRegions.addAll(getRegions(value));
+		setRegularRegions();
+	}
+
+	private ArrayList<Region> getRegions(String[] value) {
+		ArrayList<Region> regions = new ArrayList<Region>();
+		for (int i = 2; i < value.length; i++) {
+			try {
+				int regionId = Integer.parseInt(value[i]);
+				Region region = map.getRegion(regionId);
+				regions.add(region);
+			} catch (Exception e) {
+				System.err.println("Unable to parse pickable regions " + e.getMessage());
+			}
+		}
+		return regions;
+	}
+
+	private void setRegularRegions() {
+		for (Region r : map.getRegionList()) {
+			if (!pickableStartingRegions.contains(r) && !r.getWasteland()) {
+				r.setPlayerName("neutral");
+				r.setArmies(2);
+			}
+		}
+
 	}
 
 	// initial map is given to the bot with all the information except for
 	// player and armies info
 	public void setupMap(String[] mapInput) {
 		map.setupMap(mapInput);
-
 
 	}
 
@@ -85,45 +116,42 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
-		incomeAppreciator.updateMap();
+		// incomeAppreciator.updateMap();
 		map.updateMap(mapInput);
 	}
 
 	public void readOpponentMoves(String[] moveInput) {
 
-		map.readOpponentMoves(moveInput); // this is bad... map should not contain state
+		map.readOpponentMoves(moveInput); // this is bad... map should not
+											// contain state
 		opponentMoves.add(new ArrayList<Move>());
-		for(int i=1; i<moveInput.length; i++)
-		{
+		for (int i = 1; i < moveInput.length; i++) {
 			try {
 				Move move;
-				if(moveInput[i+1].equals("place_armies")) {
-					Region region = map.getRegion(Integer.parseInt(moveInput[i+2]));
+				if (moveInput[i + 1].equals("place_armies")) {
+					Region region = map.getRegion(Integer.parseInt(moveInput[i + 2]));
 					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i+3]);
+					int armies = Integer.parseInt(moveInput[i + 3]);
 					move = new PlaceArmiesMove(playerName, region, armies);
 					i += 3;
-				}
-				else if(moveInput[i+1].equals("attack/transfer")) {
-					Region fromRegion = map.getRegion(Integer.parseInt(moveInput[i+2]));
-					Region toRegion = map.getRegion(Integer.parseInt(moveInput[i+3]));
+				} else if (moveInput[i + 1].equals("attack/transfer")) {
+					Region fromRegion = map.getRegion(Integer.parseInt(moveInput[i + 2]));
+					Region toRegion = map.getRegion(Integer.parseInt(moveInput[i + 3]));
 
 					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i+4]);
+					int armies = Integer.parseInt(moveInput[i + 4]);
 					move = new AttackTransferMove(playerName, fromRegion, toRegion, armies);
 					i += 4;
-				}
-				else { //never happens
+				} else { // never happens
 					continue;
 				}
 				opponentMoves.get(roundNumber - 1).add(move);
-			}
-			catch(Exception e) {
+			} catch (Exception e) {
 				System.err.println("Unable to parse Opponent moves " + e.getMessage());
 			}
 		}
-		incomeAppreciator.updateMoves();
-		System.err.println("Enemy income: " + incomeAppreciator.income());
+		// incomeAppreciator.updateMoves();
+		// System.err.println("Enemy income: " + incomeAppreciator.income());
 	}
 
 	public String getMyPlayerName() {
@@ -158,7 +186,7 @@ public class BotState {
 		return opponentName;
 	}
 
-	public ArrayList<Move> getOpponentMoves(int round){
+	public ArrayList<Move> getOpponentMoves(int round) {
 		return opponentMoves.get(round - 1);
 	}
 }

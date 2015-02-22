@@ -26,14 +26,14 @@ public class Values {
 	public static final double rewardMultiplier = 40;
 	public static final double regionConnectionBonus = 1;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 16;
+	public static final double valueDenialMultiplier = 15;
 	public static final double rewardDefenseImportanceMultiplier = 30;
 	public static final double rewardGriefDefenseMultiplier = 20;
 
 	// ////// COSTS
 
 	public static final double costMultiplierEnemy = 2;
-	public static final double costMultiplierNeutral = 4;
+	public static final double costMultiplierNeutral = 5;
 	public static final double staticCostUnknown = 8;
 	public static final double staticCostUnknownEnemy = 4;
 	public static final double multipleFrontPenalty = 5;
@@ -57,7 +57,7 @@ public class Values {
 
 	public static double calculateSuperRegionWorth(SuperRegion s) {
 		if (s.getArmiesReward() < 1) {
-			return -1;
+			return 0.001;
 		} else {
 
 			int reward = s.getArmiesReward();
@@ -193,7 +193,7 @@ public class Values {
 		} else if (armySize <= 6) {
 			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.6);
+			return (int) (armySize * 1.4);
 		}
 
 	}
@@ -219,7 +219,7 @@ public class Values {
 		} else if (armySize <= 5) {
 			return armySize + 6;
 		} else {
-			return (int) (armySize * 2);
+			return (int) (armySize * 2.2);
 		}
 
 	}
