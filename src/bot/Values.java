@@ -106,7 +106,7 @@ public class Values {
 			// neutral region
 		} else if (r.getPlayerName().equals("neutral")) {
 			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 6;
 			} else if (r.getVisible() == false && !r.getWasteland()) {
 				return staticCostUnknown;
 			} else {
@@ -116,7 +116,7 @@ public class Values {
 			// unknown region
 		} else if (r.getPlayerName().equals("unknown")) {
 			if (r.getWasteland()) {
-				return costMultiplierNeutral * 10;
+				return costMultiplierNeutral * 6;
 			} else {
 				return staticCostUnknown;
 			}

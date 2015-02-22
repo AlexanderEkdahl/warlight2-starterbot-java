@@ -74,9 +74,9 @@ public class SuperRegion {
 		for (Region region : this.getSubRegions()) {
 			neutrals += 2;
 
-			// Wasteland contains 10 neutral enemies
+			// Wasteland contains 6 neutral enemies
 			if (region.getWasteland()) {
-				neutrals += 8;
+				neutrals += 4;
 			}
 		}
 
