@@ -15,6 +15,7 @@ import map.Pathfinder.Path;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
+import math.Table;
 
 public class Values {
 
@@ -31,17 +32,19 @@ public class Values {
 	public static final double rewardDefenseImportanceMultiplier = 45;
 	public static final double rewardGriefDefenseMultiplier = 20;
 	public static final double somewhatDefendedImportanceMultiplier = 1.5;
+	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
 
-	public static final double costMultiplierEnemy = 2;
-	public static final double costMultiplierNeutral = 5;
+	public static final double costUnitMultiplier = 4;
+	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
+	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
 	public static final double multipleFrontPenalty = 5;
-	public static final double staticRegionCost = 5;
+	public static final double staticRegionCost = 6;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
 	public static final double superRegionExponentialMultiplier = 1.2;
 	public static final double enemyVicinityExponentialPenalty = 1.2;
@@ -140,9 +143,10 @@ public class Values {
 
 		// add some kind of exponential growth to discourage attacking enormous
 		// regions
-		totalCost *= Math.pow(superRegionExponentialMultiplier, sr.getSubRegions().size());
+		Table table = Table.getInstance();
+		totalCost *= table.getPower(superRegionExponentialMultiplier, (double) sr.getSubRegions().size());
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
-//		totalCost *= Math.pow(internalHopsExponentialPenalty, calculateMaxInternalHops(sr, map));
+		totalCost *= table.getPower(internalHopsExponentialPenalty, (double) calculateMaxInternalHops(sr, map));
 
 		return totalCost;
 	}
@@ -187,8 +191,8 @@ public class Values {
 		if (enemyNeighbors.size() == 0) {
 			// calculate instead the distance to the closest enemy
 		}
-
-		return Math.pow(enemyVicinityExponentialPenalty, enemyNeighbors.size());
+		Table table = Table.getInstance();
+		return table.getPower(enemyVicinityExponentialPenalty, (double) enemyNeighbors.size());
 
 	}
 

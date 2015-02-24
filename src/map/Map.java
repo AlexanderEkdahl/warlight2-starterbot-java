@@ -272,14 +272,12 @@ public class Map {
 		for (SuperRegion s : superRegions) {
 			SuperRegion superRegionDuplicate = s.duplicate();
 			newMap.add(superRegionDuplicate);
-//			newSuperRegions.add(superRegionDuplicate);
 			superRegionDuplicateNumbers.put(s.getId(), superRegionDuplicate);
 		}
 		for (Region r : regions.values()) {
 			Region regionDuplicate = r.duplicateInto(superRegionDuplicateNumbers.get(r.getSuperRegion().getId()));
 			newMap.add(regionDuplicate);
 			regionDuplicateNumbers.put(regionDuplicate.getId(), regionDuplicate);
-//			newRegions.put(regionDuplicate.getId(), regionDuplicate);
 
 		}
 		for (Region r : regions.values()){

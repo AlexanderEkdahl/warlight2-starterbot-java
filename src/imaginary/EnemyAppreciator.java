@@ -116,7 +116,6 @@ public class EnemyAppreciator {
 			totalArmies += s.getArmiesReward();
 
 		}
-		// TODO Auto-generated method stub
 		return totalArmies;
 	}
 

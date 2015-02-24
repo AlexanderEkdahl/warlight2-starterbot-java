@@ -190,7 +190,7 @@ public class Region {
 
 	public Region duplicateInto(SuperRegion s) {
 		Region newRegion = new Region(this.id, s, this.playerName, this.armies, this.visible, this.wasteland);
-		s.addSubRegion(this);
+		s.addSubRegion(newRegion);
 		return newRegion;
 
 	}

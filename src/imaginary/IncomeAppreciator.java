@@ -10,6 +10,7 @@ public class IncomeAppreciator {
   private BotState state;
   private ArrayList<Integer> lastPotentialIncome;
   private ArrayList<SuperRegion> lastPotentiallyOwnedSuperRegions;
+  private static int currentIncome;
 
   private static ArrayList<ArrayList<SuperRegion>> powerset(ArrayList<SuperRegion> set) {
     if (set == null) return null;
@@ -147,6 +148,10 @@ public class IncomeAppreciator {
     System.err.println("\tpotentialIncomes: " + potentialIncome(currentKnownMinimumIncome));
     System.err.println("\tobservedIncome: " + currentObservedIncome);
   }
+  
+  public static int getIncome(){
+	  return currentIncome;
+  }
 
   public int income() {
     // Known: 8
@@ -167,8 +172,9 @@ public class IncomeAppreciator {
     }
 
     int maximum = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() - 1);
-
-    return (maximum + minimum) / 2;
+    currentIncome =  (maximum + minimum) / 2;
+    
+    return currentIncome;
 
     // if we have observed lets say 9, and the enemy lost nothing, the enemy still has 9 minimum
     // improvements: diff the copy of the previous round map and current. If the player must have lost
