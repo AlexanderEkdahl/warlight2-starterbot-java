@@ -10,37 +10,42 @@ import java.util.Set;
 import commanders.OffensiveCommander;
 import concepts.Outcome;
 import map.Map;
+import map.Pathfinder;
+import map.Pathfinder.Path;
+import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
 
 public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
-
-	public static final int extraArmiesDefence = 1;
-	public static final int unknownRegionAppreciatedRequiredForcesAttack = 5;
+	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 
 	// ////// REWARDS
 
 	public static final double staticPocketDefence = 30;
-	public static final double rewardMultiplier = 40;
-	public static final double regionConnectionBonus = 1;
+	public static final double rewardMultiplier = 70;
+	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 30;
+	public static final double rewardDefenseImportanceMultiplier = 45;
 	public static final double rewardGriefDefenseMultiplier = 20;
+	public static final double somewhatDefendedImportanceMultiplier = 1.5;
 
 	// ////// COSTS
 
 	public static final double costMultiplierEnemy = 2;
 	public static final double costMultiplierNeutral = 5;
-	public static final double staticCostUnknown = 8;
-	public static final double staticCostUnknownEnemy = 4;
+	public static final double staticCostUnknown = costMultiplierNeutral * 2;
+	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
+	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
+
 	public static final double multipleFrontPenalty = 5;
-	public static final double staticRegionCost = 3;
+	public static final double staticRegionCost = 5;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
-	public static final double superRegionExponentialMultiplier = 1.1;
+	public static final double superRegionExponentialMultiplier = 1.2;
 	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double internalHopsExponentialPenalty = 1.2;
 
 	// ////// SATISFACTION
 
@@ -101,38 +106,29 @@ public class Values {
 	}
 
 	private static double calculateRegionInitialCost(Region r) {
-		// enemy region
-		if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
-			if (r.getVisible()) {
+		if (r.getPlayerName().equals(BotState.getMyName())) {
+			return 0;
+		}
+		if (r.getVisible()) {
+			if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 				return r.getArmies() * costMultiplierEnemy;
-			} else {
-				return staticCostUnknownEnemy;
-			}
-			// neutral region
-		} else if (r.getPlayerName().equals("neutral")) {
-			if (r.getVisible() == false && r.getWasteland()) {
-				return costMultiplierNeutral * 6;
-			} else if (r.getVisible() == false && !r.getWasteland()) {
-				return staticCostUnknown;
-			} else {
+			} else if (r.getPlayerName().equals("neutral")) {
 				return r.getArmies() * costMultiplierNeutral;
 			}
-
-			// unknown region
-		} else if (r.getPlayerName().equals("unknown")) {
-			if (r.getWasteland()) {
+		} else {
+			if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
+				return staticCostUnknownEnemy;
+			} else if (r.getWasteland()) {
 				return costMultiplierNeutral * 6;
-			} else {
+			} else if (r.getPlayerName().equals("neutral")) {
+				return staticCostUnknownNeutral;
+			} else if (r.getPlayerName().equals("unknown")) {
 				return staticCostUnknown;
 			}
-
-			// my region
-		} else if (r.getPlayerName().equals(BotState.getMyName())) {
-			return 0;
-		} else {
-			// this shouldn't happen
-			return (Double) null;
 		}
+
+		// this shouldn't happen
+		return (Double) null;
 
 	}
 
@@ -146,8 +142,32 @@ public class Values {
 		// regions
 		totalCost *= Math.pow(superRegionExponentialMultiplier, sr.getSubRegions().size());
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
+//		totalCost *= Math.pow(internalHopsExponentialPenalty, calculateMaxInternalHops(sr, map));
 
 		return totalCost;
+	}
+
+	private static int calculateMaxInternalHops(SuperRegion sr, Map map) {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
+			public double weight(Region nodeA, Region nodeB) {
+				return 1;
+
+			}
+		});
+
+		int maxHops = 0;
+		ArrayList<Region> targetRegions;
+		for (Region r : sr.getSubRegions()) {
+			targetRegions = (ArrayList<Region>) sr.getSubRegions().clone();
+			targetRegions.remove(r);
+			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, targetRegions);
+			for (Path p : paths) {
+				if (p.getDistance() > maxHops) {
+					maxHops = (int) p.getDistance();
+				}
+			}
+		}
+		return maxHops;
 	}
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
@@ -242,10 +262,6 @@ public class Values {
 			total += r.getArmies() - 1;
 		}
 
-		if (regions.size() > 0) {
-			total += extraArmiesDefence;
-		}
-
 		return total;
 	}
 
@@ -256,10 +272,6 @@ public class Values {
 		for (Region r : enemyNeighbors) {
 			total += r.getArmies() - 1;
 		}
-		if (enemyNeighbors.size() > 0) {
-			total += extraArmiesDefence;
-		}
-
 		return total;
 
 	}

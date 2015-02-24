@@ -65,8 +65,6 @@ public class BotParser {
 					output("No moves");
 				}
 			
-			} else if (parts[0].equals("settings starting_regions")){
-				currentState.setStartingRegions(parts);
 			} else if (parts[0].equals("settings")) {
 				// update settings
 				currentState.updateSettings(parts[1], parts[2]);

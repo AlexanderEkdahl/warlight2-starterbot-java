@@ -14,21 +14,18 @@ import map.Pathfinder.Path;
 public class OffensiveCommander  {
 
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
-
-		Map modifiedMap = map.duplicate();
-
 		Region maxRegion = null;
 		double maxWeight = Double.MIN_VALUE;
 
 		for (Region r : possiblePicks) {
-			String beforeStatus = modifiedMap.getRegion(r.getId()).getPlayerName();
-			modifiedMap.getRegion(r.getId()).setPlayerName(BotState.getMyName());
+			String beforeStatus = map.getRegion(r.getId()).getPlayerName();
+			map.getRegion(r.getId()).setPlayerName(BotState.getMyName());
 			double weight = calculateStartRegionWorth(r, map);
 			if (weight > maxWeight) {
 				maxWeight = weight;
 				maxRegion = r;
 			}
-			modifiedMap.getRegion(r.getId()).setPlayerName(beforeStatus);
+			map.getRegion(r.getId()).setPlayerName(beforeStatus);
 		}
 
 		return maxRegion;

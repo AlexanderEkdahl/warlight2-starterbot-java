@@ -266,17 +266,20 @@ public class Map {
 
 		HashMap<Integer, Region> regionDuplicateNumbers = new HashMap<Integer, Region>();
 		HashMap<Integer, SuperRegion> superRegionDuplicateNumbers = new HashMap<Integer, SuperRegion>();
-		HashMap<Integer, ArrayList<Region>> regionDuplicateNeighbors = new HashMap<Integer, ArrayList<Region>>();
+
+		Map newMap = new Map();
 
 		for (SuperRegion s : superRegions) {
 			SuperRegion superRegionDuplicate = s.duplicate();
-			newSuperRegions.add(superRegionDuplicate);
+			newMap.add(superRegionDuplicate);
+//			newSuperRegions.add(superRegionDuplicate);
 			superRegionDuplicateNumbers.put(s.getId(), superRegionDuplicate);
 		}
 		for (Region r : regions.values()) {
 			Region regionDuplicate = r.duplicateInto(superRegionDuplicateNumbers.get(r.getSuperRegion().getId()));
+			newMap.add(regionDuplicate);
 			regionDuplicateNumbers.put(regionDuplicate.getId(), regionDuplicate);
-			newRegions.put(regionDuplicate.getId(), regionDuplicate);
+//			newRegions.put(regionDuplicate.getId(), regionDuplicate);
 
 		}
 		for (Region r : regions.values()){
@@ -285,9 +288,8 @@ public class Map {
 			}
 		}
 		
-		Map newMap = new Map();
-		newMap.setSuperRegions(newSuperRegions);
-		newMap.setRegions(newRegions);
+//		newMap.setSuperRegions(newSuperRegions);
+//		newMap.setRegions(newRegions);
 
 		return newMap;
 	}
