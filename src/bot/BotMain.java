@@ -14,6 +14,8 @@ import concepts.FromTo;
 import concepts.Outcome;
 import concepts.PotentialAttack;
 import map.Map;
+import map.Pathfinder;
+import map.PathfinderWeighter;
 import map.Region;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
@@ -39,12 +41,15 @@ public class BotMain implements Bot {
 
 	// right now it just takes the highest priority tasks and executes them
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
+		long startTime = System.currentTimeMillis();
 
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
 		Map speculativeMap = appreciator.getSpeculativeMap();
 		// where the magic happens
 		generateOrders(speculativeMap, state.getStartingArmies());
 
+		long endTime = System.currentTimeMillis();
+		System.err.println("Generating orders took " + (endTime - startTime) + " ms");
 		return placeOrders;
 	}
 
@@ -53,7 +58,25 @@ public class BotMain implements Bot {
 
 	}
 
+	private ArrayList<ActionProposal> getProposals(Map map, Set<Integer> available) {
+		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
+
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
+			public double weight(Region nodeA, Region nodeB) {
+				return Values.calculateRegionWeighedCost(nodeB);
+
+			}
+		});
+
+		proposals.addAll(oc.getActionProposals(map, available, pathfinder));
+		proposals.addAll(gc.getActionProposals(map, available, pathfinder));
+		proposals.addAll(dc.getActionProposals(map, available, pathfinder));
+
+		return proposals;
+	}
+
 	private void generateOrders(Map original, int armiesLeft) {
+
 		placeOrders = new ArrayList<PlaceArmiesMove>();
 		moveOrders = new ArrayList<AttackTransferMove>();
 		HashMap<Integer, Integer> satisfaction = Values.calculateRegionSatisfaction(original);
@@ -77,11 +100,7 @@ public class BotMain implements Bot {
 
 		while (somethingWasDone) {
 			somethingWasDone = false;
-
-			proposals.clear();
-			proposals.addAll(oc.getActionProposals(speculativeMap, available.keySet()));
-			proposals.addAll(gc.getActionProposals(speculativeMap, available.keySet()));
-			proposals.addAll(dc.getActionProposals(speculativeMap, available.keySet()));
+			proposals = getProposals(speculativeMap, available.keySet());
 
 			Collections.sort(proposals);
 

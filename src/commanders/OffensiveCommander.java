@@ -89,17 +89,10 @@ public class OffensiveCommander  {
 		return worth;
 	}
 
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
 		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-
-				return Values.calculateRegionWeighedCost(nodeB);
-
-			}
-		});
 		ArrayList<Path> paths;
 
 		// calculate plans for every sector

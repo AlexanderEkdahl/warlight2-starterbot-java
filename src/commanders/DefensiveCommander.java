@@ -54,7 +54,7 @@ public class DefensiveCommander implements TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
@@ -68,13 +68,6 @@ public class DefensiveCommander implements TemplateCommander {
 			needDefence.put(r.getId(), Values.calculateRequiredForcesDefend(r) - r.getArmies());
 			needDefenceRegions.add(r);
 		}
-
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(nodeB);
-
-			}
-		});
 
 		for (Integer r : available) {
 			// if this region is in need of defence and has too few currently on

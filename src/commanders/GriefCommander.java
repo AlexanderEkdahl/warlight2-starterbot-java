@@ -34,18 +34,12 @@ public class GriefCommander implements TemplateCommander {
 	}
 
 	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		proposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Double> ranking = calculateWorth(map);
 
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-				return Values.calculateRegionWeighedCost(nodeB);
-
-			}
-		});
 
 		double currentWeight;
 		ArrayList<Path> paths;
