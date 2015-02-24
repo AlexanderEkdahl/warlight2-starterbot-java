@@ -62,13 +62,14 @@ public class BotMain implements Bot {
 		HashMap<FromTo, Integer> backupDecisions = new HashMap<FromTo, Integer>();
 		HashMap<Integer, Boolean> hasOnlyOnesAttacking = new HashMap<Integer, Boolean>();
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
+		HashMap<Integer, Integer> availablePotential = new HashMap<Integer, Integer>();
 
 		Map speculativeMap = original.duplicate();
 		HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
 		for (Region r : original.getOwnedRegions(BotState.getMyName())) {
 			available.put(r.getId(), r.getArmies() - 1);
+			availablePotential.put(r.getId(), 0);
 		}
-		HashMap<Integer, Integer> availablePotential = new HashMap<Integer, Integer>();
 
 		boolean somethingWasDone = true;
 		// TODO decide how to merge proposals
@@ -129,8 +130,9 @@ public class BotMain implements Bot {
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
-//							available.put(currentOriginRegion.getId(), available.get(currentOriginRegion.getId()) - disposed);
-							addPotentialAttacks(potentialAttacks, currentOriginRegion, available, availablePotential);
+							available.put(currentOriginRegion.getId(), available.get(currentOriginRegion.getId()) - disposed);
+							availablePotential.put(currentOriginRegion.getId(), availablePotential.get(currentOriginRegion.getId()) + disposed);
+							addPotentialAttacks(potentialAttacks, currentOriginRegion, availablePotential);
 							break;
 						}
 					}
@@ -210,15 +212,32 @@ public class BotMain implements Bot {
 
 	}
 
-	private void addPotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, Region currentOriginRegion, HashMap<Integer, Integer> available,
-			HashMap<Integer, Integer> availablePotential) {
-		potentialAttacks.addAll(generatePotentialAttacks(currentOriginRegion, available, availablePotential));
-		int used = availablePotential.get(currentOriginRegion.getId());
-		int left = available.get(currentOriginRegion.getId()) - used;
-		System.err.println("was " + available.get(currentOriginRegion.getId()));
-		available.put(currentOriginRegion.getId(), left);
-		System.err.println(available.get(currentOriginRegion.getId()) + " left");
+	private void addPotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, Region currentOriginRegion, HashMap<Integer, Integer> availablePotential) {
+		potentialAttacks.addAll(generatePotentialAttacks(currentOriginRegion, availablePotential));
 
+	}
+
+	// potential attacks are attacks that may be performed from a tile if it
+	// means that the tile is still left decently defended against other
+	// threatening tiles
+	private ArrayList<PotentialAttack> generatePotentialAttacks(Region currentOriginRegion, HashMap<Integer, Integer> availablePotential) {
+		ArrayList<Region> enemyRegions = currentOriginRegion.getEnemyNeighbors();
+		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
+		ArrayList<Region> defendingAgainst = new ArrayList<Region>();
+		for (Region r : enemyRegions) {
+			defendingAgainst.clear();
+			for (Region r2 : enemyRegions) {
+				if (!r.equals(r2)) {
+					defendingAgainst.add(r2);
+				}
+			}
+			int requiredToDefend = Values.calculateRequiredForcesDefendRegionAgainstSpecificRegions(defendingAgainst);
+			if (requiredToDefend < availablePotential.get(currentOriginRegion.getId())) {
+				int disposed = availablePotential.get(currentOriginRegion.getId()) - requiredToDefend;
+				potentialAttacks.add(new PotentialAttack(currentOriginRegion, r, disposed));
+			}
+		}
+		return potentialAttacks;
 	}
 
 	private void usePotentialAttacks(HashMap<Integer, Integer> availablePotential, ArrayList<PotentialAttack> potentialAttacks, Region currentTargetRegion,
@@ -240,32 +259,6 @@ public class BotMain implements Bot {
 		for (PotentialAttack usedP : used) {
 			potentialAttacks.remove(usedP);
 		}
-	}
-
-	// potential attacks are attacks that may be performed from a tile if it
-	// means that the tile is still left decently defended against other
-	// threatening tiles
-	private ArrayList<PotentialAttack> generatePotentialAttacks(Region currentOriginRegion, HashMap<Integer, Integer> available,
-			HashMap<Integer, Integer> availablePotential) {
-		ArrayList<Region> enemyRegions = currentOriginRegion.getEnemyNeighbors();
-		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
-		ArrayList<Region> defendingAgainst = new ArrayList<Region>();
-		availablePotential.put(currentOriginRegion.getId(), 0);
-		for (Region r : enemyRegions) {
-			defendingAgainst.clear();
-			for (Region r2 : enemyRegions) {
-				if (!r.equals(r2)) {
-					defendingAgainst.add(r2);
-				}
-			}
-			int requiredToDefend = Values.calculateRequiredForcesDefendRegionAgainstSpecificRegions(defendingAgainst);
-			if (requiredToDefend < available.get(currentOriginRegion.getId())) {
-				int disposed = available.get(currentOriginRegion.getId()) - requiredToDefend;
-				potentialAttacks.add(new PotentialAttack(currentOriginRegion, r, disposed));
-				availablePotential.put(currentOriginRegion.getId(), availablePotential.get(currentOriginRegion.getId()) + disposed);
-			}
-		}
-		return potentialAttacks;
 	}
 
 	private void addMove(FromTo currentMove, HashMap<FromTo, Integer> decisions, int disposed, HashMap<Integer, Boolean> hasOnlyOnesAttacking, Map map,
