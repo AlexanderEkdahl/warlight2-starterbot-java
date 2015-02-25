@@ -5,6 +5,7 @@ import imaginary.EnemyAppreciator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 import commanders.*;
@@ -93,14 +94,19 @@ public class BotMain implements Bot {
 			available.put(r.getId(), r.getArmies() - 1);
 			availablePotential.put(r.getId(), 0);
 		}
+		Set<Integer> interestingKeys = available.keySet();
 
 		boolean somethingWasDone = true;
 		// TODO decide how to merge proposals
-		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
+		ArrayList<ActionProposal> proposals;
 
 		while (somethingWasDone) {
 			somethingWasDone = false;
-			proposals = getProposals(speculativeMap, available.keySet());
+			if (armiesLeft < 1){
+				interestingKeys = getInteresting(available);
+			}
+			
+			proposals = getProposals(speculativeMap, interestingKeys);
 
 			Collections.sort(proposals);
 
@@ -229,6 +235,16 @@ public class BotMain implements Bot {
 			armiesLeft = 0;
 		}
 
+	}
+
+	private Set<Integer> getInteresting(HashMap<Integer, Integer> available) {
+		Set<Integer> stillInteresting = new HashSet<Integer>();
+		for (Integer i : available.keySet()){
+			if (available.get(i) > 0){
+				stillInteresting.add(i);
+			}
+		}
+		return stillInteresting;
 	}
 
 	private void addPotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, Region currentOriginRegion, HashMap<Integer, Integer> availablePotential) {
