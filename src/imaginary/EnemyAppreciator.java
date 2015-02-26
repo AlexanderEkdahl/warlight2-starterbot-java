@@ -80,10 +80,9 @@ public class EnemyAppreciator {
 
 	private void speculate() {
 		int enemyPlacedArmies = estimatePlacedArmies();
-		ArrayList<Region> vulnerable = speculativeMap.getAllVulnerableRegions();
-//		ArrayList<Region> annoying = speculativeMap.getallAnnoyingRegions();
+		ArrayList<Region> vulnerable = speculativeMap.getAllEnemyVulnerableRegions();
+		ArrayList<Region> annoying = speculativeMap.getallAnnoyingRegions();
 		ArrayList<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
-		ArrayList<Region> otherwiseThreatening = speculativeMap.getAllRegionsThreateningOwnedRegions();
 
 		if (directlyThreatening.size() > 0) {
 			int armiesPerRegion = enemyPlacedArmies / directlyThreatening.size();
@@ -91,21 +90,18 @@ public class EnemyAppreciator {
 				r.setArmies(r.getArmies() + armiesPerRegion);
 				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 			}
-		}
-		else if (otherwiseThreatening.size() > 0) {
-			int armiesPerRegion = enemyPlacedArmies / otherwiseThreatening.size();
-			for (Region r : otherwiseThreatening) {
+		} else if (annoying.size() > 0) {
+			int armiesPerRegion = enemyPlacedArmies / annoying.size();
+			for (Region r : annoying) {
 				r.setArmies(r.getArmies() + armiesPerRegion);
 				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 			}
 		} else {
-			if (speculativeMap.getEnemyRegions().size() == 0){
+			if (speculativeMap.getEnemyRegions().size() == 0) {
 				return;
 			}
-			int armiesPerRegion = enemyPlacedArmies / speculativeMap.getEnemyRegions().size();
-			for (Region r : speculativeMap.getEnemyRegions()) {
-				r.setArmies(r.getArmies() + armiesPerRegion);
-				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
+			else{
+				speculativeMap.getEnemyRegions().get(0).setArmies(speculativeMap.getEnemyRegions().get(0).getArmies() + enemyPlacedArmies);
 			}
 		}
 	}

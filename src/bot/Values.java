@@ -1,11 +1,7 @@
 package bot;
 
-import imaginary.EnemyAppreciator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
 
 import commanders.OffensiveCommander;
 import concepts.Outcome;
@@ -15,7 +11,7 @@ import map.Pathfinder.Path;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
-import math.Table;
+import math.Tables;
 
 public class Values {
 
@@ -143,35 +139,12 @@ public class Values {
 
 		// add some kind of exponential growth to discourage attacking enormous
 		// regions
-		Table table = Table.getInstance();
-		totalCost *= table.getPower(superRegionExponentialMultiplier, (double) sr.getSubRegions().size());
+		Tables tables = Tables.getInstance();
+		totalCost *= tables.getInternalHopsPenaltyFor(sr);
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
-//		totalCost *= table.getPower(internalHopsExponentialPenalty, (double) calculateMaxInternalHops(sr, map));
+		totalCost *= tables.getSizePenaltyFor(sr);
 
 		return totalCost;
-	}
-
-	private static int calculateMaxInternalHops(SuperRegion sr, Map map) {
-		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
-			public double weight(Region nodeA, Region nodeB) {
-				return 1;
-
-			}
-		});
-
-		int maxHops = 0;
-		ArrayList<Region> targetRegions;
-		for (Region r : sr.getSubRegions()) {
-			targetRegions = (ArrayList<Region>) sr.getSubRegions().clone();
-			targetRegions.remove(r);
-			ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(r, targetRegions);
-			for (Path p : paths) {
-				if (p.getDistance() > maxHops) {
-					maxHops = (int) p.getDistance();
-				}
-			}
-		}
-		return maxHops;
 	}
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
@@ -191,8 +164,7 @@ public class Values {
 		if (enemyNeighbors.size() == 0) {
 			// calculate instead the distance to the closest enemy
 		}
-		Table table = Table.getInstance();
-		return table.getPower(enemyVicinityExponentialPenalty, (double) enemyNeighbors.size());
+		return Math.pow(enemyVicinityExponentialPenalty, (double) enemyNeighbors.size());
 
 	}
 

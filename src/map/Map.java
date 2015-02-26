@@ -261,8 +261,6 @@ public class Map {
 	}
 
 	public Map duplicate() {
-		HashMap<Integer, Region> newRegions = new HashMap<Integer, Region>();
-		ArrayList<SuperRegion> newSuperRegions = new ArrayList<SuperRegion>();
 
 		HashMap<Integer, Region> regionDuplicateNumbers = new HashMap<Integer, Region>();
 		HashMap<Integer, SuperRegion> superRegionDuplicateNumbers = new HashMap<Integer, SuperRegion>();
@@ -285,22 +283,23 @@ public class Map {
 				regionDuplicateNumbers.get(r.getId()).addNeighbor(regionDuplicateNumbers.get(n.getId()));
 			}
 		}
-		
-//		newMap.setSuperRegions(newSuperRegions);
-//		newMap.setRegions(newRegions);
 
 		return newMap;
 	}
 
-	private void setRegions(HashMap<Integer, Region> newRegions) {
-		this.regions = newRegions;
-
-	}
-
-	private void setSuperRegions(ArrayList<SuperRegion> newSuperRegions) {
-		this.superRegions = newSuperRegions;
-	}
-
+//	public ArrayList<Region> getInterestingRegions(){
+//		// interesting is defined as not being the same owned by the same person as all tiles next to it
+//		ArrayList<Region> interestingRegions = new ArrayList<Region>();
+//		for (Region r : regions.values()){
+//			String owner = r.getPlayerName();
+//			for (Region n : r.getNeighbors()){
+//				
+//			}
+//		}
+//		
+//		return null;
+//		
+//	}
 	public void updateMap(String[] mapInput) {
 		ArrayList<Region> visibleRegions = new ArrayList<Region>();
 		HashSet<Region> invisibleRegions = new HashSet<Region>(regions.values());
@@ -448,7 +447,7 @@ public class Map {
 		return armies;
 	}
 
-	public ArrayList<Region> getAllVulnerableRegions() {
+	public ArrayList<Region> getAllEnemyVulnerableRegions() {
 		ArrayList<Region> vulnerable = new ArrayList<Region>();
 		for (SuperRegion s : getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())){
 			for (Region r : s.getSubRegions()){
@@ -468,7 +467,12 @@ public class Map {
 	}
 
 	public ArrayList<Region> getallAnnoyingRegions() {
-		return null;
+		ArrayList<Region> annoyingRegions = new ArrayList<Region>();
+		for (SuperRegion s : superRegions){
+			annoyingRegions.addAll(s.getAnnoyingRegions());
+
+		}
+		return annoyingRegions;
 	}
 
 	// public ArrayList<Region> getRewardBlockers() {

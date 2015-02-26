@@ -19,6 +19,7 @@ import java.util.HashSet;
 import map.Map;
 import map.Region;
 import map.SuperRegion;
+import math.Tables;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 import move.Move;
@@ -102,6 +103,7 @@ public class BotState {
 	}
 
 	public void setPickableStartingRegions(String[] mapInput) {
+		Tables.getInstance().introCalculation(map);
 		pickableStartingRegions = new ArrayList<Region>();
 		for (int i = 2; i < mapInput.length; i++) {
 			try {

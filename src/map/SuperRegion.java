@@ -11,6 +11,7 @@
 package map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import bot.BotState;
 
@@ -137,7 +138,8 @@ public class SuperRegion {
 		return false;
 
 	}
-	public SuperRegion duplicate(){
+
+	public SuperRegion duplicate() {
 		SuperRegion newSuperRegion = new SuperRegion(this.id, this.armiesReward);
 		return newSuperRegion;
 
@@ -149,13 +151,42 @@ public class SuperRegion {
 
 	public ArrayList<Region> getUnownedRegions() {
 		ArrayList<Region> unowned = new ArrayList<Region>();
-		for (Region r : subRegions){
-			if (!r.getPlayerName().equals(BotState.getMyName())){
+		for (Region r : subRegions) {
+			if (!r.getPlayerName().equals(BotState.getMyName())) {
 				unowned.add(r);
 			}
 		}
-		
+
 		return unowned;
+	}
+
+	public Collection<? extends Region> getAnnoyingRegions() {
+		// determine if contested
+		ArrayList<Region> annoyingRegions = new ArrayList<Region>();
+		if (isContested()) {
+			for (Region r : subRegions) {
+				if (r.getPlayerName().equals(BotState.getMyOpponentName()) && r.hasNeighborWithName(BotState.getMyName())) {
+					annoyingRegions.add(r);
+
+				}
+			}
+		}
+		return annoyingRegions;
+	}
+
+	private boolean isContested() {
+		// contested is defined as having presense of both players
+		boolean hasFriendlyPresence = false;
+		boolean hasEnemyPresence = false;
+
+		for (Region r : subRegions) {
+			if (r.getPlayerName().equals(BotState.getMyName())) {
+				hasFriendlyPresence = true;
+			} else if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
+				hasEnemyPresence = true;
+			}
+		}
+		return (hasFriendlyPresence && hasEnemyPresence);
 	}
 
 }

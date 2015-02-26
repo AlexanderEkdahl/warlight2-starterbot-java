@@ -195,4 +195,13 @@ public class Region {
 
 	}
 
+	public boolean hasNeighborWithName(String myName) {
+		for (Region n : getNeighbors()){
+			if (n.getPlayerName().equals(myName)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 }
