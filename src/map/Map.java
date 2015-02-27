@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import map.Pathfinder.Path;
 import bot.BotState;
@@ -250,8 +251,8 @@ public class Map {
 		return unOwned;
 	}
 
-	public ArrayList<Region> getEnemyRegions() {
-		ArrayList<Region> enemyRegions = new ArrayList<Region>();
+	public Set<Region> getEnemyRegions() {
+		Set<Region> enemyRegions = new HashSet<Region>();
 		for (Region r : regions.values()) {
 			if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
 				enemyRegions.add(r);
@@ -412,8 +413,8 @@ public class Map {
 		appreciator.readOpponentMoves(moveInput);
 	}
 
-	public ArrayList<Region> getAllRegionsThreateningOwnedSuperRegions() {
-		ArrayList<Region> threatening = new ArrayList<Region>();
+	public Set<Region> getAllRegionsThreateningOwnedSuperRegions() {
+		Set<Region> threatening = new HashSet<Region>();
 		for (Region r : getEnemyRegions()) {
 			for (Region n : r.getNeighbors()) {
 				if (n.getSuperRegion().ownedByPlayer(BotState.getMyName()) && !threatening.contains(n)) {
@@ -426,8 +427,8 @@ public class Map {
 
 	}
 
-	public ArrayList<Region> getAllRegionsThreateningOwnedRegions() {
-		ArrayList<Region> threatening = new ArrayList<Region>();
+	public Set<Region> getAllRegionsThreateningOwnedRegions() {
+		Set<Region> threatening = new HashSet<Region>();
 		for (Region r : getOwnedRegions(BotState.getMyName())) {
 			for (Region n : r.getNeighbors()) {
 				if (n.getPlayerName().equals(BotState.getMyOpponentName()) && !threatening.contains(n)) {
@@ -447,8 +448,8 @@ public class Map {
 		return armies;
 	}
 
-	public ArrayList<Region> getAllEnemyVulnerableRegions() {
-		ArrayList<Region> vulnerable = new ArrayList<Region>();
+	public Set<Region> getAllEnemyVulnerableRegions() {
+		Set<Region> vulnerable = new HashSet<Region>();
 		for (SuperRegion s : getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())){
 			for (Region r : s.getSubRegions()){
 				if (r.getPlayerName().equals(BotState.getMyOpponentName())){
@@ -466,8 +467,8 @@ public class Map {
 		return vulnerable;
 	}
 
-	public ArrayList<Region> getallAnnoyingRegions() {
-		ArrayList<Region> annoyingRegions = new ArrayList<Region>();
+	public Set<Region> getallAnnoyingRegions() {
+		Set<Region> annoyingRegions = new HashSet<Region>();
 		for (SuperRegion s : superRegions){
 			annoyingRegions.addAll(s.getAnnoyingRegions());
 

@@ -2,6 +2,8 @@ package bot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import commanders.OffensiveCommander;
 import concepts.Outcome;
@@ -32,7 +34,7 @@ public class Values {
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 4;
+	public static final double costUnitMultiplier = 5.5;
 	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
@@ -151,8 +153,8 @@ public class Values {
 		// determine if this superregion borders an enemy region and if so how
 		// many
 
-		ArrayList<Region> enemyPositions = map.getEnemyRegions();
-		ArrayList<Region> enemyNeighbors = new ArrayList<Region>();
+		Set<Region> enemyPositions = map.getEnemyRegions();
+		Set<Region> enemyNeighbors = new HashSet<Region>();
 		for (Region r : enemyPositions) {
 			for (Region n : r.getNeighbors()) {
 				if (n.getSuperRegion().getId() == (sr.getId())) {

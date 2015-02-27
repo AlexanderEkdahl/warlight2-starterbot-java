@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import bot.BotState;
 import map.Map;
@@ -42,7 +44,7 @@ public class EnemyAppreciator {
 
 	}
 
-	public ArrayList<Region> getDefiniteEnemyPositions() {
+	public Set<Region> getDefiniteEnemyPositions() {
 		return speculativeMap.getEnemyRegions();
 	}
 
@@ -80,30 +82,66 @@ public class EnemyAppreciator {
 
 	private void speculate() {
 		int enemyPlacedArmies = estimatePlacedArmies();
-		ArrayList<Region> vulnerable = speculativeMap.getAllEnemyVulnerableRegions();
-		ArrayList<Region> annoying = speculativeMap.getallAnnoyingRegions();
-		ArrayList<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
+		Set<Region> vulnerable = speculativeMap.getAllEnemyVulnerableRegions();
+		Set<Region> annoying = speculativeMap.getallAnnoyingRegions();
+		Set<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
+		Set<Region> otherwiseThreatening = speculativeMap.getAllRegionsThreateningOwnedRegions();
+		Set<Region> allEnemyOwned = speculativeMap.getEnemyRegions();
 
-		if (directlyThreatening.size() > 0) {
-			int armiesPerRegion = enemyPlacedArmies / directlyThreatening.size();
-			for (Region r : directlyThreatening) {
-				r.setArmies(r.getArmies() + armiesPerRegion);
-				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
+		Set<Region> tier1 = new HashSet<Region>(directlyThreatening);
+		tier1.retainAll(vulnerable);
+		Set<Region> tier2 = new HashSet<Region>(directlyThreatening);
+		tier2.addAll(vulnerable);
+		Set<Region> tier3 = new HashSet<Region>(annoying);
+		Set<Region> tier4 = new HashSet<Region>(otherwiseThreatening);
+		Set<Region> tier5 = new HashSet<Region>(allEnemyOwned);
+
+		if (tier1.size() > 0) {
+			int armiesPerRegion = enemyPlacedArmies / tier1.size();
+			for (Region r : tier1) {
+				placeArmies(r, armiesPerRegion);
 			}
-		} else if (annoying.size() > 0) {
-			int armiesPerRegion = enemyPlacedArmies / annoying.size();
-			for (Region r : annoying) {
-				r.setArmies(r.getArmies() + armiesPerRegion);
-				System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
+		} else if (tier2.size() > 0) {
+			int armiesPerRegion = enemyPlacedArmies / tier2.size();
+			for (Region r : tier2) {
+				placeArmies(r, armiesPerRegion);
 			}
-		} else {
-			if (speculativeMap.getEnemyRegions().size() == 0) {
-				return;
+		} else if (tier3.size() > 0 || tier4.size() > 0 || tier5.size() > 0) {
+			Random rand = new Random();
+			while (enemyPlacedArmies > 0) {
+				Float tier3Prob = (((float) tier3.size() * 3) / (((float) tier3.size() * 3) + ((float) tier4.size() + tier5.size())));
+
+				System.out.println(tier3Prob);
+				ArrayList<Region> tier3List = new ArrayList<Region>();
+				ArrayList<Region> tier4List = new ArrayList<Region>();
+				ArrayList<Region> tier5List = new ArrayList<Region>();
+
+				tier3List.addAll(tier3);
+				tier4List.addAll(tier4);
+				tier5List.addAll(tier5);
+
+				Float seed = rand.nextFloat();
+				if (seed <= tier3Prob) {
+					int selected = rand.nextInt(tier3.size());
+					placeArmies(tier3List.get(selected), 1);
+				} else {
+					int selected = rand.nextInt(tier4.size() + tier5.size());
+					if (selected < tier4.size()) {
+						placeArmies(tier4List.get(selected), 1);
+					} else {
+						selected -= tier5.size();
+						placeArmies(tier5List.get(selected), 1);
+					}
+				}
+				enemyPlacedArmies--;
 			}
-			else{
-				speculativeMap.getEnemyRegions().get(0).setArmies(speculativeMap.getEnemyRegions().get(0).getArmies() + enemyPlacedArmies);
-			}
+
 		}
+	}
+
+	public void placeArmies(Region r, int disposed) {
+		r.setArmies(r.getArmies() + disposed);
+		System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 	}
 
 	private int estimatePlacedArmies() {
