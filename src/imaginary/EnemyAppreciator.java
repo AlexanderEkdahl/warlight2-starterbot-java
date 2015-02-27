@@ -108,17 +108,15 @@ public class EnemyAppreciator {
 			}
 		} else if (tier3.size() > 0 || tier4.size() > 0 || tier5.size() > 0) {
 			Random rand = new Random();
+			ArrayList<Region> tier3List = new ArrayList<Region>();
+			ArrayList<Region> tier4List = new ArrayList<Region>();
+			ArrayList<Region> tier5List = new ArrayList<Region>();
+
+			tier3List.addAll(tier3);
+			tier4List.addAll(tier4);
+			tier5List.addAll(tier5);
 			while (enemyPlacedArmies > 0) {
 				Float tier3Prob = (((float) tier3.size() * 3) / (((float) tier3.size() * 3) + ((float) tier4.size() + tier5.size())));
-
-				System.out.println(tier3Prob);
-				ArrayList<Region> tier3List = new ArrayList<Region>();
-				ArrayList<Region> tier4List = new ArrayList<Region>();
-				ArrayList<Region> tier5List = new ArrayList<Region>();
-
-				tier3List.addAll(tier3);
-				tier4List.addAll(tier4);
-				tier5List.addAll(tier5);
 
 				Float seed = rand.nextFloat();
 				if (seed <= tier3Prob) {
@@ -129,7 +127,7 @@ public class EnemyAppreciator {
 					if (selected < tier4.size()) {
 						placeArmies(tier4List.get(selected), 1);
 					} else {
-						selected -= tier5.size();
+						selected -= tier4.size();
 						placeArmies(tier5List.get(selected), 1);
 					}
 				}
