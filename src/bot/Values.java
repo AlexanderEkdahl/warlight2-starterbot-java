@@ -19,6 +19,8 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
+	public static final int maximumEnemyForcesAllowedPotentiallyLeftAfterAttack = 5;
+	public static final double percentageOfAttackingNeededForDefence = 0.8;
 
 	// ////// REWARDS
 
@@ -207,17 +209,13 @@ public class Values {
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
 		} else if (r.getPlayerName().equals("neutral")) {
-			if (armySize <= 2) {
-				return armySize + 1;
-			} else {
-				return (int) (armySize * 2);
-			}
+			return calculateRequiredForcesAttack(r);
 		} else if (armySize <= 3) {
 			return armySize + 3;
 		} else if (armySize <= 5) {
 			return armySize + 6;
 		} else {
-			return (int) (armySize * 2.2);
+			return (int) (armySize * 2.0);
 		}
 
 	}
@@ -240,17 +238,15 @@ public class Values {
 			total += r.getArmies() - 1;
 		}
 
+		total *= percentageOfAttackingNeededForDefence;
+
 		return total;
 	}
 
 	public static int calculateRequiredForcesDefend(Region region) {
-		int total = 0;
 		ArrayList<Region> enemyNeighbors = region.getEnemyNeighbors();
 
-		for (Region r : enemyNeighbors) {
-			total += r.getArmies() - 1;
-		}
-		return total;
+		return calculateRequiredForcesDefendRegionAgainstSpecificRegions(enemyNeighbors);
 
 	}
 

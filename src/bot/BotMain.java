@@ -102,10 +102,10 @@ public class BotMain implements Bot {
 
 		while (somethingWasDone) {
 			somethingWasDone = false;
-			if (armiesLeft < 1){
+			if (armiesLeft < 1) {
 				interestingKeys = getInteresting(available);
 			}
-			
+
 			proposals = getProposals(speculativeMap, interestingKeys);
 
 			Collections.sort(proposals);
@@ -203,16 +203,14 @@ public class BotMain implements Bot {
 
 		for (Integer r : aKeys) {
 			if ((!speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyName())))) {
-				badAttacks.add(r);
-				// if (hasOnlyOnesAttacking.get(r)) {
-				// badAttacks.add(r);
-				// System.err.println("Cancelled attack against: " + r);
-				// } else if
-				// (Values.calculateRequiredForcesAttack(speculativeMap.getRegion(r))
-				// > attacking.get(r)) {
-				// badAttacks.add(r);
-				// System.err.println("Cancelled attack against: " + r);
-				// }
+				if (speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyOpponentName()))) {
+					if (speculativeMap.getRegion(r).getArmies() > Values.maximumEnemyForcesAllowedPotentiallyLeftAfterAttack) {
+						badAttacks.add(r);
+
+					}
+				} else if (speculativeMap.getRegion(r).getPlayerName().equals("neutral")) {
+					badAttacks.add(r);
+				}
 			}
 		}
 
@@ -239,8 +237,8 @@ public class BotMain implements Bot {
 
 	private Set<Integer> getInteresting(HashMap<Integer, Integer> available) {
 		Set<Integer> stillInteresting = new HashSet<Integer>();
-		for (Integer i : available.keySet()){
-			if (available.get(i) > 0){
+		for (Integer i : available.keySet()) {
+			if (available.get(i) > 0) {
 				stillInteresting.add(i);
 			}
 		}

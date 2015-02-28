@@ -18,8 +18,7 @@ public class DefensiveCommander implements TemplateCommander {
 
 	private double calculateWeight(Region r, HashMap<SuperRegion, Double> superRegionWorths, HashMap<SuperRegion, Double> superRegionCosts,
 			HashMap<Integer, Integer> needDefence) {
-		double worth = Math.pow((Double) Values.deficitDefenceExponentialMultiplier,
-				needDefence.get(r.getId()) * superRegionWorths.get(r.getSuperRegion()));
+		double worth = Math.pow(Values.deficitDefenceExponentialMultiplier, needDefence.get(r.getId())) * superRegionWorths.get(r.getSuperRegion());
 		double cost = superRegionCosts.get(r.getSuperRegion());
 		double weight = worth / cost;
 		return weight;
@@ -81,25 +80,25 @@ public class DefensiveCommander implements TemplateCommander {
 						.getSuperRegion()), "DefensiveCommander"));
 			}
 
-//			else {
-//				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), needDefenceRegions);
-//				for (Path path : paths) {
-//					int totalRequired = needDefence.get(path.getTarget().getId());
-//					if (totalRequired < 1) {
-//						continue;
-//					}
-//					double currentCost = path.getDistance() + superRegionCosts.get(path.getTarget().getSuperRegion());
-//					double currentWorth = superRegionWorths.get(path.getTarget().getSuperRegion());
-//					double currentWeight = currentWorth / currentCost;
-//
-//					for (int i = 1; i < path.getPath().size(); i++) {
-//						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-//					}
-//					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path
-//							.getTarget().getSuperRegion()), "DefensiveCommander"));
-//
-//				}
-//			}
+			else {
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), needDefenceRegions);
+				for (Path path : paths) {
+					int totalRequired = needDefence.get(path.getTarget().getId());
+					if (totalRequired < 1) {
+						continue;
+					}
+					double currentCost = path.getDistance() + superRegionCosts.get(path.getTarget().getSuperRegion());
+					double currentWorth = superRegionWorths.get(path.getTarget().getSuperRegion());
+					double currentWeight = currentWorth / currentCost;
+
+					for (int i = 1; i < path.getPath().size(); i++) {
+						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
+					}
+					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path
+							.getTarget().getSuperRegion()), "DefensiveCommander"));
+
+				}
+			}
 
 		}
 
