@@ -29,14 +29,14 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 45;
+	public static final double rewardDefenseImportanceMultiplier = 20;
 	public static final double rewardGriefDefenseMultiplier = 20;
 	public static final double somewhatDefendedImportanceMultiplier = 1.5;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 5.5;
+	public static final double costUnitMultiplier = 6;
 	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;

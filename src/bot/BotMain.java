@@ -84,9 +84,9 @@ public class BotMain implements Bot {
 		HashMap<Integer, Integer> attacking = new HashMap<Integer, Integer>();
 		HashMap<FromTo, Integer> decisions = new HashMap<FromTo, Integer>();
 		HashMap<FromTo, Integer> backupDecisions = new HashMap<FromTo, Integer>();
-		HashMap<Integer, Boolean> hasOnlyOnesAttacking = new HashMap<Integer, Boolean>();
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
 		HashMap<Integer, Integer> availablePotential = new HashMap<Integer, Integer>();
+		HashMap<FromTo, Integer> potentialAttackDecisions = new HashMap<FromTo, Integer>();
 
 		Map speculativeMap = original.duplicate();
 		HashMap<Integer, Integer> available = new HashMap<Integer, Integer>();
@@ -125,7 +125,7 @@ public class BotMain implements Bot {
 						if (backupDecisions.get(currentMove) == null) {
 							backupDecisions.put(currentMove, required);
 						} else {
-							decisions.put(currentMove, backupDecisions.get(currentMove) + required);
+							backupDecisions.put(currentMove, backupDecisions.get(currentMove) + required);
 						}
 						continue;
 					} else {
@@ -151,11 +151,11 @@ public class BotMain implements Bot {
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString());
 					satisfaction.put(currentFinalTargetRegion.getId(), satisfaction.get(currentFinalTargetRegion.getId()) - disposed);
+					available.put(currentOriginRegion.getId(), available.get(currentOriginRegion.getId()) - disposed);
 
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
-							available.put(currentOriginRegion.getId(), available.get(currentOriginRegion.getId()) - disposed);
 							availablePotential.put(currentOriginRegion.getId(), availablePotential.get(currentOriginRegion.getId()) + disposed);
 							addPotentialAttacks(potentialAttacks, currentOriginRegion, availablePotential);
 							break;
@@ -163,12 +163,11 @@ public class BotMain implements Bot {
 					}
 
 					FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
-					addMove(currentMove, decisions, disposed, hasOnlyOnesAttacking, speculativeMap, satisfaction, attacking);
-					available.put(currentOriginRegion.getId(), available.get(currentOriginRegion.getId()) - disposed);
+					addMove(currentMove, decisions, disposed, speculativeMap, satisfaction, attacking);
 
 					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName())) {
-						usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, decisions, hasOnlyOnesAttacking,
-								speculativeMap, satisfaction);
+						usePotentialAttacks(availablePotential, potentialAttacks, currentTargetRegion, attacking, potentialAttackDecisions, speculativeMap,
+								satisfaction);
 					}
 					break;
 				}
@@ -178,10 +177,10 @@ public class BotMain implements Bot {
 		// add leftover potentialattacks to the pile of attacks
 
 		for (PotentialAttack p : potentialAttacks) {
-			if (!(availablePotential.get(p.getFrom()) == null) && availablePotential.get(p.getFrom()) > 1) {
+			if (availablePotential.get(p.getFrom()) > 1) {
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
 				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
-				addMove(currentMove, decisions, disposed, hasOnlyOnesAttacking, speculativeMap, satisfaction, attacking);
+				addMove(currentMove, potentialAttackDecisions, disposed, speculativeMap, satisfaction, attacking);
 				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
 			}
 
@@ -192,7 +191,7 @@ public class BotMain implements Bot {
 		for (FromTo f : backupKeys) {
 			int disposed = Math.min(available.get(f.getR1()), backupDecisions.get(f));
 			if (disposed > 0) {
-				addMove(f, decisions, disposed, hasOnlyOnesAttacking, speculativeMap, satisfaction, attacking);
+				addMove(f, decisions, disposed, speculativeMap, satisfaction, attacking);
 				available.put(f.getR1(), available.get(f.getR1()) - disposed);
 			}
 		}
@@ -200,16 +199,15 @@ public class BotMain implements Bot {
 		// exclude bad attacks from moves
 		Set<Integer> aKeys = attacking.keySet();
 		ArrayList<Integer> badAttacks = new ArrayList<Integer>();
+		ArrayList<Integer> badPotentialAttacks = new ArrayList<Integer>();
 
 		for (Integer r : aKeys) {
 			if ((!speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyName())))) {
 				if (speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyOpponentName()))) {
-					if (speculativeMap.getRegion(r).getArmies() > Values.maximumEnemyForcesAllowedPotentiallyLeftAfterAttack) {
-						badAttacks.add(r);
-
-					}
-				} else if (speculativeMap.getRegion(r).getPlayerName().equals("neutral")) {
+					badPotentialAttacks.add(r);
+				} else {
 					badAttacks.add(r);
+					badPotentialAttacks.add(r);
 				}
 			}
 		}
@@ -223,6 +221,19 @@ public class BotMain implements Bot {
 				} else {
 					moveOrders
 							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
+				}
+			}
+
+		}
+		keys = potentialAttackDecisions.keySet();
+		for (FromTo f : keys) {
+			if (!badPotentialAttacks.contains(f.getR2())) {
+				if (potentialAttackDecisions.get(f) == 1) {
+					moveOrders.add(0,
+							new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), potentialAttackDecisions.get(f)));
+				} else {
+					moveOrders
+							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), potentialAttackDecisions.get(f)));
 				}
 			}
 
@@ -274,15 +285,14 @@ public class BotMain implements Bot {
 	}
 
 	private void usePotentialAttacks(HashMap<Integer, Integer> availablePotential, ArrayList<PotentialAttack> potentialAttacks, Region currentTargetRegion,
-			HashMap<Integer, Integer> attacking, HashMap<FromTo, Integer> decisions, HashMap<Integer, Boolean> hasOnlyOnesAttacking, Map map,
-			HashMap<Integer, Integer> satisfaction) {
+			HashMap<Integer, Integer> attacking, HashMap<FromTo, Integer> decisions, Map map, HashMap<Integer, Integer> satisfaction) {
 		ArrayList<PotentialAttack> used = new ArrayList<PotentialAttack>();
 
 		for (PotentialAttack p : potentialAttacks) {
 			if (p.getTo().equals(currentTargetRegion.getId()) && availablePotential.get(p.getFrom()) != null) {
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), map.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
 				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
-				addMove(currentMove, decisions, disposed, hasOnlyOnesAttacking, map, satisfaction, attacking);
+				addMove(currentMove, decisions, disposed, map, satisfaction, attacking);
 				System.err.println("Potential Attack from: " + p.getFrom());
 				used.add(p);
 				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom() - disposed));
@@ -294,8 +304,8 @@ public class BotMain implements Bot {
 		}
 	}
 
-	private void addMove(FromTo currentMove, HashMap<FromTo, Integer> decisions, int disposed, HashMap<Integer, Boolean> hasOnlyOnesAttacking, Map map,
-			HashMap<Integer, Integer> satisfaction, HashMap<Integer, Integer> attacking) {
+	private void addMove(FromTo currentMove, HashMap<FromTo, Integer> decisions, int disposed, Map map, HashMap<Integer, Integer> satisfaction,
+			HashMap<Integer, Integer> attacking) {
 		if (decisions.get(currentMove) == null) {
 			decisions.put(currentMove, disposed);
 		} else {
@@ -303,7 +313,7 @@ public class BotMain implements Bot {
 		}
 
 		if (!map.getRegion(currentMove.getR2()).getPlayerName().equals(BotState.getMyName())) {
-			addAttacking(currentMove.getR2(), attacking, disposed, hasOnlyOnesAttacking, map, satisfaction);
+			addAttacking(currentMove.getR2(), attacking, disposed, map, satisfaction);
 		} else {
 			map.getRegion(currentMove.getR1()).setArmies(map.getRegion(currentMove.getR1()).getArmies() - disposed);
 			map.getRegion(currentMove.getR2()).setArmies(map.getRegion(currentMove.getR2()).getArmies() + disposed);
@@ -311,20 +321,13 @@ public class BotMain implements Bot {
 
 	}
 
-	private void addAttacking(Integer currentTargetRegion, HashMap<Integer, Integer> attacking, int disposed, HashMap<Integer, Boolean> hasOnlyOnesAttacking,
-			Map map, HashMap<Integer, Integer> satisfaction) {
+	private void addAttacking(Integer currentTargetRegion, HashMap<Integer, Integer> attacking, int disposed, Map map, HashMap<Integer, Integer> satisfaction) {
 		if (attacking.get(currentTargetRegion) == null) {
 			attacking.put(currentTargetRegion, disposed);
 		} else {
 			attacking.put(currentTargetRegion, attacking.get(currentTargetRegion) + disposed);
 		}
-		if (disposed > 1) {
-			hasOnlyOnesAttacking.put(currentTargetRegion, false);
-		} else {
-			if (hasOnlyOnesAttacking.get(currentTargetRegion) == null) {
-				hasOnlyOnesAttacking.put(currentTargetRegion, true);
-			}
-		}
+
 		Outcome outcome = Values.calculateAttackOutcome(disposed, map.getRegion(currentTargetRegion).getArmies());
 		int defendingLeft = outcome.getDefendingArmies();
 		int attackingLeft = outcome.getAttackingArmies();
