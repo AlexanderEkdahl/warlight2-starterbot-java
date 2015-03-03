@@ -79,6 +79,9 @@ public class DefensiveCommander implements TemplateCommander {
 			// amount of forces
 			if (needDefence.get(r) != null) {
 				int disposed = needDefence.get(r);
+				if (Values.defensiveCommanderUseSmallPlacements){
+					disposed = 1;
+				}
 				double weight = calculateWeight(map.getRegion(r), superRegionWorths, superRegionCosts, needDefence);
 				proposals.add(new ActionProposal(weight, map.getRegion(r), map.getRegion(r), disposed, new Plan(map.getRegion(r), map.getRegion(r)
 						.getSuperRegion()), "DefensiveCommander"));

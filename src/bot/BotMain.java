@@ -44,6 +44,12 @@ public class BotMain implements Bot {
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) {
 		long startTime = System.currentTimeMillis();
 
+		if (timeOut < 10000) {
+			Values.defensiveCommanderUseSmallPlacements = false;
+			System.err.println("Started using simplified defensive strategy");
+		} else {
+			Values.defensiveCommanderUseSmallPlacements = true;
+		}
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
 		Map speculativeMap = appreciator.getSpeculativeMap();
 		// where the magic happens

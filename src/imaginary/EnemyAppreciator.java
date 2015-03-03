@@ -149,8 +149,10 @@ public class EnemyAppreciator {
 	private int placeOnLastPlacements(int enemyPlacedArmies, ArrayList<PlaceArmiesMove> latestPlacements, ArrayList<PlaceArmiesMove> nextLatestPlacements) {
 		if (latestPlacements != null) {
 			for (PlaceArmiesMove p : latestPlacements) {
-				if (speculativeMap.getRegion(p.getRegion().getId()).hasNeighborWithOtherOwner()) {
-					placeArmies(speculativeMap.getRegion(p.getRegion().getId()), p.getArmies());
+				Region region = speculativeMap.getRegion(p.getRegion().getId());
+
+				if (region.getPlayerName().equals(BotState.getMyOpponentName()) && region.hasNeighborWithOtherOwner()) {
+					placeArmies(region, p.getArmies());
 					enemyPlacedArmies -= p.getArmies();
 				}
 

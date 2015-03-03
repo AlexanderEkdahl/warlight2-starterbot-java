@@ -29,7 +29,7 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 28;
+	public static final double rewardDefenseImportanceMultiplier = 32;
 //	public static final double rewardGriefDefenseMultiplier = 20;
 //	public static final double somewhatDefendedImportanceMultiplier = 1.5;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
@@ -54,6 +54,9 @@ public class Values {
 
 	public static final double maxSuperRegionSatisfactionMultiplier = 1.5;
 	public static final double maxRegionSatisfactionMultiplier = 1;
+	
+	// ////// PERFORMANCE
+	public static boolean defensiveCommanderUseSmallPlacements = true;
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
 
