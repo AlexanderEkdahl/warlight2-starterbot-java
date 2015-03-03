@@ -177,7 +177,7 @@ public class BotMain implements Bot {
 		// add leftover potentialattacks to the pile of attacks
 
 		for (PotentialAttack p : potentialAttacks) {
-			if (availablePotential.get(p.getFrom()) > 1) {
+			if ((availablePotential.get(p.getFrom()) != null) && availablePotential.get(p.getFrom()) > 1) {
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
 				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
 				addMove(currentMove, potentialAttackDecisions, disposed, speculativeMap, satisfaction, attacking);
@@ -229,11 +229,11 @@ public class BotMain implements Bot {
 		for (FromTo f : keys) {
 			if (!badPotentialAttacks.contains(f.getR2())) {
 				if (potentialAttackDecisions.get(f) == 1) {
-					moveOrders.add(0,
-							new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), potentialAttackDecisions.get(f)));
+					moveOrders.add(0, new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()),
+							potentialAttackDecisions.get(f)));
 				} else {
-					moveOrders
-							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), potentialAttackDecisions.get(f)));
+					moveOrders.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()),
+							potentialAttackDecisions.get(f)));
 				}
 			}
 

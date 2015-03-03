@@ -29,9 +29,9 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 20;
-	public static final double rewardGriefDefenseMultiplier = 20;
-	public static final double somewhatDefendedImportanceMultiplier = 1.5;
+	public static final double rewardDefenseImportanceMultiplier = 28;
+//	public static final double rewardGriefDefenseMultiplier = 20;
+//	public static final double somewhatDefendedImportanceMultiplier = 1.5;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
@@ -46,8 +46,8 @@ public class Values {
 	public static final double multipleFrontPenalty = 5;
 	public static final double staticRegionCost = 6;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
-	public static final double superRegionExponentialMultiplier = 1.2;
-	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double superRegionExponentialMultiplier = 1.1;
+	public static final double enemyVicinityExponentialPenalty = 1.1;
 	public static final double internalHopsExponentialPenalty = 1.2;
 
 	// ////// SATISFACTION
@@ -147,6 +147,7 @@ public class Values {
 		totalCost *= tables.getInternalHopsPenaltyFor(sr);
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
 		totalCost *= tables.getSizePenaltyFor(sr);
+		
 
 		return totalCost;
 	}
@@ -168,7 +169,8 @@ public class Values {
 		if (enemyNeighbors.size() == 0) {
 			// calculate instead the distance to the closest enemy
 		}
-		return Math.pow(enemyVicinityExponentialPenalty, (double) enemyNeighbors.size());
+		Tables table = Tables.getInstance();
+		return table.getEnemyVicinityExponentialPenaltyFor(enemyNeighbors.size());
 
 	}
 

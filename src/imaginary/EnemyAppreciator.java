@@ -81,13 +81,13 @@ public class EnemyAppreciator {
 	}
 
 	private void speculate() {
-		ArrayList<PlaceArmiesMove> latestPlacements = enemyPlacements.get(BotState.getRoundNumber()-1);
-		if (latestPlacements != null){
-			
-		}
-		
-		
 		int enemyPlacedArmies = estimatePlacedArmies();
+
+		ArrayList<PlaceArmiesMove> latestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 1);
+		ArrayList<PlaceArmiesMove> nextLatestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 1);
+
+		enemyPlacedArmies = placeOnLastPlacements(enemyPlacedArmies, latestPlacements, nextLatestPlacements);
+
 		Set<Region> vulnerable = speculativeMap.getAllEnemyVulnerableRegions();
 		Set<Region> annoying = speculativeMap.getallAnnoyingRegions();
 		Set<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();
@@ -103,15 +103,10 @@ public class EnemyAppreciator {
 		Set<Region> tier5 = new HashSet<Region>(allEnemyOwned);
 
 		if (tier1.size() > 0) {
-			int armiesPerRegion = enemyPlacedArmies / tier1.size();
-			for (Region r : tier1) {
-				placeArmies(r, armiesPerRegion);
-			}
+			placeAllOn(tier1, enemyPlacedArmies);
+
 		} else if (tier2.size() > 0) {
-			int armiesPerRegion = enemyPlacedArmies / tier2.size();
-			for (Region r : tier2) {
-				placeArmies(r, armiesPerRegion);
-			}
+			placeAllOn(tier2, enemyPlacedArmies);
 		} else if (tier3.size() > 0 || tier4.size() > 0 || tier5.size() > 0) {
 			Random rand = new Random();
 			ArrayList<Region> tier3List = new ArrayList<Region>();
@@ -122,7 +117,7 @@ public class EnemyAppreciator {
 			tier4List.addAll(tier4);
 			tier5List.addAll(tier5);
 			while (enemyPlacedArmies > 0) {
-				Float tier3Prob = (((float) tier3.size() * 3) / (((float) tier3.size() * 3) + ((float) tier4.size() + tier5.size())));
+				Float tier3Prob = (((float) tier3.size() * 2) / (((float) tier3.size() * 2) + ((float) tier4.size() + tier5.size())));
 
 				Float seed = rand.nextFloat();
 				if (seed <= tier3Prob) {
@@ -143,17 +138,41 @@ public class EnemyAppreciator {
 		}
 	}
 
+	private void placeAllOn(Set<Region> regions, int enemyPlacedArmies) {
+		int armiesPerRegion = enemyPlacedArmies / regions.size();
+		for (Region r : regions) {
+			placeArmies(r, armiesPerRegion);
+		}
+
+	}
+
+	private int placeOnLastPlacements(int enemyPlacedArmies, ArrayList<PlaceArmiesMove> latestPlacements, ArrayList<PlaceArmiesMove> nextLatestPlacements) {
+		if (latestPlacements != null) {
+			for (PlaceArmiesMove p : latestPlacements) {
+				if (speculativeMap.getRegion(p.getRegion().getId()).hasNeighborWithOtherOwner()) {
+					placeArmies(speculativeMap.getRegion(p.getRegion().getId()), p.getArmies());
+					enemyPlacedArmies -= p.getArmies();
+				}
+
+			}
+		}
+		return enemyPlacedArmies;
+	}
+
 	public void placeArmies(Region r, int disposed) {
 		r.setArmies(r.getArmies() + disposed);
 		System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
 	}
 
 	private int estimatePlacedArmies() {
-		int totalArmies = 5;
-		for (SuperRegion s : speculativeMap.getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())) {
-			totalArmies += s.getArmiesReward();
-
-		}
+		// int totalArmies = 5;
+		// for (SuperRegion s :
+		// speculativeMap.getSuspectedOwnedSuperRegions(BotState.getMyOpponentName()))
+		// {
+		// totalArmies += s.getArmiesReward();
+		//
+		// }
+		int totalArmies = IncomeAppreciator.getIncome();
 		return totalArmies;
 	}
 

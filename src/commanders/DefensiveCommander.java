@@ -10,6 +10,7 @@ import map.Pathfinder.Path;
 import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
+import math.Tables;
 import concepts.ActionProposal;
 import concepts.Plan;
 import bot.Values;
@@ -18,7 +19,8 @@ public class DefensiveCommander implements TemplateCommander {
 
 	private double calculateWeight(Region r, HashMap<SuperRegion, Double> superRegionWorths, HashMap<SuperRegion, Double> superRegionCosts,
 			HashMap<Integer, Integer> needDefence) {
-		double worth = Math.pow(Values.deficitDefenceExponentialMultiplier, needDefence.get(r.getId())) * superRegionWorths.get(r.getSuperRegion());
+		Tables tables = Tables.getInstance();
+		double worth = tables.getDeficitDefenceExponentialMultiplierFor(needDefence.get(r.getId())) * superRegionWorths.get(r.getSuperRegion());
 		double cost = superRegionCosts.get(r.getSuperRegion());
 		double weight = worth / cost;
 		return weight;
@@ -62,8 +64,10 @@ public class DefensiveCommander implements TemplateCommander {
 
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they defense
-			needDefence.put(r.getId(), Values.calculateRequiredForcesDefend(r) - r.getArmies());
+			int need = Math.max(Values.calculateRequiredForcesDefend(r) - r.getArmies(), 0);
+			needDefence.put(r.getId(), need);
 			needDefenceRegions.add(r);
+
 		}
 
 		for (Integer r : available) {

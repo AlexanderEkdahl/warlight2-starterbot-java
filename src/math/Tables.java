@@ -12,15 +12,21 @@ import map.SuperRegion;
 import map.Pathfinder.Path;
 
 public class Tables {
+	private static final int maxCalc = 30;
+
 	private static Tables tables;
 	private static HashMap<Integer, Double> internalHopsPenalty;
 	private static HashMap<Integer, Double> sizePenalty;
+	private static HashMap<Integer, Double> deficitDefenceExponentialMultiplier;
+	private static HashMap<Integer, Double> enemyVicinityExponentialPenalty;
 
-	private Tables(){
+	private Tables() {
 		internalHopsPenalty = new HashMap<Integer, Double>();
 		sizePenalty = new HashMap<Integer, Double>();
+		deficitDefenceExponentialMultiplier = new HashMap<Integer, Double>();
+		enemyVicinityExponentialPenalty = new HashMap<Integer, Double>();
 	}
-	
+
 	public static Tables getInstance() {
 		if (tables == null) {
 			tables = new Tables();
@@ -28,17 +34,20 @@ public class Tables {
 		return tables;
 
 	};
-	
-	public void introCalculation(Map map){
-		for (SuperRegion s : map.getSuperRegions()){
+
+	public void introCalculation(Map map) {
+		for (SuperRegion s : map.getSuperRegions()) {
 			sizePenalty.put(s.getId(), Math.pow(Values.superRegionExponentialMultiplier, (double) s.getSubRegions().size()));
 			internalHopsPenalty.put(s.getId(), Math.pow(Values.internalHopsExponentialPenalty, (double) calculateMaxInternalHops(s, map)));
-			
 		}
-		
+
+		for (int i = 0; i <= maxCalc; i++) {
+			deficitDefenceExponentialMultiplier.put(i, Math.pow(Values.deficitDefenceExponentialMultiplier, i));
+			enemyVicinityExponentialPenalty.put(i, Math.pow(Values.enemyVicinityExponentialPenalty, i));
+		}
+
 	}
-	
-	
+
 	private int calculateMaxInternalHops(SuperRegion sr, Map map) {
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
 			public double weight(Region nodeA, Region nodeB) {
@@ -61,22 +70,23 @@ public class Tables {
 		}
 		return maxHops;
 	}
+
 	public Double getInternalHopsPenaltyFor(SuperRegion s) {
 		return internalHopsPenalty.get(s.getId());
-	}
-
-	public void setInternalHopsPenalty(HashMap<Integer, Double> internalHopsPenalty) {
-		Tables.internalHopsPenalty = internalHopsPenalty;
 	}
 
 	public Double getSizePenaltyFor(SuperRegion s) {
 		return sizePenalty.get(s.getId());
 	}
 
-	public void setSizePenalty(HashMap<Integer, Double> sizePenalty) {
-		Tables.sizePenalty = sizePenalty;
+	public Double getEnemyVicinityExponentialPenaltyFor(int i) {
+		i = Math.min(i, maxCalc);
+		return enemyVicinityExponentialPenalty.get(i);
 	}
 
-
+	public Double getDeficitDefenceExponentialMultiplierFor(int i) {
+		i = Math.min(i, maxCalc);
+		return deficitDefenceExponentialMultiplier.get(i);
+	}
 
 }

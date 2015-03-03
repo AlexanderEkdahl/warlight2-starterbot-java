@@ -37,7 +37,7 @@ public class Region {
 
 		superRegion.addSubRegion(this);
 	}
-	
+
 	public Region(int id, SuperRegion superRegion, String playerName, int armies, boolean visible, boolean wasteland) {
 		this.id = id;
 		this.superRegion = superRegion;
@@ -138,11 +138,10 @@ public class Region {
 	public boolean getVisible() {
 		return visible;
 	}
-	
+
 	public void setNeighbors(ArrayList<Region> neighbors) {
 		this.neighbors = neighbors;
 	}
-
 
 	public int getTotalThreateningForce() {
 		int totalForce = 0;
@@ -196,12 +195,23 @@ public class Region {
 	}
 
 	public boolean hasNeighborWithName(String myName) {
-		for (Region n : getNeighbors()){
-			if (n.getPlayerName().equals(myName)){
+		for (Region n : getNeighbors()) {
+			if (n.getPlayerName().equals(myName)) {
 				return true;
 			}
 		}
 		return false;
+	}
+
+	public boolean hasNeighborWithOtherOwner() {
+		for (Region n : neighbors) {
+			if (!n.getPlayerName().equals(playerName)) {
+				return true;
+			}
+		}
+
+		return false;
+
 	}
 
 }

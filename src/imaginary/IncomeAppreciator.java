@@ -172,7 +172,7 @@ public class IncomeAppreciator {
     }
 
     int maximum = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() - 1);
-    currentIncome =  (maximum + minimum) / 2;
+    currentIncome =  minimum;
     
     return currentIncome;
 
