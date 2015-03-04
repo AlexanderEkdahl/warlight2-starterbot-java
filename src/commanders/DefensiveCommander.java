@@ -57,6 +57,7 @@ public class DefensiveCommander implements TemplateCommander {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
+		ArrayList<Region> rewardBlockers = map.getOwnedRewardBlockers();
 		HashMap<Integer, Integer> needDefence = new HashMap<Integer, Integer>();
 		ArrayList<Region> needDefenceRegions = new ArrayList<Region>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateWorths(map);
@@ -69,6 +70,11 @@ public class DefensiveCommander implements TemplateCommander {
 			needDefenceRegions.add(r);
 
 		}
+		for (Region r : rewardBlockers) {
+			int need = Math.max(Values.calculateRequiredForcesDefendRewardBlocker(r) - r.getArmies(), 0);
+			needDefence.put(r.getId(), need);
+			needDefenceRegions.add(r);
+		}
 
 		for (Integer r : available) {
 			// if this region is in need of defence and has too few currently on
@@ -77,9 +83,9 @@ public class DefensiveCommander implements TemplateCommander {
 			// who cares what I think
 			// if it needs to be defended set a proposal to contain the needed
 			// amount of forces
-			if (needDefence.get(r) != null) {
+			if (needDefence.get(r) != null && needDefence.get(r) > 0) {
 				int disposed = needDefence.get(r);
-				if (Values.defensiveCommanderUseSmallPlacements){
+				if (Values.defensiveCommanderUseSmallPlacements) {
 					disposed = 1;
 				}
 				double weight = calculateWeight(map.getRegion(r), superRegionWorths, superRegionCosts, needDefence);

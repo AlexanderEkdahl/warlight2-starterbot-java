@@ -279,8 +279,8 @@ public class Map {
 			regionDuplicateNumbers.put(regionDuplicate.getId(), regionDuplicate);
 
 		}
-		for (Region r : regions.values()){
-			for (Region n : r.getNeighbors()){
+		for (Region r : regions.values()) {
+			for (Region n : r.getNeighbors()) {
 				regionDuplicateNumbers.get(r.getId()).addNeighbor(regionDuplicateNumbers.get(n.getId()));
 			}
 		}
@@ -288,19 +288,20 @@ public class Map {
 		return newMap;
 	}
 
-//	public ArrayList<Region> getInterestingRegions(){
-//		// interesting is defined as not being the same owned by the same person as all tiles next to it
-//		ArrayList<Region> interestingRegions = new ArrayList<Region>();
-//		for (Region r : regions.values()){
-//			String owner = r.getPlayerName();
-//			for (Region n : r.getNeighbors()){
-//				
-//			}
-//		}
-//		
-//		return null;
-//		
-//	}
+	// public ArrayList<Region> getInterestingRegions(){
+	// // interesting is defined as not being the same owned by the same person
+	// as all tiles next to it
+	// ArrayList<Region> interestingRegions = new ArrayList<Region>();
+	// for (Region r : regions.values()){
+	// String owner = r.getPlayerName();
+	// for (Region n : r.getNeighbors()){
+	//
+	// }
+	// }
+	//
+	// return null;
+	//
+	// }
 	public void updateMap(String[] mapInput) {
 		ArrayList<Region> visibleRegions = new ArrayList<Region>();
 		HashSet<Region> invisibleRegions = new HashSet<Region>(regions.values());
@@ -450,17 +451,17 @@ public class Map {
 
 	public Set<Region> getAllEnemyVulnerableRegions() {
 		Set<Region> vulnerable = new HashSet<Region>();
-		for (SuperRegion s : getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())){
-			for (Region r : s.getSubRegions()){
-				if (r.getPlayerName().equals(BotState.getMyOpponentName())){
-					for (Region n : r.getNeighbors()){
-						if (n.getPlayerName().equals(BotState.getMyName())){
+		for (SuperRegion s : getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())) {
+			for (Region r : s.getSubRegions()) {
+				if (r.getPlayerName().equals(BotState.getMyOpponentName())) {
+					for (Region n : r.getNeighbors()) {
+						if (n.getPlayerName().equals(BotState.getMyName())) {
 							vulnerable.add(r);
 							break;
 						}
 					}
 				}
-				
+
 			}
 		}
 		// TODO Auto-generated method stub
@@ -469,19 +470,22 @@ public class Map {
 
 	public Set<Region> getallAnnoyingRegions() {
 		Set<Region> annoyingRegions = new HashSet<Region>();
-		for (SuperRegion s : superRegions){
+		for (SuperRegion s : superRegions) {
 			annoyingRegions.addAll(s.getAnnoyingRegions());
 
 		}
 		return annoyingRegions;
 	}
 
-	// public ArrayList<Region> getRewardBlockers() {
-	// ArrayList<Region> rewardBlockers = new ArrayList<Region>();
-	// for (Region r : getOwnedRegions(BotState.getMyName())){
-	// if (r.isOnlyFriendlyRegionInSuperRegion() && )
-	// }
-	//
-	// return rewardBlockers;
-	// }
+	public ArrayList<Region> getOwnedRewardBlockers() {
+		ArrayList<Region> rewardBlockers = new ArrayList<Region>();
+		for (Region r : getOwnedRegions(BotState.getMyName())) {
+			if (r.isOnlyFriendlyRegionInSuperRegion()) {
+				rewardBlockers.add(r);
+			}
+		}
+
+		return rewardBlockers;
+	}
+
 }

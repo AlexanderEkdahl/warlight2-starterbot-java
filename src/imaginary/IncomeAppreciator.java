@@ -144,9 +144,9 @@ public class IncomeAppreciator {
     evidenceOfOwnership(currentObservedIncome);
 
     int currentKnownMinimumIncome = knownIncome();
-    System.err.println("\tcurrentKnownMinimumIncome: " + currentKnownMinimumIncome);
-    System.err.println("\tpotentialIncomes: " + potentialIncome(currentKnownMinimumIncome));
-    System.err.println("\tobservedIncome: " + currentObservedIncome);
+//    System.err.println("\tcurrentKnownMinimumIncome: " + currentKnownMinimumIncome);
+//    System.err.println("\tpotentialIncomes: " + potentialIncome(currentKnownMinimumIncome));
+//    System.err.println("\tobservedIncome: " + currentObservedIncome);
   }
   
   public static int getIncome(){

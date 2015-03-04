@@ -20,7 +20,8 @@ public class Values {
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final int maximumEnemyForcesAllowedPotentiallyLeftAfterAttack = 5;
-	public static final double percentageOfAttackingNeededForDefence = 0.8;
+	public static final double partOfAttackingNeededForDefence = 1;
+	public static final double partOfAttackingNeededForRewardBlockerDefence = 0.6;
 
 	// ////// REWARDS
 
@@ -30,8 +31,7 @@ public class Values {
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 15;
 	public static final double rewardDefenseImportanceMultiplier = 32;
-//	public static final double rewardGriefDefenseMultiplier = 20;
-//	public static final double somewhatDefendedImportanceMultiplier = 1.5;
+	public static final double rewardGriefDefenseMultiplier = 20;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
@@ -43,18 +43,18 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double multipleFrontPenalty = 5;
+	public static final double multipleFrontPenalty = 7;
 	public static final double staticRegionCost = 6;
-	public static final double costMultiplierDefendingAgainstEnemy = 0.5;
+	public static final double costMultiplierDefendingAgainstEnemy = 0.1;
 	public static final double superRegionExponentialMultiplier = 1.1;
-	public static final double enemyVicinityExponentialPenalty = 1.1;
+	public static final double enemyVicinityExponentialPenalty = 1.2;
 	public static final double internalHopsExponentialPenalty = 1.2;
 
 	// ////// SATISFACTION
 
 	public static final double maxSuperRegionSatisfactionMultiplier = 1.5;
 	public static final double maxRegionSatisfactionMultiplier = 1;
-	
+
 	// ////// PERFORMANCE
 	public static boolean defensiveCommanderUseSmallPlacements = true;
 
@@ -150,7 +150,6 @@ public class Values {
 		totalCost *= tables.getInternalHopsPenaltyFor(sr);
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
 		totalCost *= tables.getSizePenaltyFor(sr);
-		
 
 		return totalCost;
 	}
@@ -243,14 +242,13 @@ public class Values {
 			total += r.getArmies() - 1;
 		}
 
-		total *= percentageOfAttackingNeededForDefence;
+		total *= partOfAttackingNeededForDefence;
 
 		return total;
 	}
 
 	public static int calculateRequiredForcesDefend(Region region) {
 		ArrayList<Region> enemyNeighbors = region.getEnemyNeighbors();
-
 		return calculateRequiredForcesDefendRegionAgainstSpecificRegions(enemyNeighbors);
 
 	}
@@ -291,6 +289,13 @@ public class Values {
 		}
 		return untakenRegions * regionConnectionBonus;
 
+	}
+
+	public static int calculateRequiredForcesDefendRewardBlocker(Region r) {
+		// TODO Auto-generated method stub
+		int required = (int) (calculateRequiredForcesDefend(r) * partOfAttackingNeededForRewardBlockerDefence);
+
+		return required;
 	}
 
 }

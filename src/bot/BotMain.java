@@ -46,9 +46,11 @@ public class BotMain implements Bot {
 
 		if (timeOut < 10000) {
 			Values.defensiveCommanderUseSmallPlacements = false;
-			System.err.println("Started using simplified defensive strategy");
+			System.err.println("Using performance - cheap defensive strategy");
 		} else {
 			Values.defensiveCommanderUseSmallPlacements = true;
+			System.err.println("Using performance - expensive defensive strategy");
+
 		}
 		EnemyAppreciator appreciator = state.getFullMap().getAppreciator();
 		Map speculativeMap = appreciator.getSpeculativeMap();

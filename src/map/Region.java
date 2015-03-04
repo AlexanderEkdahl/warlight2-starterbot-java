@@ -214,4 +214,17 @@ public class Region {
 
 	}
 
+	public boolean isOnlyFriendlyRegionInSuperRegion() {
+		if (playerName != BotState.getMyName()){
+			return false;
+		}
+		for (Region r : superRegion.getSubRegions()) {
+			if (!r.equals(this) && !r.getPlayerName().equals(BotState.getMyOpponentName())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 }
