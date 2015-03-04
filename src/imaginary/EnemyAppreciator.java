@@ -98,7 +98,7 @@ public class EnemyAppreciator {
 		tier1.retainAll(vulnerable);
 		Set<Region> tier2 = new HashSet<Region>(directlyThreatening);
 		tier2.addAll(vulnerable);
-		Set<Region> tier3 = new HashSet<Region>(annoying);
+		tier2.addAll(annoying);
 		Set<Region> tier4 = new HashSet<Region>(otherwiseThreatening);
 		Set<Region> tier5 = new HashSet<Region>(allEnemyOwned);
 
@@ -107,23 +107,14 @@ public class EnemyAppreciator {
 
 		} else if (tier2.size() > 0) {
 			placeAllOn(tier2, enemyPlacedArmies);
-		} else if (tier3.size() > 0 || tier4.size() > 0 || tier5.size() > 0) {
+		} else if (tier4.size() > 0 || tier5.size() > 0) {
 			Random rand = new Random();
-			ArrayList<Region> tier3List = new ArrayList<Region>();
 			ArrayList<Region> tier4List = new ArrayList<Region>();
 			ArrayList<Region> tier5List = new ArrayList<Region>();
 
-			tier3List.addAll(tier3);
 			tier4List.addAll(tier4);
 			tier5List.addAll(tier5);
 			while (enemyPlacedArmies > 0) {
-				Float tier3Prob = (((float) tier3.size() * 2) / (((float) tier3.size() * 2) + ((float) tier4.size() + tier5.size())));
-
-				Float seed = rand.nextFloat();
-				if (seed <= tier3Prob) {
-					int selected = rand.nextInt(tier3.size());
-					placeArmies(tier3List.get(selected), 1);
-				} else {
 					int selected = rand.nextInt(tier4.size() + tier5.size());
 					if (selected < tier4.size()) {
 						placeArmies(tier4List.get(selected), 1);
@@ -131,12 +122,12 @@ public class EnemyAppreciator {
 						selected -= tier4.size();
 						placeArmies(tier5List.get(selected), 1);
 					}
+					enemyPlacedArmies--;
 				}
-				enemyPlacedArmies--;
 			}
 
 		}
-	}
+	
 
 	private void placeAllOn(Set<Region> regions, int enemyPlacedArmies) {
 		int armiesPerRegion = enemyPlacedArmies / regions.size();
