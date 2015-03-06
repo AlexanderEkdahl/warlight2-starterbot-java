@@ -39,15 +39,11 @@ public class DefensiveCommander implements TemplateCommander {
 		return worths;
 	}
 
-	private double calculateCost(SuperRegion s) {
-		double cost = (s.getFronts().size() * Values.multipleFrontPenalty) + (s.getTotalThreateningForce() * Values.costMultiplierDefendingAgainstEnemy);
-		return cost;
-	}
 
 	private HashMap<SuperRegion, Double> calculateCosts(Map map) {
 		HashMap<SuperRegion, Double> costs = new HashMap<SuperRegion, Double>();
 		for (SuperRegion s : map.getSuperRegions()) {
-			costs.put(s, calculateCost(s));
+			costs.put(s, Values.calculateSuperRegionWeighedCost(s, map));
 		}
 		return costs;
 	}

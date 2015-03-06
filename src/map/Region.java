@@ -11,6 +11,9 @@
 package map;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import bot.BotState;
 
@@ -225,6 +228,17 @@ public class Region {
 		}
 
 		return true;
+	}
+
+	public Collection<? extends Region> getUnOwnedNeighbors() {
+		Set<Region> unOwnedNeighbors = new HashSet<Region>();
+		for (Region n : neighbors){
+			if (!n.getPlayerName().equals(BotState.getMyName())){
+				unOwnedNeighbors.add(n);
+			}
+		}
+		
+		return unOwnedNeighbors;
 	}
 
 }

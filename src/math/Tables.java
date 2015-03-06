@@ -19,12 +19,14 @@ public class Tables {
 	private static HashMap<Integer, Double> sizePenalty;
 	private static HashMap<Integer, Double> deficitDefenceExponentialMultiplier;
 	private static HashMap<Integer, Double> enemyVicinityExponentialPenalty;
+	private static HashMap<Integer, Double> multipleFrontExponentialPenalty;
 
 	private Tables() {
 		internalHopsPenalty = new HashMap<Integer, Double>();
 		sizePenalty = new HashMap<Integer, Double>();
 		deficitDefenceExponentialMultiplier = new HashMap<Integer, Double>();
 		enemyVicinityExponentialPenalty = new HashMap<Integer, Double>();
+		multipleFrontExponentialPenalty = new HashMap<Integer, Double>();
 	}
 
 	public static Tables getInstance() {
@@ -37,13 +39,14 @@ public class Tables {
 
 	public void introCalculation(Map map) {
 		for (SuperRegion s : map.getSuperRegions()) {
-			sizePenalty.put(s.getId(), Math.pow(Values.superRegionExponentialMultiplier, (double) s.getSubRegions().size()));
+			sizePenalty.put(s.getId(), Math.pow(Values.superRegionSizeExponentialPenalty, (double) s.getSubRegions().size()));
 			internalHopsPenalty.put(s.getId(), Math.pow(Values.internalHopsExponentialPenalty, (double) calculateMaxInternalHops(s, map)));
 		}
 
 		for (int i = 0; i <= maxCalc; i++) {
 			deficitDefenceExponentialMultiplier.put(i, Math.pow(Values.deficitDefenceExponentialMultiplier, i));
 			enemyVicinityExponentialPenalty.put(i, Math.pow(Values.enemyVicinityExponentialPenalty, i));
+			multipleFrontExponentialPenalty.put(i, Math.pow(Values.multipleFrontExponentialPenalty, i));
 		}
 
 	}
@@ -87,6 +90,10 @@ public class Tables {
 	public Double getDeficitDefenceExponentialMultiplierFor(int i) {
 		i = Math.min(i, maxCalc);
 		return deficitDefenceExponentialMultiplier.get(i);
+	}
+	public Double getMultipleFrontExponentialPenaltyFor(int i) {
+		i = Math.min(i, maxCalc);
+		return multipleFrontExponentialPenalty.get(i);
 	}
 
 }
