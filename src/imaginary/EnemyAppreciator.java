@@ -84,7 +84,7 @@ public class EnemyAppreciator {
 		int enemyPlacedArmies = estimatePlacedArmies();
 
 		ArrayList<PlaceArmiesMove> latestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 1);
-		ArrayList<PlaceArmiesMove> nextLatestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 1);
+		ArrayList<PlaceArmiesMove> nextLatestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 2);
 
 		enemyPlacedArmies = placeOnLastPlacements(enemyPlacedArmies, latestPlacements, nextLatestPlacements);
 
