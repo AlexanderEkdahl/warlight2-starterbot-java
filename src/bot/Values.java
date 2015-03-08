@@ -26,12 +26,12 @@ public class Values {
 	// ////// REWARDS
 
 	public static final double staticPocketDefence = 30;
-	public static final double rewardMultiplier = 60;
+	public static final double rewardMultiplier = 120;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 15;
-	public static final double rewardDefenseImportanceMultiplier = 30;
-	public static final double rewardGriefDefenseMultiplier = 20;
+	public static final double valueDenialMultiplier = 30;
+	public static final double rewardDefenseImportanceMultiplier = 15;
+	// public static final double rewardGriefDefenseMultiplier = 30;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
@@ -43,13 +43,12 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	
 	public static final double staticRegionCost = 6;
 	public static final double costMultiplierDefendingAgainstEnemy = 0.1;
 	public static final double superRegionSizeExponentialPenalty = 1.1;
 	public static final double enemyVicinityExponentialPenalty = 1.2;
 	public static final double internalHopsExponentialPenalty = 1.2;
-	public static final double multipleFrontExponentialPenalty = 1.1;
+	// public static final double multipleFrontExponentialPenalty = 1.1;
 	// ////// SATISFACTION
 
 	public static final double maxSuperRegionSatisfactionMultiplier = 1.5;
@@ -149,30 +148,30 @@ public class Values {
 		totalCost *= tables.getInternalHopsPenaltyFor(sr);
 		totalCost *= tables.getSizePenaltyFor(sr);
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
-		totalCost *= calculateFrontsOpened(sr,map);
-		
+		// totalCost *= calculateFrontsOpened(sr,map);
 
 		return totalCost;
 	}
 
-	private static double calculateFrontsOpened(SuperRegion sr, Map map) {
-		Set<Region> alreadyHasContact = new HashSet<Region>();
-		Set<Region> contactWithSuperRegion = new HashSet<Region>();
-		
-		for (Region r : map.getOwnedRegions(BotState.getMyName())){
-			alreadyHasContact.addAll(r.getUnOwnedNeighbors());
-		}
-		for (Region r : sr.getSubRegions()){
-			contactWithSuperRegion.addAll(r.getUnOwnedNeighbors());
-		}
-		
-		contactWithSuperRegion.removeAll(alreadyHasContact);
-		Tables tables = Tables.getInstance();
-		
-		
-		return tables.getMultipleFrontExponentialPenaltyFor(contactWithSuperRegion.size());
-		
-	}
+	// private static double calculateFrontsOpened(SuperRegion sr, Map map) {
+	// Set<Region> alreadyHasContact = new HashSet<Region>();
+	// Set<Region> contactWithSuperRegion = new HashSet<Region>();
+	//
+	// for (Region r : map.getOwnedRegions(BotState.getMyName())){
+	// alreadyHasContact.addAll(r.getUnOwnedNeighbors());
+	// }
+	// for (Region r : sr.getSubRegions()){
+	// contactWithSuperRegion.addAll(r.getUnOwnedNeighbors());
+	// }
+	//
+	// contactWithSuperRegion.removeAll(alreadyHasContact);
+	// Tables tables = Tables.getInstance();
+	//
+	//
+	// return
+	// tables.getMultipleFrontExponentialPenaltyFor(contactWithSuperRegion.size());
+	//
+	// }
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
 		// determine if this superregion borders an enemy region and if so how

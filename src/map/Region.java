@@ -182,12 +182,15 @@ public class Region {
 	}
 
 	public int getSuspectedOwnedRegion() {
-		if (getPlayerName().equals(BotState.getMyOpponentName())) {
+		if (playerName.equals(BotState.getMyOpponentName())) {
 			return 1;
-		} else if (getPlayerName().equals("unknown")) {
+		}
+		else if (!visible){
 			return 0;
-		} else
+		}
+		else{
 			return -1000;
+		}
 	}
 
 	public Region duplicateInto(SuperRegion s) {

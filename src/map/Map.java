@@ -418,8 +418,9 @@ public class Map {
 		Set<Region> threatening = new HashSet<Region>();
 		for (Region r : getEnemyRegions()) {
 			for (Region n : r.getNeighbors()) {
-				if (n.getSuperRegion().ownedByPlayer(BotState.getMyName()) && !threatening.contains(n)) {
+				if (n.getSuperRegion().ownedByPlayer(BotState.getMyName())) {
 					threatening.add(r);
+					break;
 				}
 			}
 		}

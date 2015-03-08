@@ -103,11 +103,14 @@ public class EnemyAppreciator {
 		Set<Region> tier5 = new HashSet<Region>(allEnemyOwned);
 
 		if (tier1.size() > 0) {
+			System.err.println("EnemyAppreciator placing enemy forces on tier 1 regions, there are " + tier1.size());
 			placeAllOn(tier1, enemyPlacedArmies);
-
 		} else if (tier2.size() > 0) {
+			System.err.println("EnemyAppreciator placing enemy forces on tier 2 regions, there are " + tier2.size());
 			placeAllOn(tier2, enemyPlacedArmies);
 		} else if (tier4.size() > 0 || tier5.size() > 0) {
+			System.err.println("EnemyAppreciator placing enemy forces on tier 4 & 5 regions, there are " + (tier4.size() + tier5.size()));
+
 			Random rand = new Random();
 			ArrayList<Region> tier4List = new ArrayList<Region>();
 			ArrayList<Region> tier5List = new ArrayList<Region>();
@@ -115,40 +118,49 @@ public class EnemyAppreciator {
 			tier4List.addAll(tier4);
 			tier5List.addAll(tier5);
 			while (enemyPlacedArmies > 0) {
-					int selected = rand.nextInt(tier4.size() + tier5.size());
-					if (selected < tier4.size()) {
-						placeArmies(tier4List.get(selected), 1);
-					} else {
-						selected -= tier4.size();
-						placeArmies(tier5List.get(selected), 1);
-					}
-					enemyPlacedArmies--;
+				int selected = rand.nextInt(tier4.size() + tier5.size());
+				if (selected < tier4.size()) {
+					placeArmies(tier4List.get(selected), 1);
+				} else {
+					selected -= tier4.size();
+					placeArmies(tier5List.get(selected), 1);
 				}
+				enemyPlacedArmies--;
 			}
-
 		}
-	
+
+	}
 
 	private void placeAllOn(Set<Region> regions, int enemyPlacedArmies) {
 		int armiesPerRegion = enemyPlacedArmies / regions.size();
 		for (Region r : regions) {
 			placeArmies(r, armiesPerRegion);
+			enemyPlacedArmies--;
+		}
+		if (enemyPlacedArmies > 0){
+			placeArmies(regions.iterator().next(), enemyPlacedArmies);
 		}
 
 	}
 
 	private int placeOnLastPlacements(int enemyPlacedArmies, ArrayList<PlaceArmiesMove> latestPlacements, ArrayList<PlaceArmiesMove> nextLatestPlacements) {
+		boolean hasPlaced = false;
 		if (latestPlacements != null) {
 			for (PlaceArmiesMove p : latestPlacements) {
 				Region region = speculativeMap.getRegion(p.getRegion().getId());
-
 				if (region.getPlayerName().equals(BotState.getMyOpponentName()) && region.hasNeighborWithOtherOwner()) {
 					placeArmies(region, p.getArmies());
 					enemyPlacedArmies -= p.getArmies();
+					hasPlaced = true;
 				}
 
 			}
 		}
+		if (hasPlaced) {
+			System.err.println("EnemyAppreciator placing enemy forces on regions that have been used by the enemy before");
+
+		}
+
 		return enemyPlacedArmies;
 	}
 
