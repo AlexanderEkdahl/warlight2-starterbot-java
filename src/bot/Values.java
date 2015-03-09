@@ -29,9 +29,9 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 30;
-	public static final double rewardDefenseImportanceMultiplier = 15;
+	public static final double rewardDefenseImportanceMultiplier = 20;
 	// public static final double rewardGriefDefenseMultiplier = 30;
-	public static final double deficitDefenceExponentialMultiplier = 1.05;
+	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
 	// ////// COSTS
 

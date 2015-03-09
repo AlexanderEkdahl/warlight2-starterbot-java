@@ -339,32 +339,38 @@ public class BotMain implements Bot {
 		}
 		attackingAgainst.get(currentTargetRegion).get(currentOriginRegion);
 
-		calculateOutcomeForRegion(currentTargetRegion, map, satisfaction, attackingAgainst, startingEnemyForces);
+		calculateOutcomeForRegion(currentTargetRegion, currentOriginRegion, disposed, map, satisfaction, attackingAgainst, startingEnemyForces);
 
 	}
 
-	private void calculateOutcomeForRegion(Integer currentTargetRegion, Map map, HashMap<Integer, Integer> satisfaction,
-			HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst, HashMap<Integer, Integer> startingEnemyForces) {
+	private void calculateOutcomeForRegion(Integer currentTargetRegion, Integer currentOriginRegion, int disposed, Map map,
+			HashMap<Integer, Integer> satisfaction, HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst, HashMap<Integer, Integer> startingEnemyForces) {
 		int defending = startingEnemyForces.get(currentTargetRegion);
-		int latestAttacking = 0;
+		int latestAttackingLeft = 0;
+		int latestAttackingTotal = 0;
 		Outcome currentOutcome = null;
-		for (Integer currentOriginRegion : attackingAgainst.get(currentTargetRegion).keySet()) {
+		if (map.getUnOwnedRegions().size() < 2){
+			return;
+		}
+		for (Integer tempOriginRegion : attackingAgainst.get(currentTargetRegion).keySet()) {
 			if (defending > 0) {
-				currentOutcome = Values.calculateAttackOutcome(attackingAgainst.get(currentTargetRegion).get(currentOriginRegion), defending);
+				latestAttackingTotal = attackingAgainst.get(currentTargetRegion).get(tempOriginRegion);
+				currentOutcome = Values.calculateAttackOutcome(latestAttackingTotal, defending);
 				defending = currentOutcome.getDefendingArmies();
-				latestAttacking = currentOutcome.getAttackingArmies();
+				latestAttackingLeft = currentOutcome.getAttackingArmies();
+				if (defending < 1) {
+					map.getRegion(currentTargetRegion).setArmies(latestAttackingLeft);
+					map.getRegion(currentTargetRegion).setPlayerName(BotState.getMyName());
+					map.getRegion(currentOriginRegion).setArmies(map.getRegion(currentOriginRegion).getArmies() - latestAttackingTotal);
+					satisfaction.put(currentTargetRegion, Values.calculateRequiredForcesDefend(map.getRegion(currentTargetRegion)) - latestAttackingLeft);
+				} else {
+					int lost = latestAttackingTotal - latestAttackingLeft;
+					map.getRegion(currentTargetRegion).setArmies(defending);
+					map.getRegion(currentOriginRegion).setArmies(map.getRegion(currentOriginRegion).getArmies() - lost);
+
+				}
 			}
 
 		}
-
-		if (defending < 1) {
-			map.getRegion(currentTargetRegion).setArmies(latestAttacking);
-			map.getRegion(currentTargetRegion).setPlayerName(BotState.getMyName());
-			satisfaction.put(currentTargetRegion, Values.calculateRequiredForcesDefend(map.getRegion(currentTargetRegion)) - latestAttacking);
-		} else {
-			map.getRegion(currentTargetRegion).setArmies(defending);
-		}
-
 	}
-
 }
