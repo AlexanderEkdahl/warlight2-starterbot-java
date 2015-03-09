@@ -176,7 +176,7 @@ public class IncomeAppreciator {
 		}
 
 		int maximum = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() - 1);
-		int likely = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() / 4);
+		int likely = potentialIncome(knownIncome()).get(potentialIncome(knownIncome()).size() / 6);
 		currentIncome = likely;
 
 		return currentIncome;

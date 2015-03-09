@@ -105,7 +105,6 @@ public class BotMain implements Bot {
 		for (Region r : original.getUnOwnedRegions()) {
 			startingEnemyForces.put(r.getId(), r.getArmies());
 		}
-		
 
 		Set<Integer> interestingKeys = available.keySet();
 
@@ -202,7 +201,7 @@ public class BotMain implements Bot {
 		Set<FromTo> backupKeys = backupDecisions.keySet();
 		for (FromTo f : backupKeys) {
 			int disposed = Math.min(available.get(f.getR1()), backupDecisions.get(f));
-			if (disposed > 0) {
+			if (disposed > 0 && satisfaction.get(f.getR2()) > -10) {
 				addMove(f, decisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces);
 				available.put(f.getR1(), available.get(f.getR1()) - disposed);
 			}
@@ -350,12 +349,12 @@ public class BotMain implements Bot {
 		int latestAttacking = 0;
 		Outcome currentOutcome = null;
 		for (Integer currentOriginRegion : attackingAgainst.get(currentTargetRegion).keySet()) {
-			if (defending > 0){
+			if (defending > 0) {
 				currentOutcome = Values.calculateAttackOutcome(attackingAgainst.get(currentTargetRegion).get(currentOriginRegion), defending);
 				defending = currentOutcome.getDefendingArmies();
 				latestAttacking = currentOutcome.getAttackingArmies();
 			}
-			
+
 		}
 
 		if (defending < 1) {

@@ -135,7 +135,7 @@ public class EnemyAppreciator {
 		int armiesPerRegion = enemyPlacedArmies / regions.size();
 		for (Region r : regions) {
 			placeArmies(r, armiesPerRegion);
-			enemyPlacedArmies--;
+			enemyPlacedArmies -= armiesPerRegion;
 		}
 		if (enemyPlacedArmies > 0){
 			placeArmies(regions.iterator().next(), enemyPlacedArmies);

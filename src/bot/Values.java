@@ -19,7 +19,6 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
-	public static final int maximumEnemyForcesAllowedPotentiallyLeftAfterAttack = 5;
 	public static final double partOfAttackingNeededForDefence = 1;
 	public static final double partOfAttackingNeededForRewardBlockerDefence = 0.6;
 
@@ -233,7 +232,7 @@ public class Values {
 		} else if (armySize <= 3) {
 			return armySize + 3;
 		} else if (armySize <= 5) {
-			return armySize + 6;
+			return armySize + 4;
 		} else {
 			return (int) (armySize * 2.0);
 		}
