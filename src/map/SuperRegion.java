@@ -69,20 +69,6 @@ public class SuperRegion {
 	 * @return The number of neutrals in this superregion at the start of the
 	 *         game
 	 */
-	public int getInitialNeutralCount() {
-		int neutrals = 0;
-
-		for (Region region : this.getSubRegions()) {
-			neutrals += 2;
-
-			// Wasteland contains 10 neutral enemies
-			if (region.getWasteland()) {
-				neutrals += 4;
-			}
-		}
-
-		return neutrals;
-	}
 
 	public ArrayList<Region> getFronts() {
 		ArrayList<Region> fronts = new ArrayList<Region>();

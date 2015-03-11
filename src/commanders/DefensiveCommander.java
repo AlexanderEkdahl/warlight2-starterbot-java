@@ -2,6 +2,7 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import map.Map;
@@ -38,7 +39,6 @@ public class DefensiveCommander implements TemplateCommander {
 		}
 		return worths;
 	}
-
 
 	private HashMap<SuperRegion, Double> calculateCosts(Map map) {
 		HashMap<SuperRegion, Double> costs = new HashMap<SuperRegion, Double>();
@@ -99,10 +99,9 @@ public class DefensiveCommander implements TemplateCommander {
 					double currentCost = path.getDistance() + superRegionCosts.get(path.getTarget().getSuperRegion());
 					double currentWorth = superRegionWorths.get(path.getTarget().getSuperRegion());
 					double currentWeight = currentWorth / currentCost;
-
-					for (int i = 1; i < path.getPath().size(); i++) {
-						totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-					}
+					ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+					regionsAttacked.remove(0);
+					totalRequired += Values.calculateRequiredForcesForRegions(regionsAttacked);
 					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path
 							.getTarget().getSuperRegion()), "DefensiveCommander"));
 

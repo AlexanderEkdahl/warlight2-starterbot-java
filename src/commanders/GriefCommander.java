@@ -3,6 +3,7 @@ package commanders;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import map.Map;
@@ -54,10 +55,9 @@ public class GriefCommander implements TemplateCommander {
 				double currentPathCost = path.getDistance();
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / currentPathCost;
-				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-				}
+				ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+				regionsAttacked.remove(0);
+				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
 
 				proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(),
 						path.getTarget().getSuperRegion()), "GriefCommander"));

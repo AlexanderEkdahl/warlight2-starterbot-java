@@ -2,6 +2,7 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import concepts.ActionProposal;
@@ -101,10 +102,9 @@ public class OffensiveCommander  {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
 				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
-				int totalRequired = 0;
-				for (int i = 1; i < path.getPath().size(); i++) {
-					totalRequired += Values.calculateRequiredForcesAttack(path.getPath().get(i));
-				}
+				ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+				regionsAttacked.remove(0);
+				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
 				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired,
 						new Plan(path.getTarget(), path.getTarget().getSuperRegion()), "OffensiveCommander"));
 

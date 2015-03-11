@@ -42,7 +42,9 @@ public class BotState {
 		roundNumber = 0;
 		map.initAppreciator();
 		opponentMoves = new ArrayList<ArrayList<Move>>();
-		 incomeAppreciator = new IncomeAppreciator(this);
+		incomeAppreciator = new IncomeAppreciator(this);
+		pickableStartingRegions = new ArrayList<Region>();
+
 	}
 
 	public void updateSettings(String key, String value) {
@@ -60,15 +62,12 @@ public class BotState {
 			startingArmies = Integer.parseInt(value);
 			roundNumber++; // next round
 		} else if (key.equals("starting_regions")) {
-
-			// Do nothing
+			setRegularRegions();
 		}
 	}
 
 	public void setStartingRegions(String[] value) {
-		pickableStartingRegions = new ArrayList<Region>();
 		pickableStartingRegions.addAll(getRegions(value));
-		setRegularRegions();
 	}
 
 	private ArrayList<Region> getRegions(String[] value) {
@@ -87,8 +86,7 @@ public class BotState {
 
 	private void setRegularRegions() {
 		for (Region r : map.getRegionList()) {
-			if (!pickableStartingRegions.contains(r) && !r.getWasteland()) {
-				r.setPlayerName("neutral");
+			if (!r.getWasteland()) {
 				r.setArmies(2);
 			}
 		}
@@ -152,8 +150,8 @@ public class BotState {
 				System.err.println("Unable to parse Opponent moves " + e.getMessage());
 			}
 		}
-		 incomeAppreciator.updateMoves();
-		 System.err.println("Enemy income: " + incomeAppreciator.income());
+		incomeAppreciator.updateMoves();
+		System.err.println("Enemy income: " + incomeAppreciator.income());
 	}
 
 	public String getMyPlayerName() {

@@ -3,6 +3,7 @@ package bot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import commanders.OffensiveCommander;
@@ -42,10 +43,9 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 6;
-	public static final double costMultiplierDefendingAgainstEnemy = 0.1;
+	public static final double staticRegionCost = 7;
 	public static final double superRegionSizeExponentialPenalty = 1.1;
-	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double enemyVicinityExponentialPenalty = 1.25;
 	public static final double internalHopsExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 	// ////// SATISFACTION
@@ -77,7 +77,7 @@ public class Values {
 
 	public static Outcome calculateAttackOutcome(int attacking, int defending) {
 		if (defending < 1) {
-			return null;
+			return new Outcome(attacking, 0);
 		}
 		if (attacking == 1) {
 			return new Outcome(0, Math.max(1, defending - 1));
@@ -311,6 +311,26 @@ public class Values {
 		int required = (int) (calculateRequiredForcesDefend(r) * partOfAttackingNeededForRewardBlockerDefence);
 
 		return required;
+	}
+
+	public static int calculateRequiredForcesForRegions(List<Region> path) {
+		int total = 0;
+		int left = 0;
+		int currentRequired = 0;
+
+		for (Region r : path) {
+			currentRequired = calculateRequiredForcesAttack(r) - left;
+			left = calculateAttackOutcome(currentRequired, r.getArmies()).getAttackingArmies();
+			left--;
+			total += currentRequired;
+		}
+
+		return total;
+
+	}
+
+	public static int calculateRequiredForcesForSuperRegion(SuperRegion s) {
+		return (calculateRequiredForcesForRegions(s.getSubRegions()));
 	}
 
 }

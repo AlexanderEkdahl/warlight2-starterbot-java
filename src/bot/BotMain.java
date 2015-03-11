@@ -349,9 +349,6 @@ public class BotMain implements Bot {
 		int latestAttackingLeft = 0;
 		int latestAttackingTotal = 0;
 		Outcome currentOutcome = null;
-		if (map.getUnOwnedRegions().size() < 2){
-			return;
-		}
 		for (Integer tempOriginRegion : attackingAgainst.get(currentTargetRegion).keySet()) {
 			if (defending > 0) {
 				latestAttackingTotal = attackingAgainst.get(currentTargetRegion).get(tempOriginRegion);

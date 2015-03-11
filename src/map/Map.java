@@ -389,6 +389,8 @@ public class Map {
 				try {
 					Region region = getRegion(Integer.parseInt(mapInput[i]));
 					region.setWasteland(true);
+					region.setArmies(6);
+					region.setPlayerName("neutral");
 				} catch (Exception e) {
 					System.err.println("Unable to parse wastelands " + e.getMessage());
 				}
