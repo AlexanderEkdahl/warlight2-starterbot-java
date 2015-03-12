@@ -159,6 +159,10 @@ public class BotMain implements Bot {
 						disposed = required;
 					}
 
+					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && disposed < 2) {
+						continue;
+					}
+
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString());
 
@@ -168,9 +172,14 @@ public class BotMain implements Bot {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
-//							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
-//							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
-//									startingEnemyForces);
+							// addPotentialAttacks(potentialAttacks,
+							// speculativeMap.getRegion(currentOriginRegion.getId()),
+							// availablePotential);
+							// usePotentialAttacks(potentialAttacks,
+							// satisfaction, potentialAttackDecisions,
+							// speculativeMap, availablePotential,
+							// attackingAgainst,
+							// startingEnemyForces);
 							break;
 						}
 					} else {
@@ -184,7 +193,6 @@ public class BotMain implements Bot {
 			}
 		}
 
-		
 		for (Integer i : availablePotential.keySet()) {
 			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
 		}
@@ -234,13 +242,14 @@ public class BotMain implements Bot {
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				if (decisions.get(f) == 1) {
-					moveOrders.add(0,
-							new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
-				} else {
-					moveOrders
-							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
-				}
+				// if (decisions.get(f) == 1) {
+				// moveOrders.add(0,
+				// new AttackTransferMove(BotState.getMyName(),
+				// original.getRegion(f.getR1()), original.getRegion(f.getR2()),
+				// decisions.get(f)));
+				// } else {
+				moveOrders.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
+				// }
 			}
 
 		}
