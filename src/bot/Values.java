@@ -30,13 +30,13 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 30;
-	public static final double rewardDefenseImportanceMultiplier = 20;
+	public static final double rewardDefenseImportanceMultiplier = 27;
 	// public static final double rewardGriefDefenseMultiplier = 30;
-	public static final double deficitDefenceExponentialMultiplier = 1.03;
+	public static final double deficitDefenceExponentialMultiplier = 1.04;
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 6;
+	public static final double costUnitMultiplier = 8;
 	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
@@ -44,13 +44,12 @@ public class Values {
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
 	public static final double staticRegionCost = 7;
-	public static final double superRegionSizeExponentialPenalty = 1.1;
+	public static final double superRegionSizeExponentialPenalty = 1.15;
 	public static final double enemyVicinityExponentialPenalty = 1.25;
-	public static final double internalHopsExponentialPenalty = 1.2;
+	public static final double internalHopsExponentialPenalty = 1.1;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 	// ////// SATISFACTION
 
-	public static final double maxSuperRegionSatisfactionMultiplier = 1.5;
 	public static final double maxRegionSatisfactionMultiplier = 1;
 
 	// ////// PERFORMANCE
@@ -268,19 +267,7 @@ public class Values {
 
 	}
 
-	public static HashMap<SuperRegion, Integer> calculateSuperRegionSatisfaction(Map map) {
-		HashMap<SuperRegion, Integer> roomLeft = new HashMap<SuperRegion, Integer>();
-		for (SuperRegion s : map.getSuperRegions()) {
-			if (s.ownedByPlayer(BotState.getMyName())) {
-				roomLeft.put(s, Integer.MAX_VALUE);
-			} else {
-				roomLeft.put(s, (int) ((Values.calculateRequiredForcesAttack(s)) * maxSuperRegionSatisfactionMultiplier));
-			}
-
-		}
-		return roomLeft;
-	}
-
+	
 	public static HashMap<Integer, Integer> calculateRegionSatisfaction(Map map) {
 		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
 		for (Region r : map.getRegionList()) {

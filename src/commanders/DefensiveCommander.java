@@ -68,8 +68,10 @@ public class DefensiveCommander implements TemplateCommander {
 		}
 		for (Region r : rewardBlockers) {
 			int need = Math.max(Values.calculateRequiredForcesDefendRewardBlocker(r) - r.getArmies(), 0);
-			needDefence.put(r.getId(), need);
-			needDefenceRegions.add(r);
+			if (!needDefence.containsKey(r.getId())){
+				needDefence.put(r.getId(), need);
+				needDefenceRegions.add(r);
+			}
 		}
 
 		for (Integer r : available) {

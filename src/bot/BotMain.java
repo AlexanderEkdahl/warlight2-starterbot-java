@@ -168,9 +168,9 @@ public class BotMain implements Bot {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
-							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
-							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
-									startingEnemyForces);
+//							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
+//							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+//									startingEnemyForces);
 							break;
 						}
 					} else {
@@ -184,8 +184,10 @@ public class BotMain implements Bot {
 			}
 		}
 
-		// add leftover potentialattacks to the pile of attacks
-
+		
+		for (Integer i : availablePotential.keySet()) {
+			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
+		}
 		for (PotentialAttack p : potentialAttacks) {
 			if ((availablePotential.get(p.getFrom()) != null) && availablePotential.get(p.getFrom()) > 1) {
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
@@ -214,11 +216,9 @@ public class BotMain implements Bot {
 
 		for (Integer r : aKeys) {
 			if ((!speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyName())))) {
-				if (speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyOpponentName()))) {
-					badPotentialAttacks.add(r);
-				} else {
+				badPotentialAttacks.add(r);
+				if (speculativeMap.getRegion(r).getPlayerName().equals(("neutral"))) {
 					badAttacks.add(r);
-					badPotentialAttacks.add(r);
 				}
 			}
 		}
@@ -255,12 +255,15 @@ public class BotMain implements Bot {
 	private void usePotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, HashMap<Integer, Integer> satisfaction,
 			HashMap<FromTo, Integer> potentialAttackDecisions, Map map, HashMap<Integer, Integer> availablePotential,
 			HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst, HashMap<Integer, Integer> startingEnemyForces) {
+		ArrayList<PotentialAttack> used = new ArrayList<PotentialAttack>();
 		for (PotentialAttack p : potentialAttacks) {
 			FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
 			addMove(currentMove, potentialAttackDecisions, p.getForces(), map, satisfaction, attackingAgainst, startingEnemyForces);
 			availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - p.getForces());
+			used.add(p);
 			System.err.println("Potential Attack from: " + p.getFrom() + " To " + p.getTo() + " With " + p.getForces());
 		}
+		potentialAttacks.removeAll(used);
 
 	}
 
