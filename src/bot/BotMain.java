@@ -131,8 +131,8 @@ public class BotMain implements Bot {
 				// decision has been made to go forward with the proposal
 				if ((available.get(currentOriginRegion.getId()) > 0 || armiesLeft > 0) && required > 0) {
 					// check satisfaction
+					FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
 					if (satisfaction.get(currentFinalTargetRegion.getId()) <= 0) {
-						FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
 						if (backupDecisions.get(currentMove) == null) {
 							backupDecisions.put(currentMove, required);
 						} else {
@@ -140,7 +140,18 @@ public class BotMain implements Bot {
 						}
 						continue;
 					} else {
+						if (required > satisfaction.get(currentFinalTargetRegion.getId())) {
+							required = satisfaction.get(currentFinalTargetRegion.getId());
+							int diff = required - satisfaction.get(currentFinalTargetRegion.getId());
+							if (backupDecisions.get(currentMove) == null) {
+								backupDecisions.put(currentMove, diff);
+							} else {
+								backupDecisions.put(currentMove, backupDecisions.get(currentMove) + diff);
+							}
+
+						}
 						required = Math.min(satisfaction.get(currentFinalTargetRegion.getId()), required);
+
 					}
 
 					int disposed;
@@ -184,7 +195,7 @@ public class BotMain implements Bot {
 							break;
 						}
 					} else {
-						FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
+						currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
 						addMove(currentMove, decisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces, currentlyDefending);
 
 						break;
@@ -214,6 +225,7 @@ public class BotMain implements Bot {
 		for (FromTo f : backupKeys) {
 			int disposed = Math.min(available.get(f.getR1()), backupDecisions.get(f));
 			if (disposed > 0 && satisfaction.get(f.getR2()) > -10) {
+				System.err.println("BACKUPDECISION: from " + f.getR1() + " to " + f.getR2());
 				addMove(f, decisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces, currentlyDefending);
 				available.put(f.getR1(), available.get(f.getR1()) - disposed);
 			}
