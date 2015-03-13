@@ -16,7 +16,7 @@ import concepts.ActionProposal;
 import concepts.Plan;
 import bot.Values;
 
-public class DefensiveCommander implements TemplateCommander {
+public class DefensiveCommander {
 
 	private double calculateWeight(Region r, HashMap<SuperRegion, Double> superRegionWorths, HashMap<SuperRegion, Double> superRegionCosts,
 			HashMap<Integer, Integer> needDefence) {
@@ -48,8 +48,8 @@ public class DefensiveCommander implements TemplateCommander {
 		return costs;
 	}
 
-	@Override
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
+	
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder, HashMap<Integer, Integer> currentlyDefending) {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
@@ -61,14 +61,14 @@ public class DefensiveCommander implements TemplateCommander {
 
 		for (Region r : fronts) {
 			// for all the interesting regions, calculate if they defense
-			int need = Math.max(Values.calculateRequiredForcesDefend(r) - r.getArmies(), 0);
+			int need = Math.max(Values.calculateRequiredForcesDefend(r) - currentlyDefending.get(r.getId()), 0);
 			needDefence.put(r.getId(), need);
 			needDefenceRegions.add(r);
 
 		}
 		for (Region r : rewardBlockers) {
-			int need = Math.max(Values.calculateRequiredForcesDefendRewardBlocker(r) - r.getArmies(), 0);
-			if (!needDefence.containsKey(r.getId())){
+			int need = Math.max(Values.calculateRequiredForcesDefendRewardBlocker(r) - currentlyDefending.get(r.getId()), 0);
+			if (needDefence.get(r.getId()) != null) {
 				needDefence.put(r.getId(), need);
 				needDefenceRegions.add(r);
 			}
@@ -101,7 +101,7 @@ public class DefensiveCommander implements TemplateCommander {
 					double currentCost = path.getDistance() + superRegionCosts.get(path.getTarget().getSuperRegion());
 					double currentWorth = superRegionWorths.get(path.getTarget().getSuperRegion());
 					double currentWeight = currentWorth / currentCost;
-					ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+					ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 					regionsAttacked.remove(0);
 					totalRequired += Values.calculateRequiredForcesForRegions(regionsAttacked);
 					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path
@@ -114,5 +114,4 @@ public class DefensiveCommander implements TemplateCommander {
 
 		return proposals;
 	}
-
 }

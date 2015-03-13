@@ -20,33 +20,32 @@ public class Values {
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
-	public static final double partOfAttackingNeededForDefence = 1;
+	public static final double partOfAttackingNeededForDefence = 0.85;
 	public static final double partOfAttackingNeededForRewardBlockerDefence = 0.6;
 
 	// ////// REWARDS
 
-	public static final double staticPocketDefence = 30;
 	public static final double rewardMultiplier = 120;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 17;
 	public static final double rewardDefenseImportanceMultiplier = 27;
 	// public static final double rewardGriefDefenseMultiplier = 30;
-	public static final double deficitDefenceExponentialMultiplier = 1.04;
+	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 8;
+	public static final double costUnitMultiplier = 7;
 	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 7;
+	public static final double staticRegionCost = 10;
 	public static final double superRegionSizeExponentialPenalty = 1.15;
 	public static final double enemyVicinityExponentialPenalty = 1.25;
-	public static final double internalHopsExponentialPenalty = 1.1;
+	public static final double internalHopsExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 	// ////// SATISFACTION
 
@@ -76,7 +75,7 @@ public class Values {
 
 	public static Outcome calculateAttackOutcome(int attacking, int defending) {
 		if (defending < 1) {
-			return new Outcome(attacking, 0);
+			return null;
 		}
 		if (attacking == 1) {
 			return new Outcome(0, Math.max(1, defending - 1));
@@ -215,6 +214,8 @@ public class Values {
 		}
 
 	}
+	
+	
 
 	public static int calculateRequiredForcesAttackTotalVictory(Region r) {
 
@@ -250,7 +251,7 @@ public class Values {
 
 	}
 
-	public static int calculateRequiredForcesDefendRegionAgainstSpecificRegions(ArrayList<Region> regions) {
+	public static int calculateRequiredForcesDefendAgainstRegions(ArrayList<Region> regions) {
 		int total = 0;
 		for (Region r : regions) {
 			total += r.getArmies() - 1;
@@ -263,7 +264,7 @@ public class Values {
 
 	public static int calculateRequiredForcesDefend(Region region) {
 		ArrayList<Region> enemyNeighbors = region.getEnemyNeighbors();
-		return calculateRequiredForcesDefendRegionAgainstSpecificRegions(enemyNeighbors);
+		return calculateRequiredForcesDefendAgainstRegions(enemyNeighbors);
 
 	}
 
@@ -306,10 +307,12 @@ public class Values {
 		int currentRequired = 0;
 
 		for (Region r : path) {
-			currentRequired = calculateRequiredForcesAttack(r) - left;
-			left = calculateAttackOutcome(currentRequired, r.getArmies()).getAttackingArmies();
-			left--;
-			total += currentRequired;
+			if (!r.getPlayerName().equals(BotState.getMyName())){
+				currentRequired = calculateRequiredForcesAttack(r) - left;
+				left = calculateAttackOutcome(currentRequired, r.getArmies()).getAttackingArmies();
+				left--;
+				total += currentRequired;
+			}	
 		}
 
 		return total;

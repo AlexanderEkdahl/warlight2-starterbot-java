@@ -55,7 +55,7 @@ public class GriefCommander implements TemplateCommander {
 				double currentPathCost = path.getDistance();
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / currentPathCost;
-				ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 				regionsAttacked.remove(0);
 				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
 

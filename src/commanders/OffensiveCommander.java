@@ -102,7 +102,7 @@ public class OffensiveCommander  {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
 				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
-				ArrayList<Region> regionsAttacked = new ArrayList(path.getPath());
+				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 				regionsAttacked.remove(0);
 				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
 				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired,
