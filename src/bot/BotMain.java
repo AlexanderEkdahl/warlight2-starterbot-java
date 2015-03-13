@@ -159,7 +159,7 @@ public class BotMain implements Bot {
 						disposed = required;
 					}
 
-					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && !(currentTargetRegion.getArmies() == 1) && disposed < 2) {
+					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && !(currentTargetRegion.getArmies() < 3) && disposed < 2) {
 						continue;
 					}
 
@@ -208,7 +208,6 @@ public class BotMain implements Bot {
 		// }
 		//
 		// }
-		
 
 		// add backup proposals
 		Set<FromTo> backupKeys = backupDecisions.keySet();
@@ -245,14 +244,13 @@ public class BotMain implements Bot {
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				// if (decisions.get(f) == 1) {
-				// moveOrders.add(0,
-				// new AttackTransferMove(BotState.getMyName(),
-				// original.getRegion(f.getR1()), original.getRegion(f.getR2()),
-				// decisions.get(f)));
-				// } else {
-				moveOrders.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
-				// }
+				if (decisions.get(f) == 1) {
+					moveOrders.add(0,
+							new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
+				} else {
+					moveOrders
+							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
+				}
 			}
 
 		}
@@ -269,14 +267,12 @@ public class BotMain implements Bot {
 			HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst, HashMap<Integer, Integer> startingEnemyForces) {
 		ArrayList<PotentialAttack> used = new ArrayList<PotentialAttack>();
 		for (PotentialAttack p : potentialAttacks) {
-			if (availablePotential.get(p.getFrom()) != null && availablePotential.get(p.getFrom()) > 0){
-				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
-				addMove(currentMove, potentialAttackDecisions, p.getForces(), map, satisfaction, attackingAgainst, startingEnemyForces);
-				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - p.getForces());
-				used.add(p);
-				System.err.println("Potential Attack from: " + p.getFrom() + " To " + p.getTo() + " With " + p.getForces());
-			}
-			
+			FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
+			addMove(currentMove, potentialAttackDecisions, p.getForces(), map, satisfaction, attackingAgainst, startingEnemyForces);
+			availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - p.getForces());
+			used.add(p);
+			System.err.println("Potential Attack from: " + p.getFrom() + " To " + p.getTo() + " With " + p.getForces());
+
 		}
 		potentialAttacks.removeAll(used);
 
@@ -310,6 +306,7 @@ public class BotMain implements Bot {
 	// threatening tiles
 	private ArrayList<PotentialAttack> generatePotentialAttacks(Region currentOriginRegion, HashMap<Integer, Integer> availablePotential) {
 		ArrayList<Region> enemyRegions = currentOriginRegion.getEnemyNeighbors();
+		
 		ArrayList<PotentialAttack> potentialAttacks = new ArrayList<PotentialAttack>();
 		ArrayList<Region> defendingAgainst = new ArrayList<Region>();
 		for (Region r : enemyRegions) {
