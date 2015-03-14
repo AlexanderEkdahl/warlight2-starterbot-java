@@ -11,6 +11,7 @@
 bin/
 
 *.zip
+*.rar
 
 ### Eclipse ###
 *.pydevproject

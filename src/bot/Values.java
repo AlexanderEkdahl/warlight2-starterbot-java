@@ -36,7 +36,7 @@ public class Values {
 	// ////// COSTS
 
 	public static final double costUnitMultiplier = 7;
-	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
+	public static final double costMultiplierEnemy = 3 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
@@ -75,14 +75,14 @@ public class Values {
 
 	public static Outcome calculateAttackOutcome(int attacking, int defending) {
 		if (defending < 1) {
-			return null;
+			return new Outcome(attacking, 0);
 		}
 		if (attacking == 1) {
 			return new Outcome(0, Math.max(1, defending - 1));
 		}
 		int defendingCopy = defending;
-		defending = (int) Math.round(Math.max(defending - ((0.6 * attacking)), 0));
-		attacking = (int) Math.round(Math.max(attacking - ((0.7 * defendingCopy)), 0));
+		defending = (int) Math.round(Math.max(defending - ((0.65 * attacking)), 0));
+		attacking = (int) Math.round(Math.max(attacking - ((0.75 * defendingCopy)), 0));
 
 		return new Outcome(attacking, defending);
 
@@ -214,8 +214,6 @@ public class Values {
 		}
 
 	}
-	
-	
 
 	public static int calculateRequiredForcesAttackTotalVictory(Region r) {
 
@@ -268,7 +266,6 @@ public class Values {
 
 	}
 
-	
 	public static HashMap<Integer, Integer> calculateRegionSatisfaction(Map map) {
 		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
 		for (Region r : map.getRegionList()) {
@@ -294,12 +291,6 @@ public class Values {
 
 	}
 
-	public static int calculateRequiredForcesDefendRewardBlocker(Region r) {
-		// TODO Auto-generated method stub
-		int required = (int) (calculateRequiredForcesDefend(r) * partOfAttackingNeededForRewardBlockerDefence);
-
-		return required;
-	}
 
 	public static int calculateRequiredForcesForRegions(List<Region> path) {
 		int total = 0;
@@ -307,12 +298,12 @@ public class Values {
 		int currentRequired = 0;
 
 		for (Region r : path) {
-			if (!r.getPlayerName().equals(BotState.getMyName())){
+			if (!r.getPlayerName().equals(BotState.getMyName())) {
 				currentRequired = calculateRequiredForcesAttack(r) - left;
 				left = calculateAttackOutcome(currentRequired, r.getArmies()).getAttackingArmies();
 				left--;
 				total += currentRequired;
-			}	
+			}
 		}
 
 		return total;

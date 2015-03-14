@@ -151,9 +151,7 @@ public class BotMain implements Bot {
 
 						}
 						required = Math.min(satisfaction.get(currentFinalTargetRegion.getId()), required);
-
 					}
-
 					int disposed;
 					if (available.get(currentOriginRegion.getId()) < required) {
 						int initiallyAvailable = available.get(currentOriginRegion.getId());
@@ -170,7 +168,8 @@ public class BotMain implements Bot {
 						disposed = required;
 					}
 
-					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 2) && disposed < 2) {
+					//probably a bad idea to attack with 1 dude
+					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && disposed < 2) {
 						continue;
 					}
 

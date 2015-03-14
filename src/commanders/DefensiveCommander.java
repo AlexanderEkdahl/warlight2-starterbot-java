@@ -53,7 +53,6 @@ public class DefensiveCommander {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> fronts = map.getOwnedFrontRegions();
-		ArrayList<Region> rewardBlockers = map.getOwnedRewardBlockers();
 		HashMap<Integer, Integer> needDefence = new HashMap<Integer, Integer>();
 		ArrayList<Region> needDefenceRegions = new ArrayList<Region>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateWorths(map);
@@ -65,13 +64,6 @@ public class DefensiveCommander {
 			needDefence.put(r.getId(), need);
 			needDefenceRegions.add(r);
 
-		}
-		for (Region r : rewardBlockers) {
-			int need = Math.max(Values.calculateRequiredForcesDefendRewardBlocker(r) - currentlyDefending.get(r.getId()), 0);
-			if (needDefence.get(r.getId()) != null) {
-				needDefence.put(r.getId(), need);
-				needDefenceRegions.add(r);
-			}
 		}
 
 		for (Integer r : available) {
