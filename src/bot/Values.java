@@ -30,8 +30,9 @@ public class Values {
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 17;
 	public static final double rewardDefenseImportanceMultiplier = 27;
-	// public static final double rewardGriefDefenseMultiplier = 30;
+	public static final double rewardDefenseInheritanceMultiplier = 0.3;
 	public static final double deficitDefenceExponentialMultiplier = 1.03;
+	
 
 	// ////// COSTS
 
@@ -47,10 +48,11 @@ public class Values {
 	public static final double enemyVicinityExponentialPenalty = 1.25;
 	public static final double internalHopsExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
+	
 	// ////// SATISFACTION
 
 	public static final double maxRegionSatisfactionMultiplier = 1;
-
+	
 	// ////// PERFORMANCE
 	public static boolean defensiveCommanderUseSmallPlacements = true;
 
@@ -210,7 +212,7 @@ public class Values {
 		} else if (armySize <= 6) {
 			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.4);
+			return (int) (armySize * 1.55);
 		}
 
 	}

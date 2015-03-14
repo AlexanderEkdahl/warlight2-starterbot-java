@@ -168,15 +168,15 @@ public class BotMain implements Bot {
 						disposed = required;
 					}
 
-					//probably a bad idea to attack with 1 dude
+					// probably a bad idea to attack with 1 dude
 					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && disposed < 2) {
 						continue;
 					}
 
 					somethingWasDone = true;
-					System.err.println(currentProposal.toString());
+					System.err.println(currentProposal.toString() + " disposed: " + disposed);
 
-					addToIntegerHashMap(available, currentOriginRegion.getId(), -disposed);
+					addToIntegerHashMap(available, currentOriginRegion.getId(), - disposed);
 
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
 						// attack is the best defence
@@ -247,7 +247,11 @@ public class BotMain implements Bot {
 		Set<FromTo> keys = potentialAttackDecisions.keySet();
 		for (FromTo f : keys) {
 			if (!badPotentialAttacks.contains(f.getR2())) {
-				decisions.put(f, potentialAttackDecisions.get(f));
+				if (decisions.get(f) == null) {
+					decisions.put(f, potentialAttackDecisions.get(f));
+				} else {
+					decisions.put(f, decisions.get(f) + potentialAttackDecisions.get(f));
+				}
 
 			}
 		}

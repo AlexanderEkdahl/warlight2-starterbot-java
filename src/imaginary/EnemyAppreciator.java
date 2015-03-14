@@ -137,28 +137,28 @@ public class EnemyAppreciator {
 			placeArmies(r, armiesPerRegion);
 			enemyPlacedArmies -= armiesPerRegion;
 		}
-		if (enemyPlacedArmies > 0){
+		if (enemyPlacedArmies > 0) {
 			placeArmies(regions.iterator().next(), enemyPlacedArmies);
 		}
 
 	}
 
 	private int placeOnLastPlacements(int enemyPlacedArmies, ArrayList<PlaceArmiesMove> latestPlacements, ArrayList<PlaceArmiesMove> nextLatestPlacements) {
-		boolean hasPlaced = false;
+		boolean hasPrinted = false;
 		if (latestPlacements != null) {
 			for (PlaceArmiesMove p : latestPlacements) {
 				Region region = speculativeMap.getRegion(p.getRegion().getId());
 				if (region.getPlayerName().equals(BotState.getMyOpponentName()) && region.hasNeighborWithOtherOwner()) {
+					if (!hasPrinted) {
+						System.err.println("EnemyAppreciator placing enemy forces on regions that have been used by the enemy before");
+					}
+					hasPrinted = true;
 					placeArmies(region, p.getArmies());
 					enemyPlacedArmies -= p.getArmies();
-					hasPlaced = true;
+
 				}
 
 			}
-		}
-		if (hasPlaced) {
-			System.err.println("EnemyAppreciator placing enemy forces on regions that have been used by the enemy before");
-
 		}
 
 		return enemyPlacedArmies;

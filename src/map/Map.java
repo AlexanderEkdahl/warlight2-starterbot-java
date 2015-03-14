@@ -150,7 +150,7 @@ public class Map {
 		return suspected;
 	}
 
-	public ArrayList<Region> getOwnedFrontRegions() {
+	public ArrayList<Region> getOwnedSuperRegionFrontRegions() {
 		ArrayList<SuperRegion> ownedSuperRegions = getOwnedSuperRegions(BotState.getMyName());
 		ArrayList<Region> ownedRegionsInOwnedSuperRegions = new ArrayList<Region>();
 		ArrayList<Region> neighbors;
@@ -489,6 +489,23 @@ public class Map {
 		}
 
 		return rewardBlockers;
+	}
+
+	public ArrayList<Region> getOwnedFrontRegions() {
+		ArrayList<Region> frontRegions = new ArrayList<Region>();
+		for (Region r : getOwnedRegions(BotState.getMyName())) {
+			if (r.isFront()) {
+				frontRegions.add(r);
+			}
+		}
+
+		return frontRegions;
+	}
+
+	public ArrayList<SuperRegion> getProtectedSuperRegions() {
+		ArrayList<SuperRegion> protectedSuperRegions = getOwnedSuperRegions(BotState.getMyName());
+		protectedSuperRegions.removeAll(getOwnedFrontSuperRegions());
+		return protectedSuperRegions;
 	}
 
 }

@@ -175,4 +175,13 @@ public class SuperRegion {
 		return (hasFriendlyPresence && hasEnemyPresence);
 	}
 
+	public boolean isFront() {
+		for (Region r : subRegions) {
+			if (r.isFront()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

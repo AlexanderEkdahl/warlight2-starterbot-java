@@ -243,5 +243,15 @@ public class Region {
 		
 		return unOwnedNeighbors;
 	}
+	
+	public boolean isFront(){
+		for (Region r : neighbors){
+			if (r.getPlayerName().equals(BotState.getMyOpponentName())){
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 }
