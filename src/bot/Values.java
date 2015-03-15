@@ -9,21 +9,18 @@ import java.util.Set;
 import commanders.OffensiveCommander;
 import concepts.Outcome;
 import map.Map;
-import map.Pathfinder;
-import map.Pathfinder.Path;
-import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
 import math.Tables;
 
 public class Values {
 
-	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
+	//////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final double partOfAttackingNeededForDefence = 0.85;
 	public static final double partOfAttackingNeededForRewardBlockerDefence = 0.6;
 
-	// ////// REWARDS
+	//////// REWARDS
 
 	public static final double rewardMultiplier = 120;
 	public static final double regionConnectionBonus = 0.2;
@@ -34,7 +31,7 @@ public class Values {
 	public static final double deficitDefenceExponentialMultiplier = 1.03;
 	
 
-	// ////// COSTS
+	//////// COSTS
 
 	public static final double costUnitMultiplier = 7;
 	public static final double costMultiplierEnemy = 3 / 5 * costUnitMultiplier;
@@ -49,12 +46,14 @@ public class Values {
 	public static final double internalHopsExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 	
-	// ////// SATISFACTION
+	//////// SATISFACTION
 
 	public static final double maxRegionSatisfactionMultiplier = 1;
 	
-	// ////// PERFORMANCE
+	//////// PERFORMANCE
 	public static boolean defensiveCommanderUseSmallPlacements = true;
+	
+	////////
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
 
@@ -84,7 +83,7 @@ public class Values {
 		}
 		int defendingCopy = defending;
 		defending = (int) Math.round(Math.max(defending - ((0.65 * attacking)), 0));
-		attacking = (int) Math.round(Math.max(attacking - ((0.75 * defendingCopy)), 0));
+		attacking = (int) Math.round(Math.max(attacking - ((0.8 * defendingCopy)), 0));
 
 		return new Outcome(attacking, defending);
 
@@ -109,6 +108,7 @@ public class Values {
 
 	}
 
+	@SuppressWarnings("null")
 	private static double calculateRegionInitialCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
@@ -212,7 +212,7 @@ public class Values {
 		} else if (armySize <= 6) {
 			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.55);
+			return (int) (armySize * 1.6);
 		}
 
 	}

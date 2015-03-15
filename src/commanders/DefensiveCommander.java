@@ -52,10 +52,11 @@ public class DefensiveCommander {
 	private ArrayList<Region> calculateDefenceInheritance(Map map, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> inheritedWorths,
 			HashMap<Region, Double> regionCosts) {
 		ArrayList<Region> inherited = new ArrayList<Region>();
-		ArrayList<Region> AllfrontRegions = map.getOwnedFrontRegions();
+		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
+		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionFrontRegions());
 		ArrayList<SuperRegion> protectedSuperRegions = map.getProtectedSuperRegions();
 
-		for (Region r : AllfrontRegions) {
+		for (Region r : frontRegionsNotInOwnedSuperRegion) {
 			for (Region n : r.getNeighbors()) {
 				if (protectedSuperRegions.contains(n.getSuperRegion())) {
 					// if here then this region is protecting owned superregions

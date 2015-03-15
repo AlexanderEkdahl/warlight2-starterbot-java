@@ -130,28 +130,25 @@ public class BotMain implements Bot {
 
 				// decision has been made to go forward with the proposal
 				if ((available.get(currentOriginRegion.getId()) > 0 || armiesLeft > 0) && required > 0) {
-					// check satisfaction
 					FromTo currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
-					if (satisfaction.get(currentFinalTargetRegion.getId()) <= 0) {
-						if (backupDecisions.get(currentMove) == null) {
-							backupDecisions.put(currentMove, required);
-						} else {
-							backupDecisions.put(currentMove, backupDecisions.get(currentMove) + required);
-						}
-						continue;
-					} else {
-						if (required > satisfaction.get(currentFinalTargetRegion.getId())) {
-							required = satisfaction.get(currentFinalTargetRegion.getId());
-							int diff = required - satisfaction.get(currentFinalTargetRegion.getId());
-							if (backupDecisions.get(currentMove) == null) {
-								backupDecisions.put(currentMove, diff);
-							} else {
-								backupDecisions.put(currentMove, backupDecisions.get(currentMove) + diff);
-							}
 
+					// check satisfaction and create backup decisions
+					if (required > satisfaction.get(currentFinalTargetRegion.getId())) {
+						int placeLeft = Math.max(required - satisfaction.get(currentFinalTargetRegion.getId()), 0);
+						int forcesLeft = required - placeLeft;
+						required = placeLeft;
+						if (backupDecisions.get(currentMove) == null) {
+							backupDecisions.put(currentMove, forcesLeft);
+						} else {
+							backupDecisions.put(currentMove, backupDecisions.get(currentMove) + forcesLeft);
 						}
-						required = Math.min(satisfaction.get(currentFinalTargetRegion.getId()), required);
+						if (required < 1) {
+							continue;
+						}
+
 					}
+
+					// potentially place new forces
 					int disposed;
 					if (available.get(currentOriginRegion.getId()) < required) {
 						int initiallyAvailable = available.get(currentOriginRegion.getId());
@@ -169,14 +166,15 @@ public class BotMain implements Bot {
 					}
 
 					// probably a bad idea to attack with 1 dude
-					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && disposed < 2) {
+					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && (disposed < 2)) {
 						continue;
 					}
 
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString() + " disposed: " + disposed);
 
-					addToIntegerHashMap(available, currentOriginRegion.getId(), - disposed);
+					// remove used forces
+					addToIntegerHashMap(available, currentOriginRegion.getId(), -disposed);
 
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
 						// attack is the best defence
@@ -208,7 +206,7 @@ public class BotMain implements Bot {
 			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
 		}
 		for (PotentialAttack p : potentialAttacks) {
-			if ((availablePotential.get(p.getFrom()) != null) && availablePotential.get(p.getFrom()) > 1) {
+			{
 				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
 				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
 				addMove(currentMove, potentialAttackDecisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces,
@@ -223,7 +221,7 @@ public class BotMain implements Bot {
 		Set<FromTo> backupKeys = backupDecisions.keySet();
 		for (FromTo f : backupKeys) {
 			int disposed = Math.min(available.get(f.getR1()), backupDecisions.get(f));
-			if (disposed > 0 && satisfaction.get(f.getR2()) > -10) {
+			if (disposed > 0) {
 				System.err.println("BACKUPDECISION: from " + f.getR1() + " to " + f.getR2());
 				addMove(f, decisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces, currentlyDefending);
 				available.put(f.getR1(), available.get(f.getR1()) - disposed);
@@ -247,25 +245,21 @@ public class BotMain implements Bot {
 		Set<FromTo> keys = potentialAttackDecisions.keySet();
 		for (FromTo f : keys) {
 			if (!badPotentialAttacks.contains(f.getR2())) {
-				if (decisions.get(f) == null) {
-					decisions.put(f, potentialAttackDecisions.get(f));
-				} else {
-					decisions.put(f, decisions.get(f) + potentialAttackDecisions.get(f));
-				}
-
+				addMove(f, decisions, potentialAttackDecisions.get(f), speculativeMap, satisfaction, attackingAgainst, startingEnemyForces, currentlyDefending);
 			}
 		}
 
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				if (decisions.get(f) == 1) {
-					moveOrders.add(0,
-							new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
-				} else {
-					moveOrders
-							.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
-				}
+				// if (decisions.get(f) == 1) {
+				// moveOrders.add(0,
+				// new AttackTransferMove(BotState.getMyName(),
+				// original.getRegion(f.getR1()), original.getRegion(f.getR2()),
+				// decisions.get(f)));
+				// } else {
+				moveOrders.add(new AttackTransferMove(BotState.getMyName(), original.getRegion(f.getR1()), original.getRegion(f.getR2()), decisions.get(f)));
+				// }
 			}
 
 		}

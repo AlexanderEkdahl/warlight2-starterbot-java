@@ -10,11 +10,8 @@
 
 package bot;
 
-import imaginary.EnemyAppreciator;
 import imaginary.IncomeAppreciator;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import map.Map;
 import map.Region;
