@@ -33,14 +33,14 @@ public class Values {
 
 	//////// COSTS
 
-	public static final double costUnitMultiplier = 7;
+	public static final double costUnitMultiplier = 8;
 	public static final double costMultiplierEnemy = 3 / 5 * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 10;
+	public static final double staticRegionCost = 8;
 	public static final double superRegionSizeExponentialPenalty = 1.15;
 	public static final double enemyVicinityExponentialPenalty = 1.25;
 	public static final double internalHopsExponentialPenalty = 1.2;
@@ -82,7 +82,7 @@ public class Values {
 			return new Outcome(0, Math.max(1, defending - 1));
 		}
 		int defendingCopy = defending;
-		defending = (int) Math.round(Math.max(defending - ((0.65 * attacking)), 0));
+		defending = (int) Math.round(Math.max(defending - ((0.62 * attacking)), 0));
 		attacking = (int) Math.round(Math.max(attacking - ((0.8 * defendingCopy)), 0));
 
 		return new Outcome(attacking, defending);
@@ -212,7 +212,7 @@ public class Values {
 		} else if (armySize <= 6) {
 			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.6);
+			return (int) (armySize * 1.45);
 		}
 
 	}

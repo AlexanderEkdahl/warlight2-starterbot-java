@@ -134,13 +134,13 @@ public class BotMain implements Bot {
 
 					// check satisfaction and create backup decisions
 					if (required > satisfaction.get(currentFinalTargetRegion.getId())) {
-						int placeLeft = Math.max(required - satisfaction.get(currentFinalTargetRegion.getId()), 0);
-						int forcesLeft = required - placeLeft;
-						required = placeLeft;
+						int roomLeft = satisfaction.get(currentFinalTargetRegion.getId());
+						int forcesNotUsed = required - roomLeft;
+						required = roomLeft;
 						if (backupDecisions.get(currentMove) == null) {
-							backupDecisions.put(currentMove, forcesLeft);
+							backupDecisions.put(currentMove, forcesNotUsed);
 						} else {
-							backupDecisions.put(currentMove, backupDecisions.get(currentMove) + forcesLeft);
+							backupDecisions.put(currentMove, backupDecisions.get(currentMove) + forcesNotUsed);
 						}
 						if (required < 1) {
 							continue;
@@ -164,12 +164,9 @@ public class BotMain implements Bot {
 					} else {
 						disposed = required;
 					}
-
-					// probably a bad idea to attack with 1 dude
 					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && (disposed < 2)) {
 						continue;
 					}
-
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString() + " disposed: " + disposed);
 
@@ -181,14 +178,9 @@ public class BotMain implements Bot {
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
 							addToIntegerHashMap(currentlyDefending, currentOriginRegion.getId(), disposed);
-							// addPotentialAttacks(potentialAttacks,
-							// speculativeMap.getRegion(currentOriginRegion.getId()),
-							// availablePotential);
-							// usePotentialAttacks(potentialAttacks,
-							// satisfaction, potentialAttackDecisions,
-							// speculativeMap, availablePotential,
-							// attackingAgainst,
-							// startingEnemyForces);
+							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
+							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+									startingEnemyForces, currentlyDefending);
 							break;
 						}
 					} else {
@@ -202,20 +194,26 @@ public class BotMain implements Bot {
 			}
 		}
 
-		for (Integer i : availablePotential.keySet()) {
-			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
-		}
-		for (PotentialAttack p : potentialAttacks) {
-			{
-				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
-				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
-				addMove(currentMove, potentialAttackDecisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces,
-						currentlyDefending);
-				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
-				System.err.println("Potential Attack from: " + p.getFrom() + " To " + p.getTo() + " With " + p.getForces());
-			}
-
-		}
+		// for (Integer i : availablePotential.keySet()) {
+		// addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i),
+		// availablePotential);
+		// }
+		// for (PotentialAttack p : potentialAttacks) {
+		// {
+		// int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()),
+		// speculativeMap.getRegion(p.getFrom()).getArmies() - 1),
+		// p.getForces());
+		// FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
+		// addMove(currentMove, potentialAttackDecisions, disposed,
+		// speculativeMap, satisfaction, attackingAgainst, startingEnemyForces,
+		// currentlyDefending);
+		// availablePotential.put(p.getFrom(),
+		// availablePotential.get(p.getFrom()) - disposed);
+		// System.err.println("Potential Attack from: " + p.getFrom() + " To " +
+		// p.getTo() + " With " + p.getForces());
+		// }
+		//
+		// }
 
 		// add backup proposals
 		Set<FromTo> backupKeys = backupDecisions.keySet();

@@ -220,18 +220,18 @@ public class Region {
 
 	}
 
-	public boolean isOnlyFriendlyRegionInSuperRegion() {
-		if (playerName != BotState.getMyName()){
-			return false;
-		}
-		for (Region r : superRegion.getSubRegions()) {
-			if (!r.equals(this) && !r.getPlayerName().equals(BotState.getMyOpponentName())) {
-				return false;
-			}
-		}
-
-		return true;
-	}
+//	public boolean isOnlyFriendlyRegionInSuperRegion() {
+//		if (playerName != BotState.getMyName()){
+//			return false;
+//		}
+//		for (Region r : superRegion.getSubRegions()) {
+//			if (!r.equals(this) && !r.getPlayerName().equals(BotState.getMyOpponentName())) {
+//				return false;
+//			}
+//		}
+//
+//		return true;
+//	}
 
 	public Collection<? extends Region> getUnOwnedNeighbors() {
 		Set<Region> unOwnedNeighbors = new HashSet<Region>();
@@ -245,8 +245,8 @@ public class Region {
 	}
 	
 	public boolean isFront(){
-		for (Region r : neighbors){
-			if (r.getPlayerName().equals(BotState.getMyOpponentName())){
+		for (Region n : neighbors){
+			if (n.getPlayerName().equals(BotState.getMyOpponentName())){
 				return true;
 			}
 		}

@@ -53,7 +53,7 @@ public class DefensiveCommander {
 			HashMap<Region, Double> regionCosts) {
 		ArrayList<Region> inherited = new ArrayList<Region>();
 		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
-		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionFrontRegions());
+		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionRegions());
 		ArrayList<SuperRegion> protectedSuperRegions = map.getProtectedSuperRegions();
 
 		for (Region r : frontRegionsNotInOwnedSuperRegion) {
@@ -71,6 +71,8 @@ public class DefensiveCommander {
 						System.err
 								.println("MAJOR MALFUNCTION calculateDefenceInheritance IS CALCULATING DEFENCE INHERITANCE FOR REGIONS IN OWNED SUPERREGIONS");
 					}
+
+					break;
 				}
 			}
 
@@ -84,7 +86,6 @@ public class DefensiveCommander {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> interestingFronts = map.getOwnedSuperRegionFrontRegions();
 		HashMap<Integer, Integer> needDefence = new HashMap<Integer, Integer>();
-		ArrayList<Region> needDefenceRegions = new ArrayList<Region>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateWorths(map);
 		HashMap<SuperRegion, Double> superRegionCosts = calculateCosts(map);
 		HashMap<Region, Double> regionWorths = new HashMap<Region, Double>();
@@ -103,30 +104,28 @@ public class DefensiveCommander {
 		}
 
 		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, superRegionWorths, regionWorths, regionCosts);
-
 		interestingFronts.addAll(inheritedDefenceRegions);
 
 		for (Region r : interestingFronts) {
 			// for all the interesting regions, calculate if they defense
 			int need = Math.max(Values.calculateRequiredForcesDefend(r) - currentlyDefending.get(r.getId()), 0);
 			needDefence.put(r.getId(), need);
-			needDefenceRegions.add(r);
 
 		}
 
 		for (Integer r : available) {
 			if (needDefence.get(r) != null && needDefence.get(r) > 0) {
 				int disposed = needDefence.get(r);
-				if (Values.defensiveCommanderUseSmallPlacements) {
-					disposed = 1;
-				}
+				// if (Values.defensiveCommanderUseSmallPlacements) {
+				// disposed = 1;
+				// }
 				double weight = calculateWeight(map.getRegion(r), regionWorths, regionCosts, needDefence);
 				proposals.add(new ActionProposal(weight, map.getRegion(r), map.getRegion(r), disposed, new Plan(map.getRegion(r), map.getRegion(r)
 						.getSuperRegion()), "DefensiveCommander"));
 			}
 
 			else {
-				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), needDefenceRegions);
+				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), interestingFronts);
 				for (Path path : paths) {
 					int totalRequired = needDefence.get(path.getTarget().getId());
 					if (totalRequired < 1) {
