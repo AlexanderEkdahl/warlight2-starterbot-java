@@ -1,7 +1,5 @@
 package concepts;
 
-import map.Region;
-
 public class FromTo {
 	private Integer r1;
 	private Integer r2;

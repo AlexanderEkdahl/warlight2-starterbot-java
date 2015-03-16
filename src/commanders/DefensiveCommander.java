@@ -1,15 +1,12 @@
 package commanders;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import map.Map;
 import map.Pathfinder;
 import map.Pathfinder.Path;
-import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
 import math.Tables;
@@ -54,11 +51,11 @@ public class DefensiveCommander {
 		ArrayList<Region> inherited = new ArrayList<Region>();
 		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
 		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionRegions());
-		ArrayList<SuperRegion> protectedSuperRegions = map.getProtectedSuperRegions();
+		ArrayList<SuperRegion> ownedSuperRegions = map.getOwnedSuperRegions(BotState.getMyName());
 
 		for (Region r : frontRegionsNotInOwnedSuperRegion) {
 			for (Region n : r.getNeighbors()) {
-				if (protectedSuperRegions.contains(n.getSuperRegion())) {
+				if (!ownedSuperRegions.contains(n.getSuperRegion())) {
 					// if here then this region is protecting owned superregions
 					if (inheritedWorths.get(r) == null) {
 						inheritedWorths.put(r, superRegionWorths.get(n.getSuperRegion()) * Values.rewardDefenseInheritanceMultiplier);
@@ -116,9 +113,9 @@ public class DefensiveCommander {
 		for (Integer r : available) {
 			if (needDefence.get(r) != null && needDefence.get(r) > 0) {
 				int disposed = needDefence.get(r);
-				// if (Values.defensiveCommanderUseSmallPlacements) {
-				// disposed = 1;
-				// }
+				if (Values.defensiveCommanderUseSmallPlacements) {
+					disposed = 1;
+				}
 				double weight = calculateWeight(map.getRegion(r), regionWorths, regionCosts, needDefence);
 				proposals.add(new ActionProposal(weight, map.getRegion(r), map.getRegion(r), disposed, new Plan(map.getRegion(r), map.getRegion(r)
 						.getSuperRegion()), "DefensiveCommander"));

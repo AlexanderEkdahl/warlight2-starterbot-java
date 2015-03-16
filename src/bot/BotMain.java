@@ -164,9 +164,12 @@ public class BotMain implements Bot {
 					} else {
 						disposed = required;
 					}
-					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && (disposed < 2)) {
-						continue;
-					}
+					// if
+					// (!currentTargetRegion.getPlayerName().equals(BotState.getMyName())
+					// && (currentTargetRegion.getArmies() < 3) && (disposed <
+					// 2)) {
+					// continue;
+					// }
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString() + " disposed: " + disposed);
 

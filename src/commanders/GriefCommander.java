@@ -2,13 +2,10 @@ package commanders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import map.Map;
 import map.Pathfinder;
-import map.PathfinderWeighter;
 import map.Region;
 import map.SuperRegion;
 import map.Pathfinder.Path;

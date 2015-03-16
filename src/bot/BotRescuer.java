@@ -4,7 +4,6 @@ import java.lang.Exception;
 import map.Region;
 import map.SuperRegion;
 import java.util.ArrayList;
-import java.util.Collections;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
