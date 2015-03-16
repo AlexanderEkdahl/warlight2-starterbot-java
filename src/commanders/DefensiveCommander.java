@@ -46,8 +46,7 @@ public class DefensiveCommander {
 		return costs;
 	}
 
-	private ArrayList<Region> calculateDefenceInheritance(Map map, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> inheritedWorths,
-			HashMap<Region, Double> regionCosts) {
+	private ArrayList<Region> calculateDefenceInheritance(Map map, HashMap<Region, Double> regionWorths, HashMap<Region, Double> regionCosts) {
 		ArrayList<Region> inherited = new ArrayList<Region>();
 		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
 		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionRegions());
@@ -57,11 +56,11 @@ public class DefensiveCommander {
 			for (Region n : r.getNeighbors()) {
 				if (!ownedSuperRegions.contains(n.getSuperRegion())) {
 					// if here then this region is protecting owned superregions
-					if (inheritedWorths.get(r) == null) {
-						inheritedWorths.put(r, superRegionWorths.get(n.getSuperRegion()) * Values.rewardDefenseInheritanceMultiplier);
+					if (regionWorths.get(r) == null) {
+						regionWorths.put(r, regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
 						regionCosts.put(r, regionCosts.get(n));
 					} else {
-						inheritedWorths.put(r, inheritedWorths.get(r) + superRegionWorths.get(n.getSuperRegion()) * Values.rewardDefenseInheritanceMultiplier);
+						regionWorths.put(r, regionWorths.get(r) + regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
 					}
 
 					if (r.getSuperRegion().ownedByPlayer(BotState.getMyName())) {
@@ -100,7 +99,7 @@ public class DefensiveCommander {
 			}
 		}
 
-		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, superRegionWorths, regionWorths, regionCosts);
+		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
 		interestingFronts.addAll(inheritedDefenceRegions);
 
 		for (Region r : interestingFronts) {

@@ -175,7 +175,11 @@ public class BotMain implements Bot {
 
 					// remove used forces
 					addToIntegerHashMap(available, currentOriginRegion.getId(), -disposed);
-
+					
+					// add satisfaction
+					addToIntegerHashMap(satisfaction, currentFinalTargetRegion.getId(), disposed);
+					
+					// potentially add potentialattacks
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
@@ -355,6 +359,7 @@ public class BotMain implements Bot {
 			addToIntegerHashMap(currentlyDefending, currentMove.getR2(), disposed);
 		}
 
+		
 	}
 
 	private void addAttacking(Integer currentTargetRegion, Integer currentOriginRegion, int disposed, Map map, HashMap<Integer, Integer> satisfaction,
