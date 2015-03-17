@@ -164,12 +164,9 @@ public class BotMain implements Bot {
 					} else {
 						disposed = required;
 					}
-					// if
-					// (!currentTargetRegion.getPlayerName().equals(BotState.getMyName())
-					// && (currentTargetRegion.getArmies() < 3) && (disposed <
-					// 2)) {
-					// continue;
-					// }
+					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 2) && (disposed < 2)) {
+						continue;
+					}
 					somethingWasDone = true;
 					System.err.println(currentProposal.toString() + " disposed: " + disposed);
 
@@ -185,9 +182,9 @@ public class BotMain implements Bot {
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
 							addToIntegerHashMap(currentlyDefending, currentOriginRegion.getId(), disposed);
-							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
-							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
-									startingEnemyForces, currentlyDefending);
+//							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
+//							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+//									startingEnemyForces, currentlyDefending);
 							break;
 						}
 					} else {
@@ -201,26 +198,20 @@ public class BotMain implements Bot {
 			}
 		}
 
-		// for (Integer i : availablePotential.keySet()) {
-		// addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i),
-		// availablePotential);
-		// }
-		// for (PotentialAttack p : potentialAttacks) {
-		// {
-		// int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()),
-		// speculativeMap.getRegion(p.getFrom()).getArmies() - 1),
-		// p.getForces());
-		// FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
-		// addMove(currentMove, potentialAttackDecisions, disposed,
-		// speculativeMap, satisfaction, attackingAgainst, startingEnemyForces,
-		// currentlyDefending);
-		// availablePotential.put(p.getFrom(),
-		// availablePotential.get(p.getFrom()) - disposed);
-		// System.err.println("Potential Attack from: " + p.getFrom() + " To " +
-		// p.getTo() + " With " + p.getForces());
-		// }
-		//
-		// }
+		for (Integer i : availablePotential.keySet()) {
+			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
+		}
+		for (PotentialAttack p : potentialAttacks) {
+			{
+				int disposed = Math.min(Math.min(availablePotential.get(p.getFrom()), speculativeMap.getRegion(p.getFrom()).getArmies() - 1), p.getForces());
+				FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
+				addMove(currentMove, potentialAttackDecisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces,
+						currentlyDefending);
+				availablePotential.put(p.getFrom(), availablePotential.get(p.getFrom()) - disposed);
+				System.err.println("Potential Attack from: " + p.getFrom() + " To " + p.getTo() + " With " + p.getForces());
+			}
+
+		}
 
 		// add backup proposals
 		Set<FromTo> backupKeys = backupDecisions.keySet();

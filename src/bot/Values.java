@@ -202,7 +202,6 @@ public class Values {
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
 		}
-
 		else if (armySize <= 2) {
 			return armySize + 1;
 		} else if (armySize <= 3) {
