@@ -190,7 +190,6 @@ public class BotMain implements Bot {
 					} else {
 						currentMove = new FromTo(currentOriginRegion.getId(), currentTargetRegion.getId());
 						addMove(currentMove, decisions, disposed, speculativeMap, satisfaction, attackingAgainst, startingEnemyForces, currentlyDefending);
-
 						break;
 					}
 
