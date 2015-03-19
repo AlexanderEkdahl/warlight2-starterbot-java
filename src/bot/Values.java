@@ -15,12 +15,12 @@ import math.Tables;
 
 public class Values {
 
-	//////// REQUIRED FORCES FOR CERTAIN ACTIONS
+	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final double partOfAttackingNeededForDefence = 0.9;
 	public static final double partOfAttackingNeededForRewardBlockerDefence = 0.6;
 
-	//////// REWARDS
+	// ////// REWARDS
 
 	public static final double rewardMultiplier = 120;
 	public static final double regionConnectionBonus = 0.2;
@@ -29,9 +29,8 @@ public class Values {
 	public static final double rewardDefenseImportanceMultiplier = 15;
 	public static final double rewardDefenseInheritanceMultiplier = 0.4;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
-	
 
-	//////// COSTS
+	// ////// COSTS
 
 	public static final double costUnitMultiplier = 8;
 	public static final double costMultiplierEnemy = 3 / 5 * costUnitMultiplier;
@@ -45,15 +44,15 @@ public class Values {
 	public static final double enemyVicinityExponentialPenalty = 1.35;
 	public static final double internalHopsExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
-	
-	//////// SATISFACTION
+
+	// ////// SATISFACTION
 
 	public static final double maxRegionSatisfactionMultiplier = 1;
-	
-	//////// PERFORMANCE
+
+	// ////// PERFORMANCE
 	public static boolean defensiveCommanderUseSmallPlacements = true;
-	
-	////////
+
+	// //////
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
 
@@ -201,8 +200,7 @@ public class Values {
 			return unknownRegionAppreciatedRequiredForcesAttack;
 		} else if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
-		}
-		else if (armySize <= 2) {
+		} else if (armySize <= 2) {
 			return armySize + 1;
 		} else if (armySize <= 3) {
 			return armySize + 2;
@@ -210,8 +208,10 @@ public class Values {
 			return armySize + 3;
 		} else if (armySize <= 6) {
 			return armySize + 4;
+		} else if (armySize <= 7) {
+			return armySize + 5;
 		} else {
-			return (int) (armySize * 1.6);
+			return (int) (armySize * 1.8);
 		}
 
 	}
@@ -229,11 +229,11 @@ public class Values {
 		} else if (r.getPlayerName().equals("neutral")) {
 			return calculateRequiredForcesAttack(r);
 		} else if (armySize <= 3) {
-			return armySize + 3;
-		} else if (armySize <= 5) {
 			return armySize + 4;
+		} else if (armySize <= 5) {
+			return armySize + 5;
 		} else {
-			return (int) (armySize * 2.0);
+			return (int) (armySize * 2.2);
 		}
 
 	}
@@ -271,7 +271,7 @@ public class Values {
 		HashMap<Integer, Integer> roomLeft = new HashMap<Integer, Integer>();
 		for (Region r : map.getRegionList()) {
 			if (!r.getPlayerName().equals(BotState.getMyName()))
-				roomLeft.put(r.getId(), calculateRequiredForcesAttack(r));
+				roomLeft.put(r.getId(), calculateRequiredForcesAttackTotalVictory(r));
 			else {
 				roomLeft.put(r.getId(), Values.calculateRequiredForcesDefend(r));
 			}
@@ -291,7 +291,6 @@ public class Values {
 		return untakenRegions * regionConnectionBonus;
 
 	}
-
 
 	public static int calculateRequiredForcesForRegions(List<Region> path) {
 		int total = 0;

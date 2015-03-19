@@ -17,14 +17,14 @@ public class Tables {
 	private static Tables tables;
 	private static HashMap<Integer, Double> internalHopsPenalty;
 	private static HashMap<Integer, Double> sizePenalty;
-	private static HashMap<Integer, Double> deficitDefenceExponentialMultiplier;
-	private static HashMap<Integer, Double> enemyVicinityExponentialPenalty;
+	private static double[] deficitDefenceExponentialMultiplier;
+	private static double[] enemyVicinityExponentialPenalty;
 
 	private Tables() {
 		internalHopsPenalty = new HashMap<Integer, Double>();
 		sizePenalty = new HashMap<Integer, Double>();
-		deficitDefenceExponentialMultiplier = new HashMap<Integer, Double>();
-		enemyVicinityExponentialPenalty = new HashMap<Integer, Double>();
+		deficitDefenceExponentialMultiplier = new double[maxCalc+1];
+		enemyVicinityExponentialPenalty = new double[maxCalc+1];
 	}
 
 	public static Tables getInstance() {
@@ -42,8 +42,8 @@ public class Tables {
 		}
 
 		for (int i = 0; i <= maxCalc; i++) {
-			deficitDefenceExponentialMultiplier.put(i, Math.pow(Values.deficitDefenceExponentialMultiplier, i));
-			enemyVicinityExponentialPenalty.put(i, Math.pow(Values.enemyVicinityExponentialPenalty, i));
+			deficitDefenceExponentialMultiplier[i] = Math.pow(Values.deficitDefenceExponentialMultiplier, i);
+			enemyVicinityExponentialPenalty[i] = Math.pow(Values.enemyVicinityExponentialPenalty, i);
 		}
 
 	}
@@ -55,7 +55,6 @@ public class Tables {
 
 			}
 		});
-
 		int maxHops = 0;
 		ArrayList<Region> targetRegions;
 		for (Region r : sr.getSubRegions()) {
@@ -81,12 +80,12 @@ public class Tables {
 
 	public Double getEnemyVicinityExponentialPenaltyFor(int i) {
 		i = Math.min(i, maxCalc);
-		return enemyVicinityExponentialPenalty.get(i);
+		return enemyVicinityExponentialPenalty[i];
 	}
 
 	public Double getDeficitDefenceExponentialMultiplierFor(int i) {
 		i = Math.min(i, maxCalc);
-		return deficitDefenceExponentialMultiplier.get(i);
+		return deficitDefenceExponentialMultiplier[i];
 	}
 
 

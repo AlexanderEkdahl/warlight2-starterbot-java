@@ -151,8 +151,8 @@ public class EnemyAppreciator {
 				if (region.getPlayerName().equals(BotState.getMyOpponentName()) && region.hasNeighborWithOtherOwner()) {
 					if (!hasPrinted) {
 						System.err.println("EnemyAppreciator placing enemy forces on regions that have been used by the enemy before");
+						hasPrinted = true;
 					}
-					hasPrinted = true;
 					placeArmies(region, p.getArmies());
 					enemyPlacedArmies -= p.getArmies();
 
@@ -166,7 +166,7 @@ public class EnemyAppreciator {
 
 	public void placeArmies(Region r, int disposed) {
 		r.setArmies(r.getArmies() + disposed);
-		System.err.println("Appreciated number of armies on " + r.getId() + " to " + r.getArmies());
+		System.err.println("Appreciated number of armies on region " + r.getId() + " to " + r.getArmies());
 	}
 
 	private int estimatePlacedArmies() {
