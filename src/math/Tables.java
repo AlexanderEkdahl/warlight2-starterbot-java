@@ -37,8 +37,8 @@ public class Tables {
 
 	public void introCalculation(Map map) {
 		for (SuperRegion s : map.getSuperRegions()) {
-			sizePenalty.put(s.getId(), Math.pow(Values.superRegionSizeExponentialPenalty, (double) s.getSubRegions().size()));
-			internalHopsPenalty.put(s.getId(), Math.pow(Values.internalHopsExponentialPenalty, (double) calculateMaxInternalHops(s, map)));
+			sizePenalty.put(s.getId(), Math.pow(Values.superRegionSizeExponentialPenalty, s.getSubRegions().size()));
+			internalHopsPenalty.put(s.getId(), Math.pow(Values.internalHopsExponentialPenalty, calculateMaxInternalHops(s, map)));
 		}
 
 		for (int i = 0; i <= maxCalc; i++) {

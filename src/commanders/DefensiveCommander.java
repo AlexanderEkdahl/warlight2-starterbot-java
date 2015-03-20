@@ -50,11 +50,11 @@ public class DefensiveCommander {
 		ArrayList<Region> inherited = new ArrayList<Region>();
 		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
 		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionRegions());
-		ArrayList<SuperRegion> ownedSuperRegions = map.getOwnedSuperRegions(BotState.getMyName());
+		ArrayList<SuperRegion> protectedSuperRegions = map.getProtectedSuperRegions();
 
 		for (Region r : frontRegionsNotInOwnedSuperRegion) {
 			for (Region n : r.getNeighbors()) {
-				if (!ownedSuperRegions.contains(n.getSuperRegion())) {
+				if (protectedSuperRegions.contains(n.getSuperRegion())) {
 					// if here then this region is protecting owned superregions
 					if (regionWorths.get(r) == null) {
 						regionWorths.put(r, regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
@@ -62,14 +62,16 @@ public class DefensiveCommander {
 					} else {
 						regionWorths.put(r, regionWorths.get(r) + regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
 					}
+					inherited.add(r);
 
 					if (r.getSuperRegion().ownedByPlayer(BotState.getMyName())) {
 						System.err
 								.println("MAJOR MALFUNCTION calculateDefenceInheritance IS CALCULATING DEFENCE INHERITANCE FOR REGIONS IN OWNED SUPERREGIONS");
-					}
 
-					break;
+						break;
+					}
 				}
+
 			}
 
 		}
