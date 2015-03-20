@@ -60,9 +60,14 @@ public class DefensiveCommander {
 						regionWorths.put(r, regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
 						regionCosts.put(r, regionCosts.get(n));
 					} else {
-						regionWorths.put(r, regionWorths.get(r) + regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
+						regionWorths.put(r, regionWorths.get(r) + (regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier));
+						regionCosts.put(r, regionCosts.get(n) + regionCosts.get(r));
+
 					}
-					inherited.add(r);
+
+					if (!inherited.contains(r)) {
+						inherited.add(r);
+					}
 
 					if (r.getSuperRegion().ownedByPlayer(BotState.getMyName())) {
 						System.err

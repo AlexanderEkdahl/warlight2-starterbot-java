@@ -26,7 +26,7 @@ public class Values {
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 17;
 	public static final double rewardDefenseImportanceMultiplier = 20;
-	public static final double rewardDefenseInheritanceMultiplier = 0.4;
+	public static final double rewardDefenseInheritanceMultiplier = 0.3;
 	public static final double deficitDefenceExponentialMultiplier = 1.05;
 
 	// ////// COSTS
