@@ -17,7 +17,6 @@ public class OffensiveCommander  {
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
 		Region maxRegion = null;
 		double maxWeight = Double.MIN_VALUE;
-
 		for (Region r : possiblePicks) {
 			String beforeStatus = map.getRegion(r.getId()).getPlayerName();
 			map.getRegion(r.getId()).setPlayerName(BotState.getMyName());

@@ -15,6 +15,10 @@ import math.Tables;
 
 public class Values {
 
+	//// STARTING REGIONS PICKING
+	
+	public static final double hasEntryPenalty = 2;
+	
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final double partOfAttackingNeededForDefence = 1;
@@ -24,10 +28,10 @@ public class Values {
 	public static final double rewardMultiplier = 120;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 17;
-	public static final double rewardDefenseImportanceMultiplier = 20;
-	public static final double rewardDefenseInheritanceMultiplier = 0.3;
-	public static final double deficitDefenceExponentialMultiplier = 1.05;
+	public static final double valueDenialMultiplier = 13;
+	public static final double rewardDefenseImportanceMultiplier = 14;
+	public static final double rewardDefenseInheritanceMultiplier = 0.4;
+	public static final double deficitDefenceExponentialMultiplier = 1.02;
 
 	// ////// COSTS
 
@@ -41,7 +45,8 @@ public class Values {
 	public static final double staticRegionCost = 8;
 	public static final double superRegionSizeExponentialPenalty = 1.12;
 	public static final double enemyVicinityExponentialPenalty = 1.3;
-	public static final double internalHopsExponentialPenalty = 1.3;
+	public static final double internalHopsExponentialPenalty = 1.15;
+	public static final double turnsNeededToTake = 1.4;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
 	// ////// SATISFACTION
@@ -80,8 +85,8 @@ public class Values {
 			return new Outcome(0, Math.max(1, defending - 1));
 		}
 		int defendingCopy = defending;
-		defending = (int) Math.round(Math.max(defending - ((0.62 * attacking)), 0));
-		attacking = (int) Math.round(Math.max(attacking - ((0.8 * defendingCopy)), 0));
+		defending = (int) Math.round(Math.max(defending - ((0.6 * attacking)), 0));
+		attacking = (int) Math.round(Math.max(attacking - ((0.82 * defendingCopy)), 0));
 
 		return new Outcome(attacking, defending);
 

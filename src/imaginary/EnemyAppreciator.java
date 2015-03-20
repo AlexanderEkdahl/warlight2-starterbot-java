@@ -105,12 +105,15 @@ public class EnemyAppreciator {
 		if (tier1.size() > 0) {
 			System.err.println("EnemyAppreciator placing enemy forces on tier 1 regions, there are " + tier1.size());
 			placeAllOn(tier1, enemyPlacedArmies);
+			enemyPlacedArmies = 0;
 		} else if (tier2.size() > 0) {
 			System.err.println("EnemyAppreciator placing enemy forces on tier 2 regions, there are " + tier2.size());
-			placeAllOn(tier2, enemyPlacedArmies);
-		} else if (tier4.size() > 0 || tier5.size() > 0) {
+			int placedOnTier2 = enemyPlacedArmies / 2;
+			enemyPlacedArmies -= placedOnTier2;
+			placeAllOn(tier2, placedOnTier2);
+		}
+		if ((tier4.size() > 0 || tier5.size() > 0) && enemyPlacedArmies > 0) {
 			System.err.println("EnemyAppreciator placing enemy forces on tier 4 & 5 regions, there are " + (tier4.size() + tier5.size()));
-
 			Random rand = new Random();
 			ArrayList<Region> tier4List = new ArrayList<Region>();
 			ArrayList<Region> tier5List = new ArrayList<Region>();
