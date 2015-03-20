@@ -232,12 +232,14 @@ public class BotMain implements Bot {
 		System.err.println("Cancelled attacks:");
 		for (Integer r : aKeys) {
 			if ((!speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyName())))) {
-				badPotentialAttacks.add(r);
-				System.err.println("PotentialAttacks: " + r);
-				if (speculativeMap.getRegion(r).getPlayerName().equals(("neutral"))) {
-					badAttacks.add(r);
-					System.err.println("All attacks: " + r);
-				}
+				// badPotentialAttacks.add(r);
+				// System.err.println("PotentialAttacks: " + r);
+				// if
+				// (speculativeMap.getRegion(r).getPlayerName().equals(("neutral")))
+				// {
+				badAttacks.add(r);
+				System.err.println("All attacks: " + r);
+				// }
 			}
 		}
 
