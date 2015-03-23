@@ -9,29 +9,28 @@ import java.util.Set;
 import commanders.OffensiveCommander;
 import concepts.Outcome;
 import map.Map;
+import map.Pathfinder;
 import map.Region;
 import map.SuperRegion;
 import math.Tables;
 
 public class Values {
+	private static int latestTurnsNeededCalculated = 0;
+	private static double latestTurnsNeededResult = 0;
 
-	//// STARTING REGIONS PICKING
-	
-	public static final double hasEntryPenalty = 2;
-	
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final double partOfAttackingNeededForDefence = 1;
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 150;
+	public static final double rewardMultiplier = 165;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 13;
-	public static final double rewardDefenseImportanceMultiplier = 15;
+	public static final double rewardDefenseImportanceMultiplier = 20;
 	public static final double rewardDefenseInheritanceMultiplier = 0.4;
-	public static final double deficitDefenceExponentialMultiplier = 1.02;
+	public static final double deficitDefenceExponentialMultiplier = 1;
 
 	// ////// COSTS
 
@@ -42,11 +41,11 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 8;
+	public static final double staticRegionCost = 5;
 	public static final double superRegionSizeExponentialPenalty = 1.12;
-	public static final double enemyVicinityExponentialPenalty = 1.3;
-	public static final double internalHopsExponentialPenalty = 1.15;
-//	public static final double turnsNeededToTake = 1.4;
+	public static final double enemyVicinityExponentialPenalty = 1.4;
+	public static final double internalHopsExponentialPenalty = 1.1;
+	public static final double turnsNeededToTakeExponentialPenalty = 1.28;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
 	// ////// SATISFACTION
@@ -59,9 +58,7 @@ public class Values {
 	// //////
 
 	public static Region getBestStartRegion(ArrayList<Region> pickableStartingRegions, Map map) {
-
 		Region startingRegion = OffensiveCommander.determineStartPosition(pickableStartingRegions, map);
-
 		return startingRegion;
 
 	}
@@ -150,6 +147,7 @@ public class Values {
 		totalCost *= tables.getInternalHopsPenaltyFor(sr);
 		totalCost *= tables.getSizePenaltyFor(sr);
 		totalCost *= calculateSuperRegionVulnerability(sr, map);
+		totalCost *= calculateSuperRegionTurnsNeededToTake(sr, map);
 		// totalCost *= calculateFrontsOpened(sr,map);
 
 		return totalCost;
@@ -174,6 +172,29 @@ public class Values {
 	// tables.getMultipleFrontExponentialPenaltyFor(contactWithSuperRegion.size());
 	//
 	// }
+
+	private static double calculateSuperRegionTurnsNeededToTake(SuperRegion sr, Map map) {
+
+		if (latestTurnsNeededCalculated == BotState.getRoundNumber()) {
+			return latestTurnsNeededResult;
+		}
+		Pathfinder p = Pathfinder.getSimplePathfinder(map);
+		int max = 0;
+		if (map.getOwnedRegions(BotState.getMyName()).size() > 1) {
+			for (Region r : sr.getSubRegions()) {
+				max = Math.max(max, (int) p.getPathToRegionOwnedByPlayer(r, BotState.getMyName()).getDistance());
+
+			}
+		} else {
+			return 1;
+		}
+		// TODO Auto-generated method stub
+
+		Tables tables = Tables.getInstance();
+		latestTurnsNeededCalculated = BotState.getRoundNumber();
+		latestTurnsNeededResult = tables.getTurnsNeededToTakeExponentialPenaltyFor(max);
+		return latestTurnsNeededResult;
+	}
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
 		// determine if this superregion borders an enemy region and if so how
@@ -215,7 +236,7 @@ public class Values {
 		} else if (armySize <= 7) {
 			return armySize + 5;
 		} else {
-			return (int) (armySize * 1.8);
+			return (int) (armySize * 1.7);
 		}
 
 	}
@@ -233,11 +254,11 @@ public class Values {
 		} else if (r.getPlayerName().equals("neutral")) {
 			return calculateRequiredForcesAttack(r);
 		} else if (armySize <= 3) {
-			return armySize + 4;
+			return armySize + 3;
 		} else if (armySize <= 5) {
-			return armySize + 5;
+			return armySize + 4;
 		} else {
-			return (int) (armySize * 2.2);
+			return (int) (armySize * 1.9);
 		}
 
 	}

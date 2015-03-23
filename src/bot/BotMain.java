@@ -157,9 +157,6 @@ public class BotMain implements Bot {
 						int placed = Math.min(required - initiallyAvailable, armiesLeft);
 						if (placed > 0) {
 							addToIntegerHashMap(placeDecisions, currentOriginRegion.getId(), placed);
-							// placeOrders.add(new
-							// PlaceArmiesMove(BotState.getMyName(),
-							// currentOriginRegion, placed));
 							addToIntegerHashMap(available, currentOriginRegion.getId(), placed);
 							currentOriginRegion.setArmies(currentOriginRegion.getArmies() + placed);
 						}
@@ -186,14 +183,9 @@ public class BotMain implements Bot {
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
 							addToIntegerHashMap(currentlyDefending, currentOriginRegion.getId(), disposed);
-							// addPotentialAttacks(potentialAttacks,
-							// speculativeMap.getRegion(currentOriginRegion.getId()),
-							// availablePotential);
-							// usePotentialAttacks(potentialAttacks,
-							// satisfaction, potentialAttackDecisions,
-							// speculativeMap, availablePotential,
-							// attackingAgainst,
-							// startingEnemyForces, currentlyDefending);
+//							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
+//							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+//									startingEnemyForces, currentlyDefending);
 							break;
 						}
 					} else {
@@ -232,14 +224,12 @@ public class BotMain implements Bot {
 		System.err.println("Cancelled attacks:");
 		for (Integer r : aKeys) {
 			if ((!speculativeMap.getRegion(r).getPlayerName().equals((BotState.getMyName())))) {
-				// badPotentialAttacks.add(r);
-				// System.err.println("PotentialAttacks: " + r);
-				// if
-				// (speculativeMap.getRegion(r).getPlayerName().equals(("neutral")))
-				// {
-				badAttacks.add(r);
-				System.err.println("All attacks: " + r);
-				// }
+				badPotentialAttacks.add(r);
+				System.err.println("PotentialAttacks: " + r);
+				if (speculativeMap.getRegion(r).getPlayerName().equals(("neutral"))) {
+					badAttacks.add(r);
+					System.err.println("All attacks: " + r);
+				}
 			}
 		}
 
@@ -397,7 +387,7 @@ public class BotMain implements Bot {
 				defending = currentOutcome.getDefendingArmies();
 				latestAttackingLeft = currentOutcome.getAttackingArmies();
 			} else {
-				System.err.println("defenders are at 0 in region " + currentTargetRegion + " and we're still attacking for some dumb reason");
+				System.err.println("defenders are at 0 in region " + currentTargetRegion + " and we are still attacking for some dumb reason");
 			}
 		}
 		if (defending < 1) {

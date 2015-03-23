@@ -19,12 +19,14 @@ public class Tables {
 	private static HashMap<Integer, Double> sizePenalty;
 	private static double[] deficitDefenceExponentialMultiplier;
 	private static double[] enemyVicinityExponentialPenalty;
+	private static double[] turnsNeededToTakeExponentialPenalty;
 
 	private Tables() {
 		internalHopsPenalty = new HashMap<Integer, Double>();
 		sizePenalty = new HashMap<Integer, Double>();
 		deficitDefenceExponentialMultiplier = new double[maxCalc+1];
 		enemyVicinityExponentialPenalty = new double[maxCalc+1];
+		turnsNeededToTakeExponentialPenalty = new double[maxCalc+1];
 	}
 
 	public static Tables getInstance() {
@@ -44,6 +46,7 @@ public class Tables {
 		for (int i = 0; i <= maxCalc; i++) {
 			deficitDefenceExponentialMultiplier[i] = Math.pow(Values.deficitDefenceExponentialMultiplier, i);
 			enemyVicinityExponentialPenalty[i] = Math.pow(Values.enemyVicinityExponentialPenalty, i);
+			turnsNeededToTakeExponentialPenalty[i] = Math.pow(Values.turnsNeededToTakeExponentialPenalty, i);
 		}
 
 	}
@@ -86,6 +89,11 @@ public class Tables {
 	public Double getDeficitDefenceExponentialMultiplierFor(int i) {
 		i = Math.min(i, maxCalc);
 		return deficitDefenceExponentialMultiplier[i];
+	}
+	
+	public Double getTurnsNeededToTakeExponentialPenaltyFor(int i){
+		i = Math.min(i, maxCalc);
+		return turnsNeededToTakeExponentialPenalty[i];
 	}
 
 

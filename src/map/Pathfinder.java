@@ -2,6 +2,8 @@ package map;
 
 import java.util.*;
 
+import bot.Values;
+
 public class Pathfinder {
 	private PathfinderWeighter pathfinderWeighter;
 	private HashMap<Region, Double> distances;
@@ -180,7 +182,7 @@ public class Pathfinder {
 		distances = new HashMap<Region, Double>();
 
 		for (Region region : regions) {
-			distances.put(region,Double.valueOf(0));
+			distances.put(region, Double.valueOf(0));
 		}
 
 		for (Iterator<Region> iterator = new BFSIterator(regions); iterator.hasNext();) {
@@ -230,45 +232,64 @@ public class Pathfinder {
 		}
 	}
 
-	public static void blargh(String[] args) {
-		Map m = new Map();
+	public static Pathfinder getSimplePathfinder(Map map) {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
+			public double weight(Region nodeA, Region nodeB) {
+				return 1;
 
-		SuperRegion superRegion = new SuperRegion(0, 0);
-		SuperRegion superRegion2 = new SuperRegion(0, 0);
-		m.add(superRegion);
-
-		Region node1 = new Region(1, superRegion, "player1", 0);
-		Region node2 = new Region(2, superRegion, "player1", 0);
-		Region node3 = new Region(3, superRegion, "player1", 0);
-		Region node4 = new Region(4, superRegion2, "player2", 0);
-		Region node5 = new Region(5, superRegion2, "player2", 0);
-
-		node1.addNeighbor(node3);
-		node3.addNeighbor(node2);
-		node2.addNeighbor(node5);
-		// node3.addNeighbor(node4);
-		node4.addNeighbor(node5);
-
-		m.add(node1);
-		m.add(node2);
-		m.add(node3);
-		m.add(node4);
-		m.add(node5);
-
-		Pathfinder Pathfinder = new Pathfinder(m);
-
-		// Iterator<Path> it = Pathfinder.distanceIterator(node1);
-		// while (it.hasNext()){
-		// System.out.println(it.next().getTarget());
-		// }
-
-		// System.out.println(Pathfinder.getDistanceBetweenRegions(node1,
-		// node4));
-		// Pathfinder.getPlayerInnerRegions("player1");
-
-		// for (Region region : Pathfinder.getPlayerInnerRegions(m, "player1"))
-		// {
-		// System.out.println(region.getId());
-		// }
+			}
+		});
+		return pathfinder;
 	}
+
+	public static Pathfinder getWeighedCostPathfinder(Map map) {
+		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
+			public double weight(Region nodeA, Region nodeB) {
+				return Values.calculateRegionWeighedCost(nodeB);
+
+			}
+		});
+		return pathfinder;
+	}
+
+	// public static void blargh(String[] args) {
+	// Map m = new Map();
+	//
+	// SuperRegion superRegion = new SuperRegion(0, 0);
+	// SuperRegion superRegion2 = new SuperRegion(0, 0);
+	// m.add(superRegion);
+	//
+	// Region node1 = new Region(1, superRegion, "player1", 0);
+	// Region node2 = new Region(2, superRegion, "player1", 0);
+	// Region node3 = new Region(3, superRegion, "player1", 0);
+	// Region node4 = new Region(4, superRegion2, "player2", 0);
+	// Region node5 = new Region(5, superRegion2, "player2", 0);
+	//
+	// node1.addNeighbor(node3);
+	// node3.addNeighbor(node2);
+	// node2.addNeighbor(node5);
+	// // node3.addNeighbor(node4);
+	// node4.addNeighbor(node5);
+	//
+	// m.add(node1);
+	// m.add(node2);
+	// m.add(node3);
+	// m.add(node4);
+	// m.add(node5);
+	//
+	// Pathfinder Pathfinder = new Pathfinder(m);
+
+	// Iterator<Path> it = Pathfinder.distanceIterator(node1);
+	// while (it.hasNext()){
+	// System.out.println(it.next().getTarget());
+	// }
+
+	// System.out.println(Pathfinder.getDistanceBetweenRegions(node1,
+	// node4));
+	// Pathfinder.getPlayerInnerRegions("player1");
+
+	// for (Region region : Pathfinder.getPlayerInnerRegions(m, "player1"))
+	// {
+	// System.out.println(region.getId());
+	// }
 }
