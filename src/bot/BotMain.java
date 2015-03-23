@@ -183,9 +183,9 @@ public class BotMain implements Bot {
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
 							addToIntegerHashMap(currentlyDefending, currentOriginRegion.getId(), disposed);
-//							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
-//							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
-//									startingEnemyForces, currentlyDefending);
+							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
+							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+									startingEnemyForces, currentlyDefending);
 							break;
 						}
 					} else {
@@ -198,11 +198,14 @@ public class BotMain implements Bot {
 			}
 		}
 
-		for (Integer i : availablePotential.keySet()) {
-			addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i), availablePotential);
-		}
-		usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
-				startingEnemyForces, currentlyDefending);
+		// for (Integer i : availablePotential.keySet()) {
+		// addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(i),
+		// availablePotential);
+		// }
+		// usePotentialAttacks(potentialAttacks, satisfaction,
+		// potentialAttackDecisions, speculativeMap, availablePotential,
+		// attackingAgainst,
+		// startingEnemyForces, currentlyDefending);
 
 		// add backup proposals
 		Set<FromTo> backupKeys = backupDecisions.keySet();

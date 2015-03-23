@@ -32,7 +32,7 @@ public class BotState {
 	private long totalTimebank;
 	private long timePerMove;
 	private ArrayList<ArrayList<Move>> opponentMoves;
-
+	private static boolean isUsingIncomeAppreciator = true;
 	private IncomeAppreciator incomeAppreciator;
 
 	public BotState() {
@@ -113,7 +113,14 @@ public class BotState {
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
-		incomeAppreciator.updateMap();
+		if (map.getRegionList().size() < 70){
+			isUsingIncomeAppreciator = true;
+			incomeAppreciator.updateMap();
+		}
+		else{
+			isUsingIncomeAppreciator = false;
+		}
+		
 		map.updateMap(mapInput);
 	}
 
@@ -147,8 +154,11 @@ public class BotState {
 				System.err.println("Unable to parse Opponent moves " + e.getMessage());
 			}
 		}
-		incomeAppreciator.updateMoves();
-		System.err.println("Enemy income: " + incomeAppreciator.income());
+		if (isUsingIncomeAppreciator){
+			incomeAppreciator.updateMoves();
+			System.err.println("Enemy income: " + incomeAppreciator.income());
+		}
+		
 	}
 
 	public String getMyPlayerName() {
@@ -185,5 +195,10 @@ public class BotState {
 
 	public ArrayList<Move> getOpponentMoves(int round) {
 		return opponentMoves.get(round - 1);
+	}
+
+	public static boolean isUsingIncomeAppreciator() {
+		// TODO Auto-generated method stub
+		return isUsingIncomeAppreciator;
 	}
 }

@@ -15,8 +15,8 @@ import map.SuperRegion;
 import math.Tables;
 
 public class Values {
-	private static int latestTurnsNeededCalculated = 0;
-	private static double latestTurnsNeededResult = 0;
+	private static HashMap<Integer, Double> latestTurnsNeededResult = new HashMap<Integer, Double>();
+	private static HashMap<Integer, Integer> latestTurnsNeededCalculated = new HashMap<Integer, Integer>();
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -175,8 +175,8 @@ public class Values {
 
 	private static double calculateSuperRegionTurnsNeededToTake(SuperRegion sr, Map map) {
 
-		if (latestTurnsNeededCalculated == BotState.getRoundNumber()) {
-			return latestTurnsNeededResult;
+		if (latestTurnsNeededCalculated.get(sr.getId()) != null && latestTurnsNeededCalculated.get(sr.getId()) == BotState.getRoundNumber()) {
+			return latestTurnsNeededResult.get(sr.getId());
 		}
 		Pathfinder p = Pathfinder.getSimplePathfinder(map);
 		int max = 0;
@@ -191,9 +191,10 @@ public class Values {
 		// TODO Auto-generated method stub
 
 		Tables tables = Tables.getInstance();
-		latestTurnsNeededCalculated = BotState.getRoundNumber();
-		latestTurnsNeededResult = tables.getTurnsNeededToTakeExponentialPenaltyFor(max);
-		return latestTurnsNeededResult;
+		double valueForMax = tables.getTurnsNeededToTakeExponentialPenaltyFor(max);
+		latestTurnsNeededCalculated.put(sr.getId(), BotState.getRoundNumber());
+		latestTurnsNeededResult.put(sr.getId(), valueForMax);
+		return valueForMax;
 	}
 
 	private static double calculateSuperRegionVulnerability(SuperRegion sr, Map map) {
