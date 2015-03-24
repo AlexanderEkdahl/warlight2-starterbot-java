@@ -87,7 +87,6 @@ public class EnemyAppreciator {
 		ArrayList<PlaceArmiesMove> nextLatestPlacements = enemyPlacements.get(BotState.getRoundNumber() - 2);
 
 		enemyPlacedArmies = placeOnLastPlacements(enemyPlacedArmies, latestPlacements, nextLatestPlacements);
-
 		Set<Region> vulnerable = speculativeMap.getAllEnemyVulnerableRegions();
 		Set<Region> annoying = speculativeMap.getallAnnoyingRegions();
 		Set<Region> directlyThreatening = speculativeMap.getAllRegionsThreateningOwnedSuperRegions();

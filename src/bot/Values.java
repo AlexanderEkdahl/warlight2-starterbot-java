@@ -34,23 +34,19 @@ public class Values {
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 8;
-	public static final double costMultiplierEnemy = 2 / 5 * costUnitMultiplier;
+	public static final double costUnitMultiplier = 9;
+	public static final double costMultiplierEnemy = (3 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
 	public static final double staticRegionCost = 5;
-	public static final double superRegionSizeExponentialPenalty = 1.12;
-	public static final double enemyVicinityExponentialPenalty = 1.4;
+	public static final double superRegionSizeExponentialPenalty = 1.14;
+	public static final double enemyVicinityExponentialPenalty = 1;
 	public static final double internalHopsExponentialPenalty = 1.1;
-	public static final double turnsNeededToTakeExponentialPenalty = 1.28;
+	public static final double turnsNeededToTakeExponentialPenalty = 1.4;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
-
-	// ////// SATISFACTION
-
-	public static final double maxRegionSatisfactionMultiplier = 1;
 
 	// ////// PERFORMANCE
 	public static boolean defensiveCommanderUseSmallPlacements = true;
@@ -259,7 +255,7 @@ public class Values {
 		} else if (armySize <= 5) {
 			return armySize + 4;
 		} else {
-			return (int) (armySize * 1.9);
+			return (int) (armySize * 2.2);
 		}
 
 	}
