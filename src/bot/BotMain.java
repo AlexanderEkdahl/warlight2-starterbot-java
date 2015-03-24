@@ -420,8 +420,9 @@ public class BotMain implements Bot {
 	}
 
 	private int calculateOutcomeForAttack(int defending, HashMap<Integer, Integer> attacking, HashMap<Integer, Integer> attackingRemaining) {
+		
 		for (Integer i : attacking.keySet()) {
-			boolean taken = (defending <= 0) ? false : true;
+			boolean taken = (defending > 0) ? false : true;
 			if (taken) {
 				defending -= attacking.get(i);
 				attackingRemaining.put(i, 0);
