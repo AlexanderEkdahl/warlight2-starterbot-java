@@ -18,6 +18,16 @@ public class Values {
 	private static HashMap<Integer, Double> latestTurnsNeededResult = new HashMap<Integer, Double>();
 	private static HashMap<Integer, Integer> latestTurnsNeededCalculated = new HashMap<Integer, Integer>();
 
+	// ENUMS
+
+	public enum DefenseMode {
+		MAX_ONLY, ALL
+	}
+
+	// //// MODES
+
+	public static final DefenseMode defenseMode = DefenseMode.MAX_ONLY;
+
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
 	public static final double partOfAttackingNeededForDefence = 1;
@@ -28,9 +38,9 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 13;
-	public static final double rewardDefenseImportanceMultiplier = 20;
-	public static final double rewardDefenseInheritanceMultiplier = 0.4;
-	public static final double deficitDefenceExponentialMultiplier = 1;
+	public static final double rewardDefenseImportanceMultiplier = 18;
+	public static final double rewardDefenseInheritanceMultiplier = 0.3;
+	public static final double deficitDefenceExponentialMultiplier = 1.02;
 
 	// ////// COSTS
 
@@ -41,9 +51,9 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 5;
+	public static final double staticRegionCost = 7;
 	public static final double superRegionSizeExponentialPenalty = 1.14;
-	public static final double enemyVicinityExponentialPenalty = 1;
+	public static final double enemyVicinityExponentialPenalty = 1.2;
 	public static final double internalHopsExponentialPenalty = 1.1;
 	public static final double turnsNeededToTakeExponentialPenalty = 1.4;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
@@ -274,8 +284,15 @@ public class Values {
 
 	public static int calculateRequiredForcesDefendAgainstRegions(ArrayList<Region> regions) {
 		int total = 0;
-		for (Region r : regions) {
-			total += r.getArmies() - 1;
+		if (defenseMode == DefenseMode.MAX_ONLY) {
+			for (Region r : regions) {
+				total = Math.max(r.getArmies() - 1, total);
+			}
+		} else if (defenseMode == DefenseMode.ALL) {
+			for (Region r : regions) {
+				total += r.getArmies() - 1;
+			}
+			System.out.println("GRR");
 		}
 
 		total *= partOfAttackingNeededForDefence;

@@ -18,6 +18,7 @@ import map.Map;
 import map.Pathfinder;
 import map.PathfinderWeighter;
 import map.Region;
+import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
@@ -168,7 +169,7 @@ public class BotMain implements Bot {
 					} else {
 						disposed = required;
 					}
-					
+
 					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && (disposed < 2)) {
 						// tis a silly attacks
 						continue;
@@ -252,27 +253,23 @@ public class BotMain implements Bot {
 			}
 		}
 
-		// ArrayList<AttackTransferMove> performedLast = new
-		// ArrayList<AttackTransferMove>();
+		ArrayList<AttackTransferMove> performedLast = new ArrayList<AttackTransferMove>();
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				// if (decisions.get(f) == 1) {
-				// performedLast.add(0, new
-				// AttackTransferMove(BotState.getMyName(),
-				// appreciatedMap.getRegion(f.getR1()),
-				// appreciatedMap.getRegion(f.getR2()),
-				// decisions.get(f)));
-				// } else {
-				moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()), decisions
-						.get(f)));
-				// }
+				if (decisions.get(f) == 1) {
+					performedLast.add(0, new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
+							decisions.get(f)));
+				} else {
+					moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
+							decisions.get(f)));
+				}
 			}
 
 		}
-		// for (AttackTransferMove a : performedLast) {
-		// moveOrders.add(a);
-		// }
+		for (AttackTransferMove a : performedLast) {
+			moveOrders.add(a);
+		}
 
 		System.err.println("Placements:");
 		for (Integer i : placeDecisions.keySet()) {
@@ -420,7 +417,7 @@ public class BotMain implements Bot {
 	}
 
 	private int calculateOutcomeForAttack(int defending, HashMap<Integer, Integer> attacking, HashMap<Integer, Integer> attackingRemaining) {
-		
+
 		for (Integer i : attacking.keySet()) {
 			boolean taken = (defending > 0) ? false : true;
 			if (taken) {
