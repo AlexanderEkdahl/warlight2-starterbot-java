@@ -50,11 +50,10 @@ public class DefensiveCommander {
 		ArrayList<Region> inherited = new ArrayList<Region>();
 		ArrayList<Region> frontRegionsNotInOwnedSuperRegion = map.getOwnedFrontRegions();
 		frontRegionsNotInOwnedSuperRegion.removeAll(map.getOwnedSuperRegionRegions());
-		ArrayList<SuperRegion> protectedSuperRegions = map.getProtectedSuperRegions();
 
 		for (Region r : frontRegionsNotInOwnedSuperRegion) {
 			for (Region n : r.getNeighbors()) {
-				if (protectedSuperRegions.contains(n.getSuperRegion())) {
+				if (map.getOwnedSuperRegionRegions().contains(n.getSuperRegion())) {
 					// if here then this region is protecting owned superregions
 					if (regionWorths.get(r) == null) {
 						regionWorths.put(r, regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier);
@@ -107,8 +106,8 @@ public class DefensiveCommander {
 
 		
 		// add inheritancedefence
-		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
-		interestingFronts.addAll(inheritedDefenceRegions);
+//		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
+//		interestingFronts.addAll(inheritedDefenceRegions);
 
 		for (Region r : interestingFronts) {
 			// for all the interesting regions, calculate if they defense

@@ -26,7 +26,7 @@ public class Values {
 
 	// //// MODES
 
-	public static final DefenseMode defenseMode = DefenseMode.Percentage_OF_MAX_ONLY;
+	public static final DefenseMode defenseMode = DefenseMode.ALL;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -37,14 +37,14 @@ public class Values {
 	public static final double rewardMultiplier = 200;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 13;
+	public static final double valueDenialMultiplier = 12;
 	public static final double rewardDefenseImportanceMultiplier = 18;
 	public static final double rewardDefenseInheritanceMultiplier = 0.3;
 	public static final double deficitDefenceExponentialMultiplier = 1.02;
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 11;
+	public static final double costUnitMultiplier = 13;
 	public static final double costMultiplierEnemy = (3 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
