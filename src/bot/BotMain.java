@@ -171,7 +171,7 @@ public class BotMain implements Bot {
 					}
 
 					if (!currentTargetRegion.getPlayerName().equals(BotState.getMyName()) && (currentTargetRegion.getArmies() < 3) && (disposed < 2)) {
-						// tis a silly attacks
+						// tis a silly attack
 						continue;
 					}
 					somethingWasDone = true;
@@ -379,7 +379,7 @@ public class BotMain implements Bot {
 		if (defendingLeft > 0) {
 			target.setArmies(defendingLeft);
 		} else if (defendingLeft == 0) {
-			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, DEFENDING IS 0, FUCKFUCKFUCK\n\n\n\n\n\n");
+			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, DEFENDING IS 0\n\n\n\n\n\n");
 		} else {
 			// We took it!
 			target.setPlayerName(BotState.getMyName());
@@ -393,12 +393,12 @@ public class BotMain implements Bot {
 		}
 		int additionallyLost = (attackingAgainst.get(currentMove.getR1()) - attackingRemaining.get(currentMove.getR1())) - accountedLosses.get(currentMove);
 		if (additionallyLost < 0) {
-			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, LOST IS NEGATIVE, FUCKFUCKFUCK\n\n\n\n\n\n");
+			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, LOST IS NEGATIVE\n\n\n\n\n\n");
 		}
 		accountedLosses.put(currentMove, accountedLosses.get(currentMove) + additionallyLost);
 		map.getRegion(currentMove.getR1()).setArmies(map.getRegion(currentMove.getR1()).getArmies() - additionallyLost);
 		if (map.getRegion(currentMove.getR1()).getArmies() < 0) {
-			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, MAP ARMIES IS NEGATIVE, FUCKFUCKFUCK\n\n\n\n\n\n");
+			System.err.println("MAJOR MALFUNCTION IN MODIFYMAPBASEDONATTACK, MAP ARMIES IS NEGATIVE\n\n\n\n\n\n");
 		}
 
 	}

@@ -62,7 +62,6 @@ public class DefensiveCommander {
 					} else {
 						regionWorths.put(r, regionWorths.get(r) + (regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier));
 						regionCosts.put(r, regionCosts.get(n) + regionCosts.get(r));
-
 					}
 
 					if (!inherited.contains(r)) {
@@ -106,6 +105,8 @@ public class DefensiveCommander {
 			}
 		}
 
+		
+		// add inheritancedefence
 		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
 		interestingFronts.addAll(inheritedDefenceRegions);
 

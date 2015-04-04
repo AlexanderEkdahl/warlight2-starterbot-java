@@ -21,20 +21,20 @@ public class Values {
 	// ENUMS
 
 	public enum DefenseMode {
-		MAX_ONLY, ALL
+		MAX_ONLY, ALL, Percentage_OF_MAX_ONLY
 	}
 
 	// //// MODES
 
-	public static final DefenseMode defenseMode = DefenseMode.MAX_ONLY;
+	public static final DefenseMode defenseMode = DefenseMode.Percentage_OF_MAX_ONLY;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
-	public static final double partOfAttackingNeededForDefence = 1;
+	public static final double percentageOfAttackingNeededForDefence = 0.8;
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 165;
+	public static final double rewardMultiplier = 200;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 13;
@@ -44,18 +44,18 @@ public class Values {
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 9;
+	public static final double costUnitMultiplier = 11;
 	public static final double costMultiplierEnemy = (3 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 7;
-	public static final double superRegionSizeExponentialPenalty = 1.14;
-	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double staticRegionCost = 8;
+	public static final double superRegionSizeExponentialPenalty = 1.12;
+	public static final double enemyVicinityExponentialPenalty = 1.25;
 	public static final double internalHopsExponentialPenalty = 1.1;
-	public static final double turnsNeededToTakeExponentialPenalty = 1.4;
+	public static final double turnsNeededToTakeExponentialPenalty = 1.35;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
 	// ////// PERFORMANCE
@@ -217,8 +217,13 @@ public class Values {
 				}
 			}
 		}
+		int nbr = enemyNeighbors.size();
+		if (nbr < 0){
+			Pathfinder pathfinder = Pathfinder.getSimplePathfinder(map);
+			nbr = (int) pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(sr, BotState.getMyOpponentName()).getDistance();
+		}
 		Tables table = Tables.getInstance();
-		return table.getEnemyVicinityExponentialPenaltyFor(enemyNeighbors.size());
+		return table.getEnemyVicinityExponentialPenaltyFor(nbr);
 
 	}
 
@@ -292,10 +297,13 @@ public class Values {
 			for (Region r : regions) {
 				total += r.getArmies() - 1;
 			}
-			System.out.println("GRR");
 		}
-
-		total *= partOfAttackingNeededForDefence;
+		else if (defenseMode == DefenseMode.Percentage_OF_MAX_ONLY){
+			for (Region r : regions) {
+				total = Math.max(r.getArmies() - 1, total);
+			}
+			total *= percentageOfAttackingNeededForDefence;
+		}
 
 		return total;
 	}

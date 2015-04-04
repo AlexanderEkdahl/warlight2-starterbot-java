@@ -13,6 +13,7 @@ import map.Pathfinder.Path;
 
 public class Tables {
 	private static final int maxCalc = 30;
+	private static final int minCalc = -10;
 
 	private static Tables tables;
 	private static HashMap<Integer, Double> internalHopsPenalty;
@@ -73,6 +74,13 @@ public class Tables {
 		return maxHops;
 	}
 
+	private double determineOut(int i, double[] array) {
+		i = Math.max(minCalc, Math.min(i, maxCalc));
+		double returnValue = (i<0) ? 1/array[i] : array[i];
+		return returnValue;
+		
+	}
+
 	public Double getInternalHopsPenaltyFor(SuperRegion s) {
 		return internalHopsPenalty.get(s.getId());
 	}
@@ -82,18 +90,16 @@ public class Tables {
 	}
 
 	public Double getEnemyVicinityExponentialPenaltyFor(int i) {
-		i = Math.min(i, maxCalc);
-		return enemyVicinityExponentialPenalty[i];
+		return determineOut(i,enemyVicinityExponentialPenalty);
 	}
 
 	public Double getDeficitDefenceExponentialMultiplierFor(int i) {
-		i = Math.min(i, maxCalc);
-		return deficitDefenceExponentialMultiplier[i];
+		return determineOut(i,deficitDefenceExponentialMultiplier);
+
 	}
 	
 	public Double getTurnsNeededToTakeExponentialPenaltyFor(int i){
-		i = Math.min(i, maxCalc);
-		return turnsNeededToTakeExponentialPenalty[i];
+		return determineOut(i,turnsNeededToTakeExponentialPenalty);
 	}
 
 
