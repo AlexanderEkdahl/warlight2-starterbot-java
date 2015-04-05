@@ -257,13 +257,16 @@ public class BotMain implements Bot {
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				if (decisions.get(f) == 1) {
-					performedLast.add(0, new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
-							decisions.get(f)));
-				} else {
-					moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
-							decisions.get(f)));
-				}
+				// if (decisions.get(f) == 1) {
+				// performedLast.add(0, new
+				// AttackTransferMove(BotState.getMyName(),
+				// appreciatedMap.getRegion(f.getR1()),
+				// appreciatedMap.getRegion(f.getR2()),
+				// decisions.get(f)));
+				// } else {
+				moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()), decisions
+						.get(f)));
+				// }
 			}
 
 		}

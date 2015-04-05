@@ -37,10 +37,10 @@ public class Values {
 	public static final double rewardMultiplier = 200;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 12;
-	public static final double rewardDefenseImportanceMultiplier = 18;
+	public static final double valueDenialMultiplier = 10;
+	public static final double rewardDefenseImportanceMultiplier = 3;
 	public static final double rewardDefenseInheritanceMultiplier = 0.3;
-	public static final double deficitDefenceExponentialMultiplier = 1.02;
+	public static final double deficitDefenceExponentialMultiplier = 1.06;
 
 	// ////// COSTS
 
@@ -218,7 +218,7 @@ public class Values {
 			}
 		}
 		int nbr = enemyNeighbors.size();
-		if (nbr < 0){
+		if (nbr < 0) {
 			Pathfinder pathfinder = Pathfinder.getSimplePathfinder(map);
 			nbr = (int) pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(sr, BotState.getMyOpponentName()).getDistance();
 		}
@@ -266,11 +266,11 @@ public class Values {
 		} else if (r.getPlayerName().equals("neutral")) {
 			return calculateRequiredForcesAttack(r);
 		} else if (armySize <= 3) {
-			return armySize + 3;
-		} else if (armySize <= 5) {
 			return armySize + 4;
+		} else if (armySize <= 5) {
+			return armySize + 6;
 		} else {
-			return (int) (armySize * 2.2);
+			return (int) (armySize * 2.4);
 		}
 
 	}
@@ -297,8 +297,7 @@ public class Values {
 			for (Region r : regions) {
 				total += r.getArmies() - 1;
 			}
-		}
-		else if (defenseMode == DefenseMode.Percentage_OF_MAX_ONLY){
+		} else if (defenseMode == DefenseMode.Percentage_OF_MAX_ONLY) {
 			for (Region r : regions) {
 				total = Math.max(r.getArmies() - 1, total);
 			}
