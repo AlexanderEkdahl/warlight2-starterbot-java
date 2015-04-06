@@ -106,8 +106,8 @@ public class DefensiveCommander {
 
 		
 		// add inheritancedefence
-//		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
-//		interestingFronts.addAll(inheritedDefenceRegions);
+		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
+		interestingFronts.addAll(inheritedDefenceRegions);
 
 		for (Region r : interestingFronts) {
 			// for all the interesting regions, calculate if they defense

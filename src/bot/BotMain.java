@@ -181,7 +181,7 @@ public class BotMain implements Bot {
 					addToIntegerHashMap(available, currentOriginRegion.getId(), -disposed);
 
 					// add satisfaction
-					addToIntegerHashMap(satisfaction, currentFinalTargetRegion.getId(), disposed);
+					addToIntegerHashMap(satisfaction, currentFinalTargetRegion.getId(), -disposed);
 
 					// potentially add potentialattacks
 					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
@@ -190,7 +190,7 @@ public class BotMain implements Bot {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
 							addToIntegerHashMap(currentlyDefending, currentOriginRegion.getId(), disposed);
 							addPotentialAttacks(potentialAttacks, speculativeMap.getRegion(currentOriginRegion.getId()), availablePotential);
-							usePotentialAttacks(potentialAttacks, satisfaction, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
+							usePotentialAttacks(potentialAttacks, potentialAttackDecisions, speculativeMap, availablePotential, attackingAgainst,
 									startingEnemyForces, currentlyDefending, accountedLosses);
 							break;
 						}
@@ -288,10 +288,9 @@ public class BotMain implements Bot {
 
 	}
 
-	private void usePotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, HashMap<Integer, Integer> satisfaction,
-			HashMap<FromTo, Integer> potentialAttackDecisions, Map map, HashMap<Integer, Integer> availablePotential,
-			HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst, HashMap<Integer, Integer> startingEnemyForces,
-			HashMap<Integer, Integer> currentlyDefending, HashMap<FromTo, Integer> accountedLosses) {
+	private void usePotentialAttacks(ArrayList<PotentialAttack> potentialAttacks, HashMap<FromTo, Integer> potentialAttackDecisions, Map map,
+			HashMap<Integer, Integer> availablePotential, HashMap<Integer, HashMap<Integer, Integer>> attackingAgainst,
+			HashMap<Integer, Integer> startingEnemyForces, HashMap<Integer, Integer> currentlyDefending, HashMap<FromTo, Integer> accountedLosses) {
 		ArrayList<PotentialAttack> used = new ArrayList<PotentialAttack>();
 		for (PotentialAttack p : potentialAttacks) {
 			FromTo currentMove = new FromTo(p.getFrom(), p.getTo());
