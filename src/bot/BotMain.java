@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import commanders.*;
@@ -128,6 +129,18 @@ public class BotMain implements Bot {
 			Collections.sort(proposals);
 
 			for (int i = 0; i < proposals.size(); i++) {
+
+				// enable bamboozlement
+				int counter = 1;
+				int maxI = i;
+				while ((i + counter) < proposals.size() && proposals.get(i).getTarget() == proposals.get(i + counter).getTarget()
+						&& proposals.get(i).getWeight() == proposals.get(i + counter).getWeight()) {
+					maxI = (available.get(proposals.get(maxI).getOrigin().getId()) > available.get(proposals.get(i + counter).getOrigin().getId())) ?  maxI : i + counter;
+					counter++;
+					System.err.println("Determined potential other starting point for attack against: " + proposals.get(i).getTarget());
+				}
+				i = maxI;
+
 				ActionProposal currentProposal = proposals.get(i);
 				Region currentOriginRegion = speculativeMap.getRegion(currentProposal.getOrigin().getId());
 				Region currentTargetRegion = speculativeMap.getRegion(currentProposal.getTarget().getId());
@@ -257,16 +270,13 @@ public class BotMain implements Bot {
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				// if (decisions.get(f) == 1) {
-				// performedLast.add(0, new
-				// AttackTransferMove(BotState.getMyName(),
-				// appreciatedMap.getRegion(f.getR1()),
-				// appreciatedMap.getRegion(f.getR2()),
-				// decisions.get(f)));
-				// } else {
-				moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()), decisions
-						.get(f)));
-				// }
+				if (decisions.get(f) == 1) {
+					performedLast.add(0, new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
+							decisions.get(f)));
+				} else {
+					moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
+							decisions.get(f)));
+				}
 			}
 
 		}
