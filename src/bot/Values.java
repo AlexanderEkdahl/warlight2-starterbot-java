@@ -38,14 +38,14 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 13;
-	public static final double rewardDefenseImportanceMultiplier = 6;
+	public static final double rewardDefenseImportanceMultiplier = 7;
 	public static final double rewardDefenseInheritanceMultiplier = 0.3;
-	public static final double deficitDefenceExponentialMultiplier = 1.05;
+	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
 	// ////// COSTS
 
 	public static final double costUnitMultiplier = 13;
-	public static final double costMultiplierEnemy = (3 / 5) * costUnitMultiplier;
+	public static final double costMultiplierEnemy = (4 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
@@ -55,7 +55,7 @@ public class Values {
 	public static final double superRegionSizeExponentialPenalty = 1.12;
 	public static final double enemyVicinityExponentialPenalty = 1.25;
 	public static final double internalHopsExponentialPenalty = 1.1;
-	public static final double turnsNeededToTakeExponentialPenalty = 1.35;
+	public static final double turnsNeededToTakeExponentialPenalty = 1.3;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
 	// ////// PERFORMANCE

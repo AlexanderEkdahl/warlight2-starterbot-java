@@ -23,12 +23,19 @@ import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
+
+
 public class BotMain implements Bot {
+	public enum Situation{
+		CONFLICTED, ONESIDED
+	}
+	
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
 	private ArrayList<PlaceArmiesMove> placeOrders;
 	private ArrayList<AttackTransferMove> moveOrders;
+	private HashMap<Integer, Situation> situations;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
@@ -133,11 +140,13 @@ public class BotMain implements Bot {
 				// enable bamboozlement
 				int counter = 1;
 				int maxI = i;
-				while ((i + counter) < proposals.size() && proposals.get(i).getTarget() == proposals.get(i + counter).getTarget()
+				while ((i + counter) < proposals.size() && proposals.get(i).getPlan().getR() == proposals.get(i + counter).getPlan().getR()
 						&& proposals.get(i).getWeight() == proposals.get(i + counter).getWeight()) {
-					maxI = (available.get(proposals.get(maxI).getOrigin().getId()) > available.get(proposals.get(i + counter).getOrigin().getId())) ?  maxI : i + counter;
+					maxI = available.get(proposals.get(maxI).getOrigin().getId()) < available.get(proposals.get(i + counter).getOrigin().getId()) ? i + counter
+							: maxI;
 					counter++;
-					System.err.println("Determined potential other starting point for attack against: " + proposals.get(i).getTarget());
+					System.err.println("Determined potential other starting point: " + proposals.get(i + counter).getOrigin().getId() + " for attack against: "
+							+ proposals.get(i).getTarget().getId());
 				}
 				i = maxI;
 
