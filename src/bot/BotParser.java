@@ -44,7 +44,6 @@ public class BotParser {
 				output(Integer.toString(startingRegion.getId()));
 			} else if (parts[0].equals("go")) {
 				String output = "";
-
 				if (parts[1].equals("place_armies")) {
 					ArrayList<PlaceArmiesMove> placeArmiesMoves = bot
 							.getPlaceArmiesMoves(currentState,

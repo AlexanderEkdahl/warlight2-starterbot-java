@@ -53,7 +53,7 @@ public class Values {
 
 	public static final double staticRegionCost = 8;
 	public static final double superRegionSizeExponentialPenalty = 1.12;
-	public static final double enemyVicinityExponentialPenalty = 1.25;
+	public static final double enemyVicinityExponentialPenalty = 1.35;
 	public static final double internalHopsExponentialPenalty = 1.1;
 	public static final double turnsNeededToTakeExponentialPenalty = 1.3;
 	// public static final double multipleFrontExponentialPenalty = 1.1;

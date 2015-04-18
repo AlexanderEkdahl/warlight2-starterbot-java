@@ -14,7 +14,7 @@ import bot.Values;
 import concepts.ActionProposal;
 import concepts.Plan;
 
-public class GriefCommander implements TemplateCommander {
+public class GriefCommander {
 
 	private HashMap<SuperRegion, Double> calculateWorth(Map map) {
 		HashMap<SuperRegion, Double> worths = new HashMap<SuperRegion, Double>();
@@ -31,7 +31,6 @@ public class GriefCommander implements TemplateCommander {
 		return worths;
 	}
 
-	@Override
 	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
@@ -46,16 +45,12 @@ public class GriefCommander implements TemplateCommander {
 		for (Integer r : available) {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
-				if (path.getTarget().getPlayerName().equals(BotState.getMyName())){
-					continue;
-				}
 				double currentPathCost = path.getDistance();
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / currentPathCost;
 				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 				regionsAttacked.remove(0);
 				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
-
 				proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(),
 						path.getTarget().getSuperRegion()), "GriefCommander"));
 

@@ -36,6 +36,8 @@ public class BotMain implements Bot {
 	private ArrayList<PlaceArmiesMove> placeOrders;
 	private ArrayList<AttackTransferMove> moveOrders;
 	private HashMap<Integer, Situation> situations;
+	
+	private ArrayList<Region> pickableRegions;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
@@ -45,6 +47,7 @@ public class BotMain implements Bot {
 	}
 
 	public Region getStartingRegion(BotState state, Long timeOut) {
+
 		Region startPosition = Values.getBestStartRegion(state.getPickableStartingRegions(), state.getFullMap());
 		return startPosition;
 	}
@@ -140,8 +143,8 @@ public class BotMain implements Bot {
 				// enable bamboozlement
 				int counter = 1;
 				int maxI = i;
-				while ((i + counter) < proposals.size() && proposals.get(i).getPlan().getR() == proposals.get(i + counter).getPlan().getR()
-						&& proposals.get(i).getWeight() == proposals.get(i + counter).getWeight()) {
+				while ((i + counter) < proposals.size() && (proposals.get(i).getPlan().getR() == proposals.get(i + counter).getPlan().getR())
+						&& (proposals.get(i).getWeight() == proposals.get(i + counter).getWeight())) {
 					maxI = available.get(proposals.get(maxI).getOrigin().getId()) < available.get(proposals.get(i + counter).getOrigin().getId()) ? i + counter
 							: maxI;
 					counter++;

@@ -11,7 +11,10 @@
 package bot;
 
 import imaginary.IncomeAppreciator;
+
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import map.Map;
 import map.Region;
@@ -34,6 +37,8 @@ public class BotState {
 	private ArrayList<ArrayList<Move>> opponentMoves;
 	private static boolean isUsingIncomeAppreciator = true;
 	private IncomeAppreciator incomeAppreciator;
+
+	private Set<Integer> wasOncePickable = new HashSet<Integer>();
 
 	public BotState() {
 		roundNumber = 0;
@@ -59,6 +64,11 @@ public class BotState {
 			startingArmies = Integer.parseInt(value);
 			roundNumber++; // next round
 		} else if (key.equals("starting_regions")) {
+			for (String s : value.split(" ")) {
+				int id = Integer.parseInt(s);
+				wasOncePickable.add(id);
+			}
+			Tables.getInstance().introCalculation(map);
 			setRegularRegions();
 		}
 	}
@@ -98,7 +108,6 @@ public class BotState {
 	}
 
 	public void setPickableStartingRegions(String[] mapInput) {
-		Tables.getInstance().introCalculation(map);
 		pickableStartingRegions = new ArrayList<Region>();
 		for (int i = 2; i < mapInput.length; i++) {
 			try {
@@ -109,19 +118,28 @@ public class BotState {
 				System.err.println("Unable to parse pickable regions " + e.getMessage());
 			}
 		}
+		for (Integer i : wasOncePickable) {
+			if (!pickableStartingRegions.contains(map.getRegion(i)) && !map.getRegion(i).getPlayerName().equals(BotState.getMyName())) {
+				map.getRegion(i).setPlayerName(BotState.getMyOpponentName());
+				System.err.println("Determined that enemy has picked region " + i);
+			}
+		}
 	}
 
 	// visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput) {
-		if (map.getRegionList().size() < 70){
+		if (map.getRegionList().size() < 70) {
 			isUsingIncomeAppreciator = true;
 			incomeAppreciator.updateMap();
-		}
-		else{
+		} else {
 			isUsingIncomeAppreciator = false;
 		}
-		
+
 		map.updateMap(mapInput);
+		if (isUsingIncomeAppreciator) {
+			incomeAppreciator.updateMoves();
+			System.err.println("Enemy income: " + incomeAppreciator.income());
+		}
 	}
 
 	public void readOpponentMoves(String[] moveInput) {
@@ -154,11 +172,11 @@ public class BotState {
 				System.err.println("Unable to parse Opponent moves " + e.getMessage());
 			}
 		}
-		if (isUsingIncomeAppreciator){
-			incomeAppreciator.updateMoves();
-			System.err.println("Enemy income: " + incomeAppreciator.income());
-		}
-		
+		// if (isUsingIncomeAppreciator){
+		// incomeAppreciator.updateMoves();
+		// System.err.println("Enemy income: " + incomeAppreciator.income());
+		// }
+
 	}
 
 	public String getMyPlayerName() {
@@ -194,7 +212,10 @@ public class BotState {
 	}
 
 	public ArrayList<Move> getOpponentMoves(int round) {
-		return opponentMoves.get(round - 1);
+		if (round < 2){
+			return new ArrayList<Move>();
+		}
+		return opponentMoves.get(round - 2);
 	}
 
 	public static boolean isUsingIncomeAppreciator() {
