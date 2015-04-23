@@ -68,9 +68,13 @@ public class OffensiveCommander  {
 
 	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map) {
 		double worth = superRegionWorths.get(path.getTarget().getSuperRegion()) + regionWorths.get(path.getTarget());
-		double cost = path.getDistance() - Values.calculateRegionWeighedCost(path.getTarget())
+		double currentCost = 0;
+		for (int i = 1; i< path.getPath().size(); i++){
+			currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
+		}
+		currentCost += - Values.calculateRegionWeighedCost(path.getTarget())
 				+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
-		double weight = worth / cost;
+		double weight = worth / currentCost;
 
 		return weight;
 	}

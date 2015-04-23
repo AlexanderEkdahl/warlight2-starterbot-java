@@ -45,7 +45,10 @@ public class GriefCommander {
 		for (Integer r : available) {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
-				double currentPathCost = path.getDistance();
+				double currentPathCost = 0;
+				for (int i = 1; i< path.getPath().size(); i++){
+					currentPathCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
+				}
 				double currentWorth = ranking.get(path.getTarget().getSuperRegion());
 				currentWeight = currentWorth / currentPathCost;
 				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());

@@ -119,7 +119,7 @@ public class DefensiveCommander {
 		for (Integer r : available) {
 			if (needDefence.get(r) != null && needDefence.get(r) > 0) {
 				int disposed = needDefence.get(r);
-				if (Values.defensiveCommanderUseSmallPlacements) {
+				if (Values.tryToUseSmallDefensivePlacements && Values.defensiveCommanderUseSmallPlacements) {
 					disposed = 1;
 				}
 				double weight = calculateWeight(map.getRegion(r), regionWorths, regionCosts, needDefence);
@@ -134,7 +134,10 @@ public class DefensiveCommander {
 					if (totalRequired < 1) {
 						continue;
 					}
-					double currentCost = path.getDistance() + regionCosts.get(path.getTarget());
+					double currentCost = regionCosts.get(path.getTarget());
+					for (int i = 1; i< path.getPath().size(); i++){
+						currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
+					}
 					double currentWorth = regionWorths.get(path.getTarget());
 					double currentWeight = currentWorth / currentCost;
 					ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());

@@ -10,6 +10,7 @@ import commanders.OffensiveCommander;
 import concepts.Outcome;
 import map.Map;
 import map.Pathfinder;
+import map.Pathfinder.Path;
 import map.Region;
 import map.SuperRegion;
 import math.Tables;
@@ -27,6 +28,7 @@ public class Values {
 	// //// MODES
 
 	public static final DefenseMode defenseMode = DefenseMode.ALL;
+	public static final boolean tryToUseSmallDefensivePlacements = false;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -34,28 +36,28 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 220;
+	public static final double rewardMultiplier = 300;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 13;
 	public static final double rewardDefenseImportanceMultiplier = 7;
-	public static final double rewardDefenseInheritanceMultiplier = 0.3;
-	public static final double deficitDefenceExponentialMultiplier = 1.03;
+	public static final double rewardDefenseInheritanceMultiplier = 0.45;
+	public static final double deficitDefenceExponentialMultiplier = 1;
 
 	// ////// COSTS
 
 	public static final double costUnitMultiplier = 13;
-	public static final double costMultiplierEnemy = (4 / 5) * costUnitMultiplier;
+	public static final double costMultiplierEnemy = (7 / 10) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 8;
-	public static final double superRegionSizeExponentialPenalty = 1.12;
-	public static final double enemyVicinityExponentialPenalty = 1.35;
+	public static final double staticRegionCost = 7;
+	public static final double superRegionSizeExponentialPenalty = 1.1;
+	public static final double enemyVicinityExponentialPenalty = 1.3;
 	public static final double internalHopsExponentialPenalty = 1.1;
-	public static final double turnsNeededToTakeExponentialPenalty = 1.3;
+	public static final double turnsNeededToTakeExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
 	// ////// PERFORMANCE
@@ -218,9 +220,15 @@ public class Values {
 			}
 		}
 		int nbr = enemyNeighbors.size();
-		if (nbr < 0) {
+		if (nbr < 1) {
 			Pathfinder pathfinder = Pathfinder.getSimplePathfinder(map);
-			nbr = (int) pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(sr, BotState.getMyOpponentName()).getDistance();
+			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(sr, BotState.getMyOpponentName());
+			if (path == null){
+				nbr = 1;
+			}
+			else{
+				nbr = - (path.getPath().size()-1) / 2;
+			}
 		}
 		Tables table = Tables.getInstance();
 		return table.getEnemyVicinityExponentialPenaltyFor(nbr);

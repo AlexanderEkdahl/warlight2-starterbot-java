@@ -76,7 +76,7 @@ public class Tables {
 
 	private double determineOut(int i, double[] array) {
 		i = Math.max(minCalc, Math.min(i, maxCalc));
-		double returnValue = (i<0) ? 1/array[i] : array[i];
+		double returnValue = (i<0) ? 1/array[-i] : array[i];
 		return returnValue;
 		
 	}
