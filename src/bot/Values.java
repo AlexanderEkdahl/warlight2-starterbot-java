@@ -28,7 +28,7 @@ public class Values {
 	// //// MODES
 
 	public static final DefenseMode defenseMode = DefenseMode.ALL;
-	public static final boolean tryToUseSmallDefensivePlacements = false;
+	public static final boolean tryToUseSmallDefensivePlacements = true;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -36,11 +36,11 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 300;
+	public static final double rewardMultiplier = 250;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
-	public static final double valueDenialMultiplier = 13;
-	public static final double rewardDefenseImportanceMultiplier = 7;
+	public static final double valueDenialMultiplier = 20;
+	public static final double rewardDefenseImportanceMultiplier = 45;
 	public static final double rewardDefenseInheritanceMultiplier = 0.45;
 	public static final double deficitDefenceExponentialMultiplier = 1;
 
@@ -53,10 +53,10 @@ public class Values {
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 
-	public static final double staticRegionCost = 7;
+	public static final double staticRegionCost = 6;
 	public static final double superRegionSizeExponentialPenalty = 1.1;
-	public static final double enemyVicinityExponentialPenalty = 1.3;
-	public static final double internalHopsExponentialPenalty = 1.1;
+	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double internalHopsExponentialPenalty = 1.05;
 	public static final double turnsNeededToTakeExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
 
