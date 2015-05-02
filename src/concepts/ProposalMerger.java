@@ -10,7 +10,7 @@ import map.SuperRegion;
 
 public class ProposalMerger {
 
-	public static ArrayList<TemplateProposal> merge(
+	public static ArrayList<TemplateProposal> adjust(
 			ArrayList<TemplateProposal> list1, ArrayList<TemplateProposal> list2) {
 		ArrayList<TemplateProposal> mergedProposals = new ArrayList<TemplateProposal>();
 

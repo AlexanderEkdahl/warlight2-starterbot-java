@@ -27,8 +27,8 @@ public class Values {
 
 	// //// MODES
 
-	public static final DefenseMode defenseMode = DefenseMode.ALL;
-	public static final boolean tryToUseSmallDefensivePlacements = true;
+	public static final DefenseMode defenseMode = DefenseMode.MAX_ONLY;
+	public static final boolean tryToUseSmallDefensivePlacements = false;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -40,14 +40,14 @@ public class Values {
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 20;
-	public static final double rewardDefenseImportanceMultiplier = 45;
+	public static final double rewardDefenseImportanceMultiplier = 7;
 	public static final double rewardDefenseInheritanceMultiplier = 0.45;
-	public static final double deficitDefenceExponentialMultiplier = 1;
+	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
 	// ////// COSTS
 
 	public static final double costUnitMultiplier = 13;
-	public static final double costMultiplierEnemy = (7 / 10) * costUnitMultiplier;
+	public static final double costMultiplierEnemy = (4 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;

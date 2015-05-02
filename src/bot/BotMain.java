@@ -77,7 +77,7 @@ public class BotMain implements Bot {
 
 	}
 
-	private ArrayList<ActionProposal> getProposals(Map map, Set<Integer> available, HashMap<Integer, Integer> currentlyDefending) {
+	private ArrayList<ActionProposal> generateProposals(Map map, Set<Integer> available, HashMap<Integer, Integer> currentlyDefending) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
@@ -134,7 +134,7 @@ public class BotMain implements Bot {
 			if (armiesLeft < 1) {
 				interestingKeys = getInteresting(available);
 			}
-			proposals = getProposals(speculativeMap, interestingKeys, currentlyDefending);
+			proposals = generateProposals(speculativeMap, interestingKeys, currentlyDefending);
 
 			Collections.sort(proposals);
 
@@ -176,7 +176,6 @@ public class BotMain implements Bot {
 						if (required < 1) {
 							continue;
 						}
-
 					}
 
 					// potentially place new forces

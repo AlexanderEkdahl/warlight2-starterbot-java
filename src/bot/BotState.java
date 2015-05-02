@@ -138,7 +138,7 @@ public class BotState {
 		map.updateMap(mapInput);
 		if (isUsingIncomeAppreciator) {
 			incomeAppreciator.updateMoves();
-			System.err.println("Enemy income: " + incomeAppreciator.income());
+			System.err.println("IncomeAppreciator: Enemy income: " + incomeAppreciator.income());
 		}
 	}
 

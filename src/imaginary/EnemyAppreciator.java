@@ -176,11 +176,11 @@ public class EnemyAppreciator {
 			totalArmies = IncomeAppreciator.getIncome();
 			return totalArmies;
 		} else {
-			System.err.println("EnemyAppreciator is NOT using incomeAppreciator");
 			totalArmies = 5;
 			for (SuperRegion s : speculativeMap.getSuspectedOwnedSuperRegions(BotState.getMyOpponentName())) {
 				totalArmies += s.getArmiesReward();
 			}
+			System.err.println("EnemyAppreciator: Enemy income: " + totalArmies);
 
 		}
 
