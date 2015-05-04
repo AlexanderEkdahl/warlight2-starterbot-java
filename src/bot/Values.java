@@ -27,8 +27,8 @@ public class Values {
 
 	// //// MODES
 
-	public static final DefenseMode defenseMode = DefenseMode.MAX_ONLY;
-	public static final boolean tryToUseSmallDefensivePlacements = false;
+	public static final DefenseMode defenseMode = DefenseMode.ALL;
+	public static final boolean tryToUseSmallDefensivePlacements = true;
 
 	// ////// REQUIRED FORCES FOR CERTAIN ACTIONS
 	public static final int unknownRegionAppreciatedRequiredForcesAttack = 3;
@@ -36,11 +36,11 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 250;
+	public static final double rewardMultiplier = 200;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 20;
-	public static final double rewardDefenseImportanceMultiplier = 7;
+	public static final double rewardDefenseImportanceMultiplier = 20;
 	public static final double rewardDefenseInheritanceMultiplier = 0.45;
 	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
@@ -52,9 +52,10 @@ public class Values {
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownNeutral = costMultiplierNeutral * 2;
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
+	public static final double needsPlacementPenalty = 2;
 
-	public static final double staticRegionCost = 6;
-	public static final double superRegionSizeExponentialPenalty = 1.1;
+	public static final double staticRegionCost = 8;
+	public static final double superRegionSizeExponentialPenalty = 1.12;
 	public static final double enemyVicinityExponentialPenalty = 1.2;
 	public static final double internalHopsExponentialPenalty = 1.05;
 	public static final double turnsNeededToTakeExponentialPenalty = 1.2;
@@ -350,7 +351,6 @@ public class Values {
 		int total = 0;
 		int left = 0;
 		int currentRequired = 0;
-
 		for (Region r : path) {
 			if (!r.getPlayerName().equals(BotState.getMyName())) {
 				currentRequired = calculateRequiredForcesAttack(r) - left;
@@ -359,13 +359,22 @@ public class Values {
 				total += currentRequired;
 			}
 		}
-
 		return total;
 
 	}
 
 	public static int calculateRequiredForcesForSuperRegion(SuperRegion s) {
 		return (calculateRequiredForcesForRegions(s.getSubRegions()));
+	}
+	
+	public static double calculatePathCost(ArrayList<Region> regions, int totalRequired, int available){
+		double currentPathCost = 0;
+		for (Region r : regions){
+			currentPathCost += calculateRegionWeighedCost(r);
+		}
+		int needPlaced = Math.max(0, totalRequired - available);
+		currentPathCost += needPlaced * Values.needsPlacementPenalty;
+		return currentPathCost;
 	}
 
 }

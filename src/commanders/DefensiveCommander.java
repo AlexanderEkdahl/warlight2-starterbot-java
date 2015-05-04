@@ -17,12 +17,10 @@ import bot.Values;
 
 public class DefensiveCommander {
 
-	private double calculateWeight(Region r, HashMap<Region, Double> regionWorths, HashMap<Region, Double> regionCosts, HashMap<Integer, Integer> needDefence) {
+	private double calculateWorth(Region r, HashMap<Region, Double> regionWorths,HashMap<Integer, Integer> needDefence) {
 		Tables tables = Tables.getInstance();
 		double worth = tables.getDeficitDefenceExponentialMultiplierFor(needDefence.get(r.getId())) * regionWorths.get(r);
-		double cost = regionCosts.get(r);
-		double weight = worth / cost;
-		return weight;
+		return worth;
 	}
 
 	private double calculateWorth(SuperRegion s) {
@@ -60,7 +58,7 @@ public class DefensiveCommander {
 						regionCosts.put(r, regionCosts.get(n));
 					} else {
 						regionWorths.put(r, regionWorths.get(r) + (regionWorths.get(n) * Values.rewardDefenseInheritanceMultiplier));
-						regionCosts.put(r, regionCosts.get(n) + regionCosts.get(r));
+						regionCosts.put(r, regionCosts.get(r));
 					}
 
 					if (!inherited.contains(r)) {
@@ -82,7 +80,8 @@ public class DefensiveCommander {
 		return inherited;
 	}
 
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder, HashMap<Integer, Integer> currentlyDefending) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> interesting, Pathfinder pathfinder, HashMap<Integer, Integer> currentlyDefending,
+			HashMap<Integer, Integer> availableForces) {
 
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		ArrayList<Region> interestingFronts = map.getOwnedSuperRegionFrontRegions();
@@ -104,7 +103,6 @@ public class DefensiveCommander {
 			}
 		}
 
-		
 		// add inheritancedefence
 		ArrayList<Region> inheritedDefenceRegions = calculateDefenceInheritance(map, regionWorths, regionCosts);
 		interestingFronts.addAll(inheritedDefenceRegions);
@@ -116,33 +114,34 @@ public class DefensiveCommander {
 
 		}
 
-		for (Integer r : available) {
+		for (Integer r : interesting) {
 			if (needDefence.get(r) != null && needDefence.get(r) > 0) {
 				int disposed = needDefence.get(r);
 				if (Values.tryToUseSmallDefensivePlacements && Values.defensiveCommanderUseSmallPlacements) {
 					disposed = 1;
 				}
-				double weight = calculateWeight(map.getRegion(r), regionWorths, regionCosts, needDefence);
+				double worth = calculateWorth(map.getRegion(r), regionWorths,needDefence);
+
+				int needPlaced = disposed;
+				double currentCost = regionCosts.get(map.getRegion(r));
+				double weight = worth / currentCost;
 				proposals.add(new ActionProposal(weight, map.getRegion(r), map.getRegion(r), disposed, new Plan(map.getRegion(r), map.getRegion(r)
 						.getSuperRegion()), "DefensiveCommander"));
-			}
-
-			else {
+			} else {
 				ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(map.getRegion(r), interestingFronts);
 				for (Path path : paths) {
 					int totalRequired = needDefence.get(path.getTarget().getId());
 					if (totalRequired < 1) {
 						continue;
 					}
-					double currentCost = regionCosts.get(path.getTarget());
-					for (int i = 1; i< path.getPath().size(); i++){
-						currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
-					}
-					double currentWorth = regionWorths.get(path.getTarget());
-					double currentWeight = currentWorth / currentCost;
 					ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 					regionsAttacked.remove(0);
 					totalRequired += Values.calculateRequiredForcesForRegions(regionsAttacked);
+					totalRequired = Math.min(availableForces.get(r), totalRequired);
+					double currentCost = Values.calculatePathCost(regionsAttacked, totalRequired, availableForces.get(r));
+					double currentWorth = calculateWorth(path.getTarget(), regionWorths, needDefence);
+					double currentWeight = currentWorth / currentCost;
+
 					proposals.add(new ActionProposal(currentWeight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path
 							.getTarget().getSuperRegion()), "DefensiveCommander"));
 

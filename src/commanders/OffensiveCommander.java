@@ -46,7 +46,7 @@ public class OffensiveCommander  {
 		ArrayList<Path> paths = pathfinder.getPathToRegionsFromRegion(region, map.getUnOwnedRegions());
 
 		for (Path path : paths) {
-			double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
+			double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map, 0, 0);
 			if (weight > maxWeight) {
 				maxWeight = weight;
 			}
@@ -66,14 +66,19 @@ public class OffensiveCommander  {
 		return worths;
 	}
 
-	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map) {
+	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map, int totalRequired, int available) {
 		double worth = superRegionWorths.get(path.getTarget().getSuperRegion()) + regionWorths.get(path.getTarget());
-		double currentCost = 0;
-		for (int i = 1; i< path.getPath().size(); i++){
-			currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
-		}
+		ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
+		regionsAttacked.remove(0);
+		double currentCost = Values.calculatePathCost(regionsAttacked, totalRequired, available);
+//		for (int i = 1; i< path.getPath().size(); i++){
+//			currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
+//		}
 		currentCost += - Values.calculateRegionWeighedCost(path.getTarget())
 				+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
+//		int needPlaced = Math.max(0, totalRequired - path.getOrigin().getArmies());
+//		currentCost += needPlaced * Values.needsPlacementPenalty;
+		
 		double weight = worth / currentCost;
 
 		return weight;
@@ -93,7 +98,7 @@ public class OffensiveCommander  {
 		return worth;
 	}
 
-	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> available, Pathfinder pathfinder) {
+	public ArrayList<ActionProposal> getActionProposals(Map map, Set<Integer> availableRegions, Pathfinder pathfinder, HashMap<Integer, Integer> availableForces) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 		HashMap<SuperRegion, Double> superRegionWorths = calculateSuperRegionWorth(map);
 		HashMap<Region, Double> regionWorths = calculateRegionWorth(map);
@@ -101,13 +106,14 @@ public class OffensiveCommander  {
 
 		// calculate plans for every sector
 
-		for (Integer r : available) {
+		for (Integer r : availableRegions) {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
-				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map);
 				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
-				regionsAttacked.remove(0);
 				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
+				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map, totalRequired, availableForces.get(r));
+				regionsAttacked.remove(0);
+//				weight /=
 				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired,
 						new Plan(path.getTarget(), path.getTarget().getSuperRegion()), "OffensiveCommander"));
 

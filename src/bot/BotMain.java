@@ -23,21 +23,17 @@ import map.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
-
-
 public class BotMain implements Bot {
-	public enum Situation{
+	public enum Situation {
 		CONFLICTED, ONESIDED
 	}
-	
+
 	private OffensiveCommander oc;
 	private DefensiveCommander dc;
 	private GriefCommander gc;
 	private ArrayList<PlaceArmiesMove> placeOrders;
 	private ArrayList<AttackTransferMove> moveOrders;
 	private HashMap<Integer, Situation> situations;
-	
-	private ArrayList<Region> pickableRegions;
 
 	public BotMain() {
 		oc = new OffensiveCommander();
@@ -77,7 +73,8 @@ public class BotMain implements Bot {
 
 	}
 
-	private ArrayList<ActionProposal> generateProposals(Map map, Set<Integer> available, HashMap<Integer, Integer> currentlyDefending) {
+	private ArrayList<ActionProposal> generateProposals(Map map, Set<Integer> interesting, HashMap<Integer, Integer> currentlyDefending,
+			HashMap<Integer, Integer> available) {
 		ArrayList<ActionProposal> proposals = new ArrayList<ActionProposal>();
 
 		Pathfinder pathfinder = new Pathfinder(map, new PathfinderWeighter() {
@@ -87,9 +84,9 @@ public class BotMain implements Bot {
 			}
 		});
 
-		proposals.addAll(oc.getActionProposals(map, available, pathfinder));
-		proposals.addAll(gc.getActionProposals(map, available, pathfinder));
-		proposals.addAll(dc.getActionProposals(map, available, pathfinder, currentlyDefending));
+		proposals.addAll(oc.getActionProposals(map, interesting, pathfinder, available));
+		proposals.addAll(gc.getActionProposals(map, interesting, pathfinder, available));
+		proposals.addAll(dc.getActionProposals(map, interesting, pathfinder, currentlyDefending, available));
 
 		return proposals;
 	}
@@ -134,24 +131,31 @@ public class BotMain implements Bot {
 			if (armiesLeft < 1) {
 				interestingKeys = getInteresting(available);
 			}
-			proposals = generateProposals(speculativeMap, interestingKeys, currentlyDefending);
+			proposals = generateProposals(speculativeMap, interestingKeys, currentlyDefending, available);
 
 			Collections.sort(proposals);
 
 			for (int i = 0; i < proposals.size(); i++) {
 
 				// enable bamboozlement
-				int counter = 1;
-				int maxI = i;
-				while ((i + counter) < proposals.size() && (proposals.get(i).getPlan().getR() == proposals.get(i + counter).getPlan().getR())
-						&& (proposals.get(i).getWeight() == proposals.get(i + counter).getWeight())) {
-					maxI = available.get(proposals.get(maxI).getOrigin().getId()) < available.get(proposals.get(i + counter).getOrigin().getId()) ? i + counter
-							: maxI;
-					counter++;
-					System.err.println("Determined potential other starting point: " + proposals.get(i + counter).getOrigin().getId() + " for attack against: "
-							+ proposals.get(i).getTarget().getId());
-				}
-				i = maxI;
+				// int counter = 1;
+				// int maxI = i;
+				// while ((i + counter) < proposals.size()-1 &&
+				// (proposals.get(i).getPlan().getR() == proposals.get(i +
+				// counter).getPlan().getR())
+				// && (proposals.get(i).getWeight() == proposals.get(i +
+				// counter).getWeight())) {
+				// maxI = available.get(proposals.get(maxI).getOrigin().getId())
+				// < available.get(proposals.get(i +
+				// counter).getOrigin().getId()) ? i + counter
+				// : maxI;
+				// counter++;
+				// System.err.println("Determined potential other starting point: "
+				// + proposals.get(i + counter).getOrigin().getId() +
+				// " for attack against: "
+				// + proposals.get(i).getTarget().getId());
+				// }
+				// i = maxI;
 
 				ActionProposal currentProposal = proposals.get(i);
 				Region currentOriginRegion = speculativeMap.getRegion(currentProposal.getOrigin().getId());
@@ -208,7 +212,7 @@ public class BotMain implements Bot {
 					addToIntegerHashMap(satisfaction, currentFinalTargetRegion.getId(), -disposed);
 
 					// potentially add potentialattacks
-					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND)) {
+					if (currentProposal.getPlan().getActionType().equals(ActionType.DEFEND) && currentProposal.getOrigin().equals(currentProposal.getTarget())) {
 						// attack is the best defence
 						if (currentOriginRegion.equals(currentFinalTargetRegion)) {
 							addToIntegerHashMap(availablePotential, currentOriginRegion.getId(), disposed);
