@@ -12,7 +12,7 @@ import bot.Values;
 import map.*;
 import map.Pathfinder.Path;
 
-public class OffensiveCommander  {
+public class OffensiveCommander {
 
 	public static Region determineStartPosition(ArrayList<Region> possiblePicks, Map map) {
 		Region maxRegion = null;
@@ -66,19 +66,26 @@ public class OffensiveCommander  {
 		return worths;
 	}
 
-	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map, int totalRequired, int available) {
+	private static double calculatePathWeight(Path path, HashMap<SuperRegion, Double> superRegionWorths, HashMap<Region, Double> regionWorths, Map map,
+			int totalRequired, int available) {
 		double worth = superRegionWorths.get(path.getTarget().getSuperRegion()) + regionWorths.get(path.getTarget());
 		ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
 		regionsAttacked.remove(0);
 		double currentCost = Values.calculatePathCost(regionsAttacked, totalRequired, available);
-//		for (int i = 1; i< path.getPath().size(); i++){
-//			currentCost += Values.calculateRegionWeighedCost(path.getPath().get(i));
-//		}
-		currentCost += - Values.calculateRegionWeighedCost(path.getTarget())
-				+ Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
-//		int needPlaced = Math.max(0, totalRequired - path.getOrigin().getArmies());
-//		currentCost += needPlaced * Values.needsPlacementPenalty;
-		
+		// for (int i = 1; i< path.getPath().size(); i++){
+		// currentCost +=
+		// Values.calculateRegionWeighedCost(path.getPath().get(i));
+		// }
+		for (Region r : regionsAttacked) {
+			if (r.getSuperRegion().equals(path.getTarget().getSuperRegion())) {
+				currentCost -= Values.calculateRegionInitialCost(r);
+			}
+		}
+		currentCost += Values.calculateSuperRegionWeighedCost(path.getTarget().getSuperRegion(), map);
+		// int needPlaced = Math.max(0, totalRequired -
+		// path.getOrigin().getArmies());
+		// currentCost += needPlaced * Values.needsPlacementPenalty;
+
 		double weight = worth / currentCost;
 
 		return weight;
@@ -110,12 +117,12 @@ public class OffensiveCommander  {
 			paths = pathfinder.getPathToAllRegionsNotOwnedByPlayerFromRegion(map.getRegion(r), BotState.getMyName());
 			for (Path path : paths) {
 				ArrayList<Region> regionsAttacked = new ArrayList<Region>(path.getPath());
+				regionsAttacked.remove(0);
 				int totalRequired = Values.calculateRequiredForcesForRegions(regionsAttacked);
 				double weight = calculatePathWeight(path, superRegionWorths, regionWorths, map, totalRequired, availableForces.get(r));
-				regionsAttacked.remove(0);
-//				weight /=
-				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired,
-						new Plan(path.getTarget(), path.getTarget().getSuperRegion()), "OffensiveCommander"));
+				// weight /=
+				proposals.add(new ActionProposal(weight, map.getRegion(r), path.getPath().get(1), totalRequired, new Plan(path.getTarget(), path.getTarget()
+						.getSuperRegion()), "OffensiveCommander"));
 
 			}
 

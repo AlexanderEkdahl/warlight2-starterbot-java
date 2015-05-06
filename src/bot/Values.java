@@ -36,17 +36,17 @@ public class Values {
 
 	// ////// REWARDS
 
-	public static final double rewardMultiplier = 200;
+	public static final double rewardMultiplier = 210;
 	public static final double regionConnectionBonus = 0.2;
 	public static final double staticRegionBonus = 0;
 	public static final double valueDenialMultiplier = 20;
-	public static final double rewardDefenseImportanceMultiplier = 20;
+	public static final double rewardDefenseImportanceMultiplier = 25;
 	public static final double rewardDefenseInheritanceMultiplier = 0.45;
 	public static final double deficitDefenceExponentialMultiplier = 1.03;
 
 	// ////// COSTS
 
-	public static final double costUnitMultiplier = 13;
+	public static final double costUnitMultiplier = 14;
 	public static final double costMultiplierEnemy = (4 / 5) * costUnitMultiplier;
 	public static final double costMultiplierNeutral = 1 * costUnitMultiplier;
 	public static final double staticCostUnknown = costMultiplierNeutral * 2;
@@ -54,9 +54,9 @@ public class Values {
 	public static final double staticCostUnknownEnemy = costMultiplierEnemy * 2;
 	public static final double needsPlacementPenalty = 2;
 
-	public static final double staticRegionCost = 8;
-	public static final double superRegionSizeExponentialPenalty = 1.12;
-	public static final double enemyVicinityExponentialPenalty = 1.2;
+	public static final double staticRegionCost = 9;
+	public static final double superRegionSizeExponentialPenalty = 1.14;
+	public static final double enemyVicinityExponentialPenalty = 1.12;
 	public static final double internalHopsExponentialPenalty = 1.05;
 	public static final double turnsNeededToTakeExponentialPenalty = 1.2;
 	// public static final double multipleFrontExponentialPenalty = 1.1;
@@ -118,7 +118,7 @@ public class Values {
 	}
 
 	@SuppressWarnings("null")
-	private static double calculateRegionInitialCost(Region r) {
+	public static double calculateRegionInitialCost(Region r) {
 		if (r.getPlayerName().equals(BotState.getMyName())) {
 			return 0;
 		}
@@ -224,11 +224,10 @@ public class Values {
 		if (nbr < 1) {
 			Pathfinder pathfinder = Pathfinder.getSimplePathfinder(map);
 			Path path = pathfinder.getPathToSuperRegionFromRegionOwnedByPlayer(sr, BotState.getMyOpponentName());
-			if (path == null){
+			if (path == null) {
 				nbr = 1;
-			}
-			else{
-				nbr = - (path.getPath().size()-1) / 2;
+			} else {
+				nbr = -(path.getPath().size() - 1) / 2;
 			}
 		}
 		Tables table = Tables.getInstance();
@@ -366,10 +365,10 @@ public class Values {
 	public static int calculateRequiredForcesForSuperRegion(SuperRegion s) {
 		return (calculateRequiredForcesForRegions(s.getSubRegions()));
 	}
-	
-	public static double calculatePathCost(ArrayList<Region> regions, int totalRequired, int available){
+
+	public static double calculatePathCost(ArrayList<Region> regions, int totalRequired, int available) {
 		double currentPathCost = 0;
-		for (Region r : regions){
+		for (Region r : regions) {
 			currentPathCost += calculateRegionWeighedCost(r);
 		}
 		int needPlaced = Math.max(0, totalRequired - available);
