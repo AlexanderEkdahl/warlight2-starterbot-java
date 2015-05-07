@@ -281,23 +281,27 @@ public class BotMain implements Bot {
 			}
 		}
 
-		ArrayList<AttackTransferMove> performedLast = new ArrayList<AttackTransferMove>();
+		// ArrayList<AttackTransferMove> performedLast = new
+		// ArrayList<AttackTransferMove>();
 		keys = decisions.keySet();
 		for (FromTo f : keys) {
 			if (!badAttacks.contains(f.getR2())) {
-				if (decisions.get(f) == 1) {
-					performedLast.add(0, new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
-							decisions.get(f)));
-				} else {
-					moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()),
-							decisions.get(f)));
-				}
+				// if (decisions.get(f) == 1) {
+				// performedLast.add(0, new
+				// AttackTransferMove(BotState.getMyName(),
+				// appreciatedMap.getRegion(f.getR1()),
+				// appreciatedMap.getRegion(f.getR2()),
+				// decisions.get(f)));
+				// } else {
+				moveOrders.add(new AttackTransferMove(BotState.getMyName(), appreciatedMap.getRegion(f.getR1()), appreciatedMap.getRegion(f.getR2()), decisions
+						.get(f)));
+				// }
 			}
 
 		}
-		for (AttackTransferMove a : performedLast) {
-			moveOrders.add(a);
-		}
+		// for (AttackTransferMove a : performedLast) {
+		// moveOrders.add(a);
+		// }
 
 		System.err.println("Placements:");
 		for (Integer i : placeDecisions.keySet()) {
